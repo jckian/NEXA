@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-SCI-Arc Spring 2026 research: agent-based distribution of architectural program spaces, visualized as single-file Three.js HTML apps plus a Python simulation. Case studies: OMA TPAC, Jean Nouvel 53W53. **Not a git repo** — `BACKUP/` holds old versions by copy.
+SCI-Arc Spring 2026 research: agent-based distribution of architectural program spaces, visualized as single-file Three.js HTML apps plus a Python simulation. Case studies: OMA TPAC, Jean Nouvel 53W53. **Now a public git repo** — `jckian/NEXA` (pushed 260717, MIT). `BACKUP/` still holds old versions by copy and is gitignored (along with `node_modules/`, `my-video/`, `RENDER/`, `forVideo/`, `VORO/`, `fileTransfer/`). Commit only when the user asks.
 
 ## ⚠️ Before touching files
 
