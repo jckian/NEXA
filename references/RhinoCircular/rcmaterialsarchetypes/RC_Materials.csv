@@ -1,0 +1,36 @@
+Name,,,,,,,,,,
+Pine Wood,f6fb517e-8d30-46fa-bb9d-53c065288204,Timber,513,0,1,0.85,0.03,0.18,0.06,0.8
+Douglas Fir,d62d58c4-dc07-4c96-bd6a-251f17edc019,Timber,530,0,1,0.85,0.03,0.18,0.06,0.8
+Oak,b05e8126-8c02-49c5-a5e2-fd5adf520a98,Timber,466,0,1,0.85,0.03,0.18,0.06,0.8
+Spruce,1fabf1d1-91da-4671-9253-4cf8af937c1f,Timber,525,0,1,0.85,0.03,0.18,0.06,0.8
+Larch,88099eb6-62c9-4197-9580-badca0d1bcd7,Timber,570,0,1,0.85,0.03,0.18,0.06,0.8
+Oriented Strand Board,a2a1c849-490b-41f1-88f1-ea0d22ef3a10,Timber,620,0,0.96,0.75,0,0.18,0,0.75
+Medium Density Fiberboard,62ee9e1f-e2a8-4cd5-bb31-50787de37f7d,Timber,782,0.9,0,0.97,0,0.18,0,0.75
+Concrete,9c3b513d-38e2-4799-b1e8-ddb16b21cbc2,Mineral,2400,0,0,0.97,0.82,0,0,0.75
+Light Weight Concrete,1c7ebeca-397e-4761-b610-d57331e200d9,Mineral,1750,0,0,0.97,0.82,0,0,0.75
+Recycling Concrete,69fba4a5-0393-4dbe-9d9d-630a983323a3,Mineral,1773,0.3,0,0.75,0.21,0,0,0.75
+Concrete Hollow Block,a30d0d11-6c6a-4ee8-9227-3fd703890df1,Mineral,1900,0.26,0,0.75,0.82,0,0,0.75
+Asphalt Shingles,442c5a1b-64df-47c5-947f-9b3e8297dc68,Mineral,2478,0,0.08,0.75,0.14,0.01,0,0.75
+Cement Screed,1afb6c27-50e6-4fe3-95fd-1a2290c4ceff,Mineral,2000,0.04,0,0.75,0.82,0,0,0.75
+Brick,11fbecb9-ed46-4505-9fac-cf1f9e4feddd,Mineral,2120,0,0,0.75,0.13,0,0,0.75
+Adobe,7c16e61e-2962-4c01-b61e-461d4b6c7761,Mineral,1464,0,0,0.9,0.8,0,0,0.9
+Rammed Earth,bc7cf3a9-67c7-47a3-8644-5e75c2e5d5b6,Mineral,1950,0,0,0.95,0.9,0,0,0.95
+Natural Stone,41d191cb-2866-456d-8588-015d52e10763,Mineral,2508,0,0,0.75,0.69,0,0,0.75
+Mineral Wool Insulation,93b923f1-7bf9-46de-9d6c-900d1b7f864b,Mineral,88,0.63,0,0.47,0,0,0,0.6
+Gypsum Board,2ba8bbd3-16f6-40ff-bf4a-36a120445779,Mineral,657,0.07,0,0.75,0.02,0,0.09,0.75
+Ceramics,47c3cf3c-9d0f-4c31-a884-62c97238304a,Mineral,4135,0.07,0,0.88,0,0,0,0.5
+Wood Fiber Insulating Board,5d9fba7c-cbbc-4e45-8839-49b5f950b599,Organic,240,0.42,0.49,0.92,0.03,0.2,0,0.8
+Cork,416f0564-8355-4100-8282-e5392dc9637a,Organic,135,0.15,0.85,0.97,0.3,0.21,0,0.75
+Cellulose Insulation,2391005d-146e-45fb-88bc-d455d3dda2cc,Organic,30,0.85,0,0.73,0,0,0,0.75
+Foam Glass,f56632f3-8937-4ee9-982f-add816967711,Glass,115,0.6,0,0.9,0,0,0,0.9
+Glass,37733fd4-340b-4150-a7e7-5889739de7ab,Glass,2500,0.25,0,0.75,0.11,0,0,0.75
+Reinforcement Bars,65d2cf17-538c-45a6-bb7d-8c5f2fa1cd68,Metal,7850,0.97,0,0.75,0.62,0,0,0.75
+Stainless Steel,ee2e6032-b692-4278-8ad1-bdf5201e2352,Metal,8030,0.84,0,0.75,0.92,0,0,0.75
+Steel,860e5d41-3a0b-4ec1-9c5c-be1848f0c14e,Metal,7800,0.93,0,0.75,0.98,0,0,0.75
+Copper,0cd1a581-aac6-40c4-beb6-3b772be5ab4e,Metal,8960,0.84,0,0.8,0.9,0,0,0.8
+Aluminium,c6d4aee2-defe-4104-b162-0f541313a4b8,Metal,2750,0.68,0,0.78,0.95,0,0,0.8
+High Density Polyethylene (HDPE),18a5fb9d-d1ca-4448-86e1-0b8865ea8f10,Plastic,970,0,0,0.75,0.1,0.12,0,0.75
+Low Density Polyethylene (LDPE),b03d02f3-311a-4563-a371-5318a1dd8812,Plastic,920,0,0,0.75,0.07,0.12,0,0.75
+Extruded Polystyrene Foam (XPS),2790eed5-d3d3-416f-9e26-24481f689672,Plastic,32,0.44,0,0.75,0,0,0,0.75
+Polyurethane Insulation (PUR),3a573ed9-7553-41a3-abbd-ca9728842b18,Plastic,37,0,0,0.75,0,0,0,0.75
+Polyvnyl Chloride (PVC),bfdf70c3-cf9f-41af-a3e3-73857e38e486,Plastic,1300,0,0,0.5,0,0,0,0.5

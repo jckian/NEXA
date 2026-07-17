@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Massing → Structure · Generation Rules</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E7EAEE; --panel:#FFFFFF; --ink:#16202B; --ink-soft:#52606D;
+    --line:#C7CED6; --line-soft:#E1E6EB;
+    --beam:#E2571E;      /* structural orange (beams) */
+    --blue:#1F6FEB;      /* blueprint blue (glass)    */
+    --ok:#1C8E5A; --transfer:#C81E1E;
+    --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--mono);font-size:13px;line-height:1.55}
+  ::selection{background:var(--beam);color:#fff}
+
+  /* ---- masthead ---- */
+  header{border-bottom:2px solid var(--ink);background:var(--paper);position:sticky;top:0;z-index:5}
+  .mast{max-width:1180px;margin:0 auto;padding:18px 24px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+  .title{font-family:var(--display);font-weight:900;font-size:clamp(26px,4vw,46px);letter-spacing:-.02em;line-height:.95;text-transform:uppercase}
+  .title em{font-style:normal;color:var(--beam)}
+  .sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-top:8px}
+  .ver{font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.18em;text-transform:uppercase;border:1.5px solid var(--ink);padding:6px 10px}
+
+  main{max-width:1180px;margin:0 auto;padding:28px 24px 80px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:28px}
+  @media(max-width:920px){main{grid-template-columns:1fr}}
+
+  h2{font-family:var(--display);font-weight:900;font-size:13px;letter-spacing:.16em;text-transform:uppercase;margin:0 0 14px;padding-bottom:8px;border-bottom:1.5px solid var(--ink);display:flex;align-items:baseline;gap:10px}
+  h2 .n{color:var(--beam);font-size:12px}
+  h3{font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin:22px 0 8px}
+
+  /* ---- pipeline (left) ---- */
+  .pipe{counter-reset:step}
+  .stage{border-left:2px solid var(--line);padding:0 0 22px 20px;position:relative;margin-left:6px}
+  .stage::before{counter-increment:step;content:counter(step,decimal-leading-zero);position:absolute;left:-15px;top:-2px;width:26px;height:26px;background:var(--ink);color:#fff;font-family:var(--display);font-weight:700;font-size:11px;display:grid;place-items:center;border-radius:50%}
+  .stage:last-child{border-left-color:transparent}
+  .stage b{font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:.01em;text-transform:uppercase;display:block;margin-bottom:4px}
+  .stage p{margin:0;color:var(--ink-soft)}
+  .stage .tag{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--beam);border:1px solid var(--beam);padding:1px 6px;margin-top:6px}
+
+  .schematic{background:var(--ink);border:2px solid var(--ink);margin-bottom:22px}
+  .schematic svg{display:block;width:100%;height:auto}
+  .schematic .cap{color:#9aa7b4;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:8px 12px;border-top:1px solid #28323e}
+
+  /* ---- config (right) ---- */
+  .panel{background:var(--panel);border:1.5px solid var(--ink);padding:18px 18px 20px;margin-bottom:22px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 14px}
+  label{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:3px}
+  input,select,textarea{width:100%;font-family:var(--mono);font-size:13px;color:var(--ink);background:#F4F6F8;border:1px solid var(--line);padding:7px 8px;border-radius:0}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--blue);outline-offset:-1px;background:#fff}
+  textarea{resize:vertical;min-height:64px;line-height:1.4}
+  .row{display:flex;gap:8px;align-items:center}
+  .chk{display:flex;align-items:center;gap:8px;margin:6px 0}
+  .chk input{width:auto}
+
+  table.bays{width:100%;border-collapse:collapse;margin-top:4px}
+  table.bays th{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
+  table.bays td{padding:3px 6px;border-bottom:1px solid var(--line-soft)}
+  table.bays td:first-child{font-weight:700}
+  table.bays input{padding:4px 6px;text-align:right}
+  .unit{color:var(--ink-soft);font-size:11px}
+
+  /* ---- output ---- */
+  .out{background:var(--ink);color:#D7DEE5;border:1.5px solid var(--ink)}
+  .out .bar{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-bottom:1px solid #2a3540}
+  .out .bar span{font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#8fa0 b0}
+  pre{margin:0;padding:14px 12px;overflow:auto;font-size:11.5px;line-height:1.5;max-height:340px}
+  .tok-key{color:#7fb2ff}.tok-str{color:#e0a06a}.tok-num{color:#7fd0a8}.tok-bool{color:#d98ed9}
+
+  button{font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border:1.5px solid var(--ink);background:var(--ink);color:#fff;padding:8px 12px}
+  button.ghost{background:transparent;color:var(--ink)}
+  button:hover{background:var(--beam);border-color:var(--beam);color:#fff}
+  button.ghost:hover{background:var(--beam);border-color:var(--beam);color:#fff}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+  .note{font-size:11px;color:var(--ink-soft);margin-top:10px;border-left:2px solid var(--beam);padding-left:10px}
+  footer{max-width:1180px;margin:0 auto;padding:20px 24px 60px;color:var(--ink-soft);font-size:11px;border-top:1px solid var(--line)}
+  a{color:var(--blue)}
+</style>
+</head>
+<body>
+<header>
+  <div class="mast">
+    <div>
+      <div class="title">Massing <em>→</em> Structure</div>
+      <div class="sub">Shape-adaptive structural generation rules · Blender engine</div>
+    </div>
+    <div class="ver">Rules v1.0</div>
+  </div>
+</header>
+
+<main>
+  <!-- ================= LEFT : THE LOGIC ================= -->
+  <section>
+    <div class="schematic">
+      <svg id="schem" viewBox="0 0 460 230" aria-label="adaptive structure schematic"></svg>
+      <div class="cap" id="schemCap">Sample massing · live from parameters</div>
+    </div>
+
+    <h2><span class="n">A</span> How it adapts to any shape</h2>
+    <p style="margin:0 0 16px;color:var(--ink-soft)">
+      The engine never assumes a footprint. It inside-tests sample points against the real massing
+      to build a per-floor <strong>occupancy grid</strong>. Every system below is derived from that grid and
+      from how it changes floor to floor — so an L-shape, a tower, a stepped podium, or a single solid
+      all generate correctly without changing the code.
+    </p>
+
+    <div class="pipe">
+      <div class="stage"><b>Read massing</b><p>Gather selected meshes (or a whole collection). Build one BVH and an even-odd ray test for "is this point inside the volume?".</p></div>
+      <div class="stage"><b>Detect floors</b><p>By level tags (<span class="unit">_L0…_Ln / _B1</span>) when present, otherwise slice the height at the floor-to-floor value. Each floor gets an occupancy grid + program tags.</p></div>
+      <div class="stage"><b>Zones &amp; transfers</b><p>Compare occupancy between floors: cells lost upward = exposed roof; cells gained = cantilever needing support below = transfer level.<span class="tag">derived, not hardcoded</span></p></div>
+      <div class="stage"><b>Adaptive grid</b><p>One global column grid (spacing from program bays) clipped to each floor's occupancy, so columns stack and alignment is maximised.</p></div>
+      <div class="stage"><b>Core + shafts</b><p>Detect circulation objects and wrap them in shear walls to foundation &amp; roof; if none, place a central core sized to the smallest upper floor.</p></div>
+      <div class="stage"><b>Columns → foundation</b><p>A column is grounded only if its grid point is occupied continuously down to the base. Otherwise it transfers — a girder ties it to the nearest grounded line.</p></div>
+      <div class="stage"><b>Beams + slabs</b><p>Beams connect adjacent occupied grid points on both axes; slabs are voxel plates following the occupancy, so atrium voids stay open.</p></div>
+      <div class="stage"><b>Mass-top roofs</b><p>Every terminated block is capped, and its columns/beams extend up to that roof for a complete load path.</p></div>
+      <div class="stage"><b>Curtain wall + fins</b><p>Boundary cells become the facade; fins sit on a mullion grid and merge into continuous runs per plane (deeper on column lines).</p></div>
+      <div class="stage"><b>Underground</b><p>Diaphragm wall around the lowest floor (grade → toe) and a grade-beam frame tying every foundation column and core.</p></div>
+      <div class="stage"><b>Validate</b><p>Checks every column reaches foundation/transfer and no beam is single-ended; writes a report. <span class="tag">PASS / CHECK</span></p></div>
+    </div>
+  </section>
+
+  <!-- ================= RIGHT : THE RULES ================= -->
+  <section>
+    <h2><span class="n">B</span> Generation rules</h2>
+
+    <div class="panel">
+      <h3>Floors &amp; sampling</h3>
+      <div class="grid2">
+        <div><label>Floor detection</label>
+          <select id="floorMode"><option value="auto">auto</option><option value="tags">tags</option><option value="slice">slice</option></select></div>
+        <div><label>Floor-to-floor (slice) <span class="unit">m</span></label><input id="sliceH" type="number" step="0.1" value="4.5"></div>
+        <div><label>Grade level z <span class="unit">m</span></label><input id="gradeZ" type="number" step="0.1" value="0"></div>
+        <div><label>Occupancy cell <span class="unit">m</span></label><input id="occCell" type="number" step="0.5" value="2.0"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Structural grid</h3>
+      <div class="grid3">
+        <div><label>Spacing <span class="unit">m</span></label><input id="gridS" type="number" step="0.1" value="8.0"></div>
+        <div><label>Anchor</label><select id="gridAnchor"><option value="centroid">centroid</option><option value="origin">origin</option></select></div>
+        <div><label>Snap to edges</label><select id="snapEdges"><option value="true">yes</option><option value="false">no</option></select></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Program bays — clear span by category</h3>
+      <table class="bays">
+        <thead><tr><th>Category</th><th style="text-align:right">Min</th><th style="text-align:right">Max</th><th></th></tr></thead>
+        <tbody id="bayRows"></tbody>
+      </table>
+      <label style="margin-top:14px">Program → category keywords (JSON)</label>
+      <textarea id="kw"></textarea>
+      <div class="note">Bays inform the grid spacing you choose. <b>assembly_longspan</b> covers halls, stages and atrium roofs that exceed the retail max.</div>
+    </div>
+
+    <div class="panel">
+      <h3>Member sizes <span class="unit">m</span></h3>
+      <div class="grid3">
+        <div><label>Column</label><input id="mCol" type="number" step="0.05" value="0.60"></div>
+        <div><label>Transfer col</label><input id="mColT" type="number" step="0.05" value="0.70"></div>
+        <div><label>Slab thickness</label><input id="mSlab" type="number" step="0.05" value="0.30"></div>
+        <div><label>Beam w × d</label><div class="row"><input id="mBw" type="number" step="0.05" value="0.35"><input id="mBd" type="number" step="0.05" value="0.70"></div></div>
+        <div><label>Transfer w × d</label><div class="row"><input id="mTw" type="number" step="0.05" value="0.90"><input id="mTd" type="number" step="0.05" value="1.80"></div></div>
+        <div><label>Core wall t</label><input id="mCore" type="number" step="0.05" value="0.40"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Facade &amp; underground</h3>
+      <div class="chk"><input type="checkbox" id="enFins" checked><label style="margin:0">Facade fins</label></div>
+      <div class="grid3">
+        <div><label>Mullion <span class="unit">m</span></label><input id="finMull" type="number" step="0.1" value="1.5"></div>
+        <div><label>Fin depth (prim/infill)</label><div class="row"><input id="finDp" type="number" step="0.05" value="0.30"><input id="finDi" type="number" step="0.05" value="0.20"></div></div>
+        <div><label>Fin width (prim/infill)</label><div class="row"><input id="finWp" type="number" step="0.025" value="0.15"><input id="finWi" type="number" step="0.025" value="0.10"></div></div>
+      </div>
+      <div class="chk" style="margin-top:12px"><input type="checkbox" id="enUg" checked><label style="margin:0">Underground system</label></div>
+      <div class="chk"><input type="checkbox" id="enCw" checked><label style="margin:0">Curtain wall</label></div>
+      <div class="grid3">
+        <div><label>Diaphragm t <span class="unit">m</span></label><input id="dwT" type="number" step="0.05" value="0.8"></div>
+        <div><label>Toe below found. <span class="unit">m</span></label><input id="toe" type="number" step="0.1" value="1.0"></div>
+        <div><label>Grade beam w × d</label><div class="row"><input id="gbW" type="number" step="0.05" value="0.50"><input id="gbD" type="number" step="0.05" value="0.90"></div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Run target</h3>
+      <label>Folder holding adaptive_structural_generator.py</label>
+      <input id="pyPath" type="text" placeholder="/path/to/folder  or  C:\\models\\struct" value="/path/to/folder">
+      <div class="chk" style="margin-top:8px"><input type="checkbox" id="clearPrev" checked><label style="margin:0">Clear previously generated collections first</label></div>
+    </div>
+
+    <h2><span class="n">C</span> Export</h2>
+    <div class="out">
+      <div class="bar"><span>CONFIG · json</span>
+        <div class="btns" style="margin:0"><button class="ghost" onclick="copy('cfgText')">Copy JSON</button><button class="ghost" onclick="download_()">Download .json</button></div></div>
+      <pre id="cfgText"></pre>
+    </div>
+    <div class="out" style="margin-top:14px">
+      <div class="bar"><span>Blender · paste into Text Editor</span>
+        <button class="ghost" onclick="copy('snipText')">Copy snippet</button></div>
+      <pre id="snipText"></pre>
+    </div>
+    <div class="note">The snippet loads the engine, then runs <code>A.generate(CONFIG)</code> on your current selection
+      (or all massing if nothing is selected). Output lands in collections CORE · SHAFTS · GRID · COLUMNS · BEAMS · SLABS · CURTAIN_WALL · FACADE_FINS · DIAPHRAGM_WALL · GRADE_BEAMS, plus a report text block.</div>
+  </section>
+</main>
+
+<footer>
+  Massing → Structure · a rules file for shape-adaptive structural modelling. Pair this with <code>adaptive_structural_generator.py</code>.
+</footer>
+
+<script>
+/* ---------- default rules ---------- */
+const BAYS = {retail:[10,15],office:[8,10],residential:[6,8],hotel:[7,9],parking:[8,9],assembly_longspan:[15,30],default:[8,10]};
+const KW_DEFAULT = [
+  [["retail","shop","store","sales","display","lobby","mall","restaurant","bar","lounge","cafe","event_lounge","fitting","box_office"],"retail"],
+  [["office","staff","admin","workstation","it_support","workshop","production"],"office"],
+  [["resid","apartment","unit","dwell","bedroom","dressing","rehearsal","restroom","wc","toilet"],"residential"],
+  [["hotel","guestroom","suite","green_room","backstage"],"hotel"],
+  [["parking","garage","loading","storage","set_storage","mech","plant"],"parking"],
+  [["event_hall","hall","auditorium","theater","theatre","stage","orchestra","fly_tower","ballroom","arena","atrium"],"assembly_longspan"]
+];
+
+/* build editable bay table */
+const bayRows = document.getElementById('bayRows');
+Object.entries(BAYS).forEach(([cat,[mn,mx]])=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${cat}</td>
+    <td><input data-bay="${cat}" data-i="0" type="number" step="0.5" value="${mn}"></td>
+    <td><input data-bay="${cat}" data-i="1" type="number" step="0.5" value="${mx}"></td>
+    <td class="unit">m</td>`;
+  bayRows.appendChild(tr);
+});
+document.getElementById('kw').value = JSON.stringify(KW_DEFAULT);
+
+/* ---------- read form -> config ---------- */
+const $=id=>document.getElementById(id);
+function num(id){return parseFloat($(id).value)||0}
+function buildConfig(){
+  const bays={};
+  document.querySelectorAll('[data-bay]').forEach(inp=>{
+    bays[inp.dataset.bay]=bays[inp.dataset.bay]||[0,0];
+    bays[inp.dataset.bay][+inp.dataset.i]=parseFloat(inp.value)||0;
+  });
+  let kw; try{kw=JSON.parse($('kw').value)}catch(e){kw=KW_DEFAULT}
+  return {
+    input:{mode:"selected_or_all",collection:"",objects:[],
+      exclude_collections:["CORE","SHAFTS","GRID","COLUMNS","BEAMS","SLABS","CURTAIN_WALL","FACADE_FINS","DIAPHRAGM_WALL","GRADE_BEAMS"]},
+    floors:{mode:$('floorMode').value,tag_regex:"_(B\\d+|L\\d+)(?:_\\d+)?$",
+      slice_height:num('sliceH'),grade_z:num('gradeZ'),min_floor_thickness:1.5},
+    occupancy:{cell:num('occCell'),ray_axis:"Z"},
+    grid:{spacing:num('gridS'),anchor:$('gridAnchor').value,
+      snap_to_edges:$('snapEdges').value==="true",maximize_alignment:true},
+    bays,program_keywords:kw,
+    core:{mode:"detect",detect_keywords:["core","stair","elevator","lift","shaft","mep","escalator","freight"],
+      wall_thickness:num('mCore'),auto_size_fraction:0.18,continuous_to_roof:true},
+    members:{column:num('mCol'),column_transfer:num('mColT'),beam_w:num('mBw'),beam_d:num('mBd'),
+      transfer_w:num('mTw'),transfer_d:num('mTd'),slab_t:num('mSlab'),curtain_t:0.08},
+    curtain:{enable:$('enCw').checked,start_at_grade:true},
+    fins:{enable:$('enFins').checked,mull:num('finMull'),
+      depth_primary:num('finDp'),width_primary:num('finWp'),
+      depth_infill:num('finDi'),width_infill:num('finWi'),min_run:1.0},
+    underground:{enable:$('enUg').checked,diaphragm_thickness:num('dwT'),
+      toe_below_foundation:num('toe'),grade_beam_w:num('gbW'),grade_beam_d:num('gbD')},
+    clear_previous:$('clearPrev').checked,report_name:"structural_report.json"
+  };
+}
+
+/* ---------- syntax-highlight json ---------- */
+function hl(json){
+  return json.replace(/&/g,'&amp;').replace(/</g,'&lt;')
+   .replace(/"(\\.|[^"\\])*"(\s*:)?/g,m=>m.endsWith(':')||/":$/.test(m)?`<span class="tok-key">${m}</span>`:`<span class="tok-str">${m}</span>`)
+   .replace(/\b(true|false|null)\b/g,'<span class="tok-bool">$1</span>')
+   .replace(/(-?\d+\.?\d*)/g,'<span class="tok-num">$1</span>');
+}
+
+/* ---------- render outputs + schematic ---------- */
+function render(){
+  const cfg=buildConfig();
+  const js=JSON.stringify(cfg,null,2);
+  $('cfgText').innerHTML=hl(js);
+  const path=$('pyPath').value.replace(/\\/g,'\\\\');
+  const snip =
+`import importlib, sys, json
+sys.path.append(r"${$('pyPath').value}")
+import adaptive_structural_generator as A
+importlib.reload(A)
+
+CONFIG = json.loads(r'''${js}''')
+report = A.generate(CONFIG)
+print(report["validation"])`;
+  $('snipText').textContent=snip;
+  schematic(cfg);
+}
+
+/* signature: live elevation built from spacing + floor height */
+function schematic(cfg){
+  const W=460,H=230,pad=18, gx=46;
+  const floors=Math.max(4,Math.round(56/Math.max(cfg.floors.slice_height,1)));
+  const cols=Math.max(2,Math.round(34/Math.max(cfg.grid.spacing,1)));
+  const top=pad, bot=H-26, span=bot-top, fh=span/floors;
+  let s=`<rect x="0" y="0" width="${W}" height="${H}" fill="#16202b"/>`;
+  // stepped envelope (fake setbacks to read as adaptive)
+  const widths=[]; for(let f=0;f<floors;f++){let t=f/floors; widths.push(1-0.45*Math.pow(t,1.7)-(f%4===3?0.08:0));}
+  // slabs
+  for(let f=0;f<=floors;f++){const w=(widths[Math.min(f,floors-1)]||widths[floors-1]);
+    const y=bot-f*fh; const half=(W-2*gx)/2*w;
+    s+=`<line x1="${W/2-half}" y1="${y}" x2="${W/2+half}" y2="${y}" stroke="#3a4654" stroke-width="1"/>`;}
+  // columns (grid) + fins ticks
+  for(let c=0;c<=cols;c++){const t=c/cols; const x=gx+ t*(W-2*gx);
+    // height where occupied: shrink with width near top
+    const xrel=Math.abs(x-W/2)/((W-2*gx)/2);
+    let topF=floors; for(let f=floors-1;f>=0;f--){if(xrel<=widths[f]+0.001){topF=f+1;break;}}
+    const y2=bot-topF*fh;
+    s+=`<line x1="${x}" y1="${bot}" x2="${x}" y2="${y2}" stroke="#e2571e" stroke-width="${c%2?1:2}" opacity="${c%2?.55:.95}"/>`;}
+  // grade + foundation
+  s+=`<line x1="0" y1="${bot}" x2="${W}" y2="${bot}" stroke="#7fb2ff" stroke-width="1.5"/>`;
+  s+=`<rect x="${gx-6}" y="${bot}" width="${W-2*gx+12}" height="16" fill="none" stroke="#52606d" stroke-width="1"/>`;
+  document.getElementById('schem').innerHTML=s;
+  document.getElementById('schemCap').textContent=
+    `~${floors} floors · ${cols} bays @ ${cfg.grid.spacing} m · fins @ ${cfg.fins.mull} m · adaptive envelope`;
+}
+
+/* ---------- actions ---------- */
+function copy(id){const t=$(id).innerText;navigator.clipboard.writeText(t);}
+function download_(){const cfg=JSON.stringify(buildConfig(),null,2);
+  const b=new Blob([cfg],{type:"application/json"});const a=document.createElement('a');
+  a.href=URL.createObjectURL(b);a.download="structural_config.json";a.click();}
+
+document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('input',render));
+render();
+</script>
+</body>
+</html>

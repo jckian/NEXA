@@ -1,0 +1,265 @@
+## Tama Art University Library (2007) — Toyo Ito
+
+Hachioji Campus, Tokyo, Japan
+
+---
+
+### Spatial + Structural Character
+
+![Image](https://images.openai.com/static-rsc-4/0M2FEMXh2dpPuLQJwgTc1kqrZGv1FnniCqvn71uhC4O_R-rMu6sqAFRrKDoLFoc4b-wT5TVzXOvDWfreEfVzCpmgxRdDs5dYBCrUoOgC6c9fWnNTLKk_INRk8hhZDkbTnTfxDlVBLLh-AXKdlgNiyOGhmnMTIT6qHd30gRvoK-8e8-itHdDdGW7mxaw3XpxW?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/GCp2ROJz7lNbBKeZNRkv0tXp2hh84xlecveLR5kOeK-0MrUbnlzz18LbUoWQB37jy0VJYgL9n1UMKZt9GLjkxfNSoI4CH_45InsFcnw2btpDWyV0JdLnYSL-f1PmObBS1GuHaNDPRwiVvI1zbAc_7EUCB29rLuXqNQcLlC1F5fLp50rDABQt0HLXpxX89XSA?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/mEUSyqE53HTlTd4mK7uxTCEfEtRrya4DPJHpP1E2RPygzZ7ieWzug9nKpWtVT2ttsFXsoucAfsQRGl5He6xJDvZWFWHxaPEjIWFHc7gkbwjf0-DKSpGREQrp8-DDwHT_qiSjJVTWD8GHmChydZbVFh5tYGxMOYxLeoYh3wFxpViQkav8cgsEjDRqtF4i3y1_?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/Vzbxu4xg3V6FxAnbnDFRU6ophFpeou4nYdSZl5BxosRTZxvyz4FhOEDoPAZNweBalP3lOMA8GVBLOVflUXudBf9BwUuvtH90GctEgbSe0kcsnNOfjF1ik6y9KJW4ItoazDOf-1mIjdVuAKn-QtaZig71zjtGfk9uYm3FpRoYiA6Rrn2-8sK2t3BnxlQFRvKE?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/tv2E36ZrHLMvYwVljU1-BaKG7m5W_RWHqVWwvZ7JAv-4EBl2WHGdcNfMYgqZYcuOTS5y3DOSoBH4AHa2Xz8_DrcPEcTr8mBqf3tBeCMFW9CFHJObJ1bUyutgyhIE8_hMp0ZmkQsZMiuQuaJRLjjg_97siJjJsWFQM5hDX2DPT4uu4DyVK6HXXhGxix-u7epz?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/r0Mm3vrbKmWNGBiLf1aBAx5e9svgJRYgODNaG2DGfScGH_NM-9IIEpaIgJAGV5czKTvm-W8E0FPJ54TBAdU_nN9z67ArAuKb-EufUFO70XerbXrwKldljIDcppHDEu5uIwt4IoaXXyZ62tfce-tJVAHL6jVYvr3EHbrVTcWCXMzZy_GtHnmyBIlbKczJ-2ip?purpose=fullsize)
+
+---
+
+# 1. Basic Building Data
+
+| Category         | Data                                                  |
+| ---------------- | ----------------------------------------------------- |
+| Completion       | 2007                                                  |
+| Floors           | 2 above ground + 1 basement ([Wikipedia][1])          |
+| Total Floor Area | ~5,600 m² ([Wikipedia][1])                            |
+| Footprint        | ~2,200 m² ([Wikipedia][1])                            |
+| Height           | ~8–10 m (est. based on 2-story open section + arches) |
+| Structural Span  | up to ~12–16 m arches ([Wikipedia][1])                |
+
+**Key reading:**
+The building is not vertically driven (like towers) but **horizontally continuous**, almost a *field condition*.
+
+---
+
+# 2. Core System (VERY IMPORTANT)
+
+### → Number of cores: **0 conventional cores**
+
+* There is **no centralized vertical core** (no elevator core as spatial organizer)
+* Circulation is **distributed and non-hierarchical**
+* Vertical movement is minimal (only 2 floors + basement)
+
+### Instead:
+
+* Structure = **load-bearing arch field**
+* Circulation = **free-flow through arches**
+
+👉 This replaces:
+
+* Core → **field condition**
+* Corridor → **porous spatial gradient**
+
+---
+
+# 3. Dimensions + Geometry
+
+### Plan Logic
+
+* Approximate footprint: **~50m × 50m (non-orthogonal, curved edges)**
+* Plan defined by:
+
+  * **Irregular arch grid**
+  * Mix of **rectangular + triangular cells** ([Wikipedia][2])
+
+### Section Logic
+
+* Floor follows **~3° slope** ([Wikipedia][1])
+* Arches vary in:
+
+  * span
+  * curvature
+  * intersection angle
+
+👉 Result:
+
+* No repeated structural bay
+* Continuous differentiation
+
+---
+
+# 4. Program Distribution
+
+### Ground Floor (Public / Collective)
+
+* Exhibition / gallery space
+* Lounge / informal seating
+* Media viewing (video, magazines) ([Architectuul][3])
+* Open social space (even resting/sleeping) ([Wikipedia][1])
+
+👉 **Program type:**
+**Highly public + fluid + non-silent library**
+
+---
+
+### Second Floor (Primary Library)
+
+* Book stacks (~100,000 volumes) ([Wikipedia][1])
+* Reading areas
+* Study zones
+
+👉 **Program type:**
+**Semi-quiet but still visually open**
+
+---
+
+### Basement
+
+* Storage / archive
+* Mechanical / support
+* Additional stacks
+
+---
+
+# 5. Program Diagram (Critical Insight)
+
+Instead of:
+
+```
+ROOM → CORRIDOR → ROOM
+```
+
+Ito uses:
+
+```
+ARCH FIELD → PROGRAM CLOUDS
+```
+
+Meaning:
+
+* No hard partitions
+* Programs defined by:
+
+  * furniture
+  * light
+  * density of arches
+
+👉 This is **non-discrete zoning**
+
+---
+
+# 6. Architectural System
+
+## A. Structural Strategy = “Structural Space”
+
+![Image](https://images.openai.com/static-rsc-4/Al90PBV0WXv6M4JBcl-kymUkolHqBcz5duveolNilgEU5tKBfTvWxslVCfhJrB43-II5K9CJ0fYJi27cWfL9AyjOVhaY1OghjT8Wh25oCh_Kvyp0km7d8mWrr68OEN9L0988IcnsYUBz281Pq7Wp0_zZC1mDuIwDnSrf8-UFfGf0QXpO6ABOeXcV_Gu7xJes?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/wCegGaR_guqfMC18VcUz7kT4s_roCMZlueU2u1uRl510PeqVuSVeVplhV7y2DSGkgrMW3xMn1Lapt0ljOnAW5QgMiyq63xziXeMEtygmVohFkGXgXOrtmNuSfIvhXxpo7lfPEdRnyFlbs5Fouqv93D1BWsSzREUiZiChmc9hfhpg3ViByxGHS8d2kkuPYctv?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/5r7LTYY8v2MCg5QhDtol8EdRjOri4NxQfXjekBXTdM6QBC80M1murgj1ptkOludCOmLs7hc27-ADp1Cr6DSUxW24g28TDjP5_AT2E-Ey9A-J40XMQ_Xgg2W5UaLaoLtggTKfVxonz_HMU7Ob817Sd1sKjpAWnytp4l2VJrChBwmTvwr4FcO2nzfgmOkTs8kY?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/YgGvPdlee7pDKy7yyYZz-6xD0BRrKKaYzMF_67IbhuZ9rfMOP7695rVLgC6XNlWE5kcAQGaI_Ww1nrbbwqtoqHBLPefsulIL0EhGLUO6_2BmD_NYYdEVR21_7IVJTkRJwOuYPv0p6RTSFS-9TK-I_5G_Zgvf5ebQhIVWAkDyIp1nCUKMvZqRpPuwQ8BpXYO9?purpose=fullsize)
+
+* Thin steel plates + concrete (≈200mm thick) ([Wikipedia][1])
+* Arches:
+
+  * intersect
+  * vary continuously
+* Structure = space-making system
+
+👉 No distinction between:
+
+* column
+* wall
+* structure
+
+---
+
+## B. Spatial Concept = “Ambiguous Field”
+
+Key ideas:
+
+* No rooms → **gradients**
+* No hierarchy → **distributed occupation**
+* No center → **multiple centers**
+
+This aligns with Ito’s post–Sendai Mediatheque thinking:
+
+* dissolve architectural boundaries
+* create **continuous interior landscape**
+
+---
+
+## C. Circulation Logic
+
+* Non-linear paths
+* Movement = **wandering / drifting**
+* Visual permeability across entire floor
+
+👉 Comparable to:
+
+* SANAA spatial logic
+* but with **heavier tectonic expression**
+
+---
+
+# 7. Architectural Classification (important for your research)
+
+### Is it structural skin?
+
+❌ No
+
+### It is:
+
+✔ **Structural field system**
+✔ **Space-frame via arches (but non-repetitive)**
+✔ **Load-bearing spatial envelope (but not façade-driven)**
+
+👉 More precise term:
+
+> **“Structuralized spatial field”**
+
+---
+
+# 8. Key Takeaways (for your studio logic)
+
+### If you translate this into generative rules:
+
+**1. No core dependency**
+
+```
+circulation = distributed
+```
+
+**2. Structure generates program**
+
+```
+arch density → program intensity
+```
+
+**3. No fixed rooms**
+
+```
+program = gradient clusters
+```
+
+**4. Geometry variation**
+
+```
+no repeated bay
+continuous differentiation
+```
+
+---
+
+# 9. Why this project matters (critical reading)
+
+* Rejects:
+
+  * modernist grid
+  * typological library layout
+* Proposes:
+
+  * **library as social condenser**
+  * **structure as spatial organizer**
+  * **architecture as landscape**
+
+
+
+[1]: https://en.wikipedia.org/wiki/Tama_Art_University_Library?utm_source=chatgpt.com "Tama Art University Library"
+[2]: https://it.wikipedia.org/wiki/Tama_Art_University_Library?utm_source=chatgpt.com "Tama Art University Library"
+[3]: https://architectuul.com/architecture/tama-art-university-library?utm_source=chatgpt.com "Tama Art University Library | Architectuul"

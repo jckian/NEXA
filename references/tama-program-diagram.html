@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tama Art University Library — Program Diagram</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --grad-start: #c27a2a;
+      --grad-end:   #5B7FA6;
+      --grad:       linear-gradient(135deg, #c27a2a, #5B7FA6);
+      --panel-bg:   rgba(10, 10, 14, 0.93);
+      --border:     rgba(194, 122, 42, 0.22);
+      --border-dim: rgba(194, 122, 42, 0.10);
+      --text-hi:    #f0ede8;
+      --text-mid:   #a09880;
+      --text-lo:    #504840;
+      --radius-lg:  12px;
+      --radius-md:  8px;
+      --radius-sm:  5px;
+      --shadow:     0 8px 32px rgba(194, 122, 42, 0.08), 0 2px 8px rgba(0, 0, 0, 0.55);
+    }
+
+    body {
+      background: #1A1A1A;
+      font-family: 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      color: var(--text-hi);
+    }
+
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+    }
+
+    /* ── Top-left title overlay ── */
+    #title-block {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    #title-block h1 {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    #title-block p {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      color: var(--text-lo);
+      text-transform: uppercase;
+      margin-top: 5px;
+      font-weight: 400;
+    }
+
+    /* ── Right panel ── */
+    #right-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 280px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+
+    #right-panel::-webkit-scrollbar { display: none; }
+
+    .side-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .panel-header:hover { background: rgba(194, 122, 42, 0.05); }
+
+    .panel-title {
+      font-size: 8px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+      font-weight: 600;
+    }
+
+    .panel-arrow {
+      font-size: 9px;
+      color: var(--text-lo);
+      transition: transform 0.2s ease;
+    }
+
+    .panel-body {
+      padding: 10px 14px 14px;
+      border-top: 1px solid var(--border-dim);
+    }
+
+    .panel-body.collapsed { display: none; }
+
+    /* Building info rows */
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 5px;
+      gap: 8px;
+    }
+
+    .info-label {
+      font-size: 8px;
+      color: var(--text-lo);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .info-val {
+      font-size: 10px;
+      color: var(--text-hi);
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .info-note {
+      font-size: 9px;
+      color: var(--text-mid);
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid var(--border-dim);
+      line-height: 1.55;
+      font-style: italic;
+    }
+
+    /* Stats */
+    .stats-row {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+
+    .stats-swatch {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .stats-label {
+      font-size: 10px;
+      color: var(--text-mid);
+      flex: 1;
+      font-weight: 400;
+      text-transform: capitalize;
+    }
+
+    .stats-val {
+      font-size: 10px;
+      color: var(--text-hi);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    .stats-divider {
+      border: none;
+      border-top: 1px solid var(--border-dim);
+      margin: 8px 0;
+    }
+
+    .stats-total {
+      font-size: 10px;
+      color: var(--text-hi);
+      display: flex;
+      justify-content: space-between;
+      font-weight: 500;
+    }
+
+    .stats-meta {
+      font-size: 9px;
+      color: var(--text-lo);
+      margin-top: 6px;
+      line-height: 1.7;
+    }
+
+    .floor-breakdown {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-dim);
+    }
+
+    .floor-breakdown-title {
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-lo);
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    /* File drop zone */
+    .file-drop-zone {
+      border: 1px dashed rgba(194, 122, 42, 0.28);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      margin-bottom: 4px;
+      background: rgba(194, 122, 42, 0.03);
+    }
+
+    .file-drop-zone:hover {
+      border-color: rgba(194, 122, 42, 0.55);
+      background: rgba(194, 122, 42, 0.07);
+    }
+
+    .file-drop-zone.drag-over {
+      border-color: rgba(232, 168, 56, 0.8);
+      background: rgba(232, 168, 56, 0.10);
+    }
+
+    .file-drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .file-drop-label {
+      font-size: 8px;
+      color: var(--text-mid);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .file-drop-hint {
+      font-size: 9px;
+      color: var(--text-lo);
+      margin-top: 2px;
+    }
+
+    #loaded-filename {
+      font-size: 9px;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-top: 6px;
+      letter-spacing: 0.04em;
+      word-break: break-all;
+      min-height: 14px;
+      font-weight: 500;
+    }
+
+    #load-error {
+      font-size: 9px;
+      color: #f87171;
+      margin-top: 4px;
+      min-height: 12px;
+    }
+
+    #load-entry-count {
+      font-size: 9px;
+      color: var(--text-lo);
+      margin-top: 2px;
+    }
+
+    /* Param grid */
+    .param-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 10px;
+      margin-bottom: 8px;
+    }
+
+    .param-cell label { margin-top: 0 !important; }
+
+    .panel-body label {
+      font-size: 8px;
+      color: var(--text-lo);
+      letter-spacing: 0.1em;
+      display: block;
+      margin-bottom: 3px;
+      margin-top: 9px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .panel-body label:first-of-type { margin-top: 0; }
+
+    .param-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .param-row input[type="number"] {
+      background: rgba(194, 122, 42, 0.07);
+      border: 1px solid var(--border);
+      color: var(--text-hi);
+      font-size: 12px;
+      padding: 5px 9px;
+      border-radius: var(--radius-sm);
+      width: 70px;
+      font-family: inherit;
+      font-weight: 500;
+      transition: border-color 0.2s;
+    }
+
+    .param-row input[type="number"]:focus {
+      outline: none;
+      border-color: var(--grad-start);
+      box-shadow: 0 0 0 3px rgba(194, 122, 42, 0.15);
+    }
+
+    .param-unit {
+      font-size: 10px;
+      color: var(--text-lo);
+    }
+
+    .panel-btn {
+      background: var(--grad);
+      border: none;
+      color: #fff;
+      font-size: 8px;
+      letter-spacing: 0.12em;
+      padding: 7px 16px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      margin-top: 10px;
+      text-transform: uppercase;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 12px rgba(194, 122, 42, 0.30);
+    }
+
+    .panel-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 18px rgba(194, 122, 42, 0.45);
+    }
+
+    .panel-btn:active { transform: translateY(0); }
+
+    /* Category color legend */
+    .cat-legend {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-dim);
+    }
+
+    .cat-legend-title {
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-lo);
+      margin-bottom: 7px;
+      font-weight: 600;
+    }
+
+    .cat-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 5px;
+    }
+
+    .cat-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .cat-label {
+      font-size: 10px;
+      color: var(--text-mid);
+      font-weight: 400;
+    }
+
+    /* Tooltip */
+    #tooltip {
+      position: fixed;
+      background: rgba(10, 10, 14, 0.97);
+      border: 1px solid var(--border);
+      padding: 9px 12px;
+      border-radius: var(--radius-md);
+      font-size: 10px;
+      color: var(--text-mid);
+      line-height: 1.6;
+      pointer-events: none;
+      z-index: 20;
+      display: none;
+      max-width: 210px;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+    }
+
+    #tooltip strong {
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 11px;
+      display: block;
+      margin-bottom: 2px;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    /* Floor visibility bar at bottom */
+    #floor-bar {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 4px;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+      border-radius: var(--radius-lg);
+      z-index: 10;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+    }
+
+    .floor-btn {
+      background: rgba(194, 122, 42, 0.06);
+      border: 1px solid var(--border-dim);
+      color: var(--text-lo);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      transition: all 0.18s ease;
+    }
+
+    .floor-btn:hover {
+      background: rgba(194, 122, 42, 0.16);
+      color: var(--text-hi);
+      border-color: var(--border);
+    }
+
+    .floor-btn.active {
+      background: var(--grad);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 2px 10px rgba(194, 122, 42, 0.40);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="canvas-container"></div>
+
+  <!-- Top-left title overlay -->
+  <div id="title-block">
+    <h1>Tama Art University Library</h1>
+    <p>Toyo Ito, 2007 &nbsp;|&nbsp; Hachioji Campus, Tokyo</p>
+  </div>
+
+  <!-- Hover tooltip -->
+  <div id="tooltip"></div>
+
+  <!-- Floor visibility bar -->
+  <div id="floor-bar"></div>
+
+  <!-- Right side panel -->
+  <div id="right-panel">
+
+    <!-- Panel 1: Building Info -->
+    <div class="side-panel">
+      <div class="panel-header" onclick="togglePanel('info')">
+        <span class="panel-title">Building Info</span>
+        <span class="panel-arrow" id="arrow-info">&#9660;</span>
+      </div>
+      <div class="panel-body" id="body-info">
+        <div class="info-row">
+          <span class="info-label">Building</span>
+          <span class="info-val">Tama Art University Library</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Architect</span>
+          <span class="info-val">Toyo Ito &amp; Associates</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Year</span>
+          <span class="info-val">2007</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Location</span>
+          <span class="info-val">Hachioji, Tokyo</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Site</span>
+          <span class="info-val">70 m &times; 70 m</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Floors</span>
+          <span class="info-val">B1 + Ground + L1 (2 above grade)</span>
+        </div>
+        <div class="info-note">
+          Structural note: No central core. All fire stairs are distributed
+          to perimeter edges (SW / NE / SE), leaving the floor plate
+          open — a defining feature of Ito's arch design.
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 2: Program Statistics -->
+    <div class="side-panel">
+      <div class="panel-header" onclick="togglePanel('stats')">
+        <span class="panel-title">Program Statistics</span>
+        <span class="panel-arrow" id="arrow-stats">&#9660;</span>
+      </div>
+      <div class="panel-body" id="body-stats">
+        <div id="stats-content"></div>
+      </div>
+    </div>
+
+    <!-- Panel 3: Load Program -->
+    <div class="side-panel">
+      <div class="panel-header" onclick="togglePanel('load')">
+        <span class="panel-title">Load Program</span>
+        <span class="panel-arrow" id="arrow-load">&#9656;</span>
+      </div>
+      <div class="panel-body collapsed" id="body-load">
+        <div class="file-drop-zone" id="drop-zone">
+          <input type="file" id="file-input" accept=".txt,.md">
+          <div class="file-drop-label">Drop .txt / .md file</div>
+          <div class="file-drop-hint">or click to browse</div>
+        </div>
+        <div id="loaded-filename"></div>
+        <div id="load-entry-count"></div>
+        <div id="load-error"></div>
+      </div>
+    </div>
+
+    <!-- Panel 4: Parameters + Legend -->
+    <div class="side-panel">
+      <div class="panel-header" onclick="togglePanel('params')">
+        <span class="panel-title">Parameters</span>
+        <span class="panel-arrow" id="arrow-params">&#9656;</span>
+      </div>
+      <div class="panel-body collapsed" id="body-params">
+        <div class="param-grid">
+          <div class="param-cell">
+            <label>Site Width</label>
+            <div class="param-row">
+              <input type="number" id="param-site-w" value="70" min="20" max="200">
+              <span class="param-unit">m</span>
+            </div>
+          </div>
+          <div class="param-cell">
+            <label>Site Depth</label>
+            <div class="param-row">
+              <input type="number" id="param-site-d" value="70" min="20" max="200">
+              <span class="param-unit">m</span>
+            </div>
+          </div>
+          <div class="param-cell">
+            <label>Floor Height</label>
+            <div class="param-row">
+              <input type="number" id="param-floor-h" value="4.0" min="2.5" max="8" step="0.1">
+              <span class="param-unit">m</span>
+            </div>
+          </div>
+          <div class="param-cell">
+            <label>Slab Gap</label>
+            <div class="param-row">
+              <input type="number" id="param-slab-gap" value="15" min="0" max="30" step="1">
+              <span class="param-unit">%</span>
+            </div>
+          </div>
+        </div>
+        <button class="panel-btn" onclick="applyParams()">Apply</button>
+
+        <!-- Category color legend — populated by buildLegend() -->
+        <div class="cat-legend">
+          <div class="cat-legend-title">Category Legend</div>
+          <div id="cat-legend-items"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /right-panel -->
+
+  <script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+  }
+}
+</script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // ─────────────────────────────────────────────────────────
+    // PROGRAM DATASET  (Tama Art University Library)
+    // Format: {type}/{area m2}/{floor level}/{category}/{width,length}
+    // ─────────────────────────────────────────────────────────
+    const RAW_PROGRAM = `
+## ─── B1 — Basement (level -1), gross ~1650 m2 ───
+{archive}/{320}/{-1}/{collection}/{18,18}
+{compact stacks}/{380}/{-1}/{collection}/{22,17}
+{book processing}/{90}/{-1}/{support}/{10,9}
+{receiving and loading}/{80}/{-1}/{loading}/{10,8}
+{storage}/{100}/{-1}/{storage}/{10,10}
+{mechanical}/{200}/{-1}/{mechanical}/{14,14}
+{server room}/{60}/{-1}/{technology}/{8,8}
+{staff workroom}/{60}/{-1}/{support}/{8,8}
+{service corridor}/{60}/{-1}/{circulation}/{5,12}
+{staff restroom}/{50}/{-1}/{services}/{7,7}
+{fire stair and freight elevator}/{100}/{-1}/{circulation}/{8,12}
+{fire stair and elevator 1}/{75}/{-1}/{circulation}/{8,10}
+{fire stair and elevator 2}/{75}/{-1}/{circulation}/{8,10}
+
+## ─── L0 — Ground Floor (level 0), gross ~2020 m2 ───
+{entry vestibule}/{60}/{0}/{entry}/{8,8}
+{entry hall}/{180}/{0}/{entry}/{15,12}
+{exhibition gallery}/{340}/{0}/{gallery}/{22,15}
+{informal lounge}/{230}/{0}/{social}/{17,14}
+{media lounge}/{180}/{0}/{media}/{15,12}
+{open reading}/{220}/{0}/{reading}/{16,14}
+{event space}/{140}/{0}/{event}/{14,10}
+{cafe}/{90}/{0}/{cafe}/{10,9}
+{reference desk}/{50}/{0}/{administration}/{8,6}
+{staff office}/{60}/{0}/{administration}/{8,8}
+{IT support}/{40}/{0}/{technology}/{5,8}
+{public restroom}/{110}/{0}/{services}/{10,11}
+{open stair}/{80}/{0}/{circulation}/{8,10}
+{fire stair and freight elevator}/{100}/{0}/{circulation}/{8,12}
+{fire stair and elevator 1}/{70}/{0}/{circulation}/{7,10}
+{fire stair and elevator 2}/{70}/{0}/{circulation}/{7,10}
+
+## ─── L1 — Second Floor (level 1), gross ~2060 m2 ───
+{book stacks}/{620}/{1}/{collection}/{28,22}
+{reading room}/{320}/{1}/{reading}/{22,15}
+{individual reading carrels}/{100}/{1}/{reading}/{10,10}
+{group study zone}/{130}/{1}/{learning}/{13,10}
+{seminar room}/{100}/{1}/{learning}/{10,10}
+{rare books}/{80}/{1}/{faculty}/{8,10}
+{faculty study}/{80}/{1}/{faculty}/{8,10}
+{administrative office}/{70}/{1}/{administration}/{8,9}
+{librarian station}/{40}/{1}/{administration}/{5,8}
+{storage}/{50}/{1}/{storage}/{6,8}
+{IT support}/{40}/{1}/{technology}/{5,8}
+{public restroom}/{100}/{1}/{services}/{10,10}
+{open stair}/{80}/{1}/{circulation}/{8,10}
+{fire stair and freight elevator}/{100}/{1}/{circulation}/{8,12}
+{fire stair and elevator 1}/{75}/{1}/{circulation}/{8,10}
+{fire stair and elevator 2}/{75}/{1}/{circulation}/{8,10}
+`;
+
+    // ─────────────────────────────────────────────────────────
+    // CATEGORY COLOR PALETTE  (18 semantic categories)
+    // Each program type carries its own category — color maps
+    // directly to architectural role, not just public/private.
+    // ─────────────────────────────────────────────────────────
+    const CAT_COLORS = {
+      // ── Public-facing (warm amber → burnt orange spectrum) ──
+      entry:          '#F2BE58',   // bright golden amber
+      gallery:        '#E8962A',   // deep amber
+      social:         '#F5CE72',   // soft gold
+      media:          '#E07A30',   // orange amber
+      reading:        '#C8A868',   // warm wheat
+      event:          '#D06820',   // burnt orange
+      cafe:           '#A05E28',   // dark warm brown
+      // ── Collection / learning (blue spectrum) ──
+      collection:     '#2E6898',   // strong deep blue
+      learning:       '#4A82B8',   // medium blue
+      faculty:        '#3A7090',   // steel blue
+      // ── Admin / support (cool grey-blue) ──
+      administration: '#4E6A84',   // slate blue-grey
+      support:        '#3A5868',   // dark teal-grey
+      // ── Services / infrastructure (dark spectrum) ──
+      services:       '#5A6E5A',   // sage grey-green
+      loading:        '#3A3E36',   // dark charcoal-green
+      storage:        '#363640',   // dark blue-grey
+      mechanical:     '#242A38',   // dark navy
+      technology:     '#2E3650',   // dark blue
+      // ── Circulation ──
+      circulation:    '#222222',   // near-black
+    };
+
+    // Category display labels for the legend panel
+    const CAT_LABELS = {
+      entry:          'Entry',
+      gallery:        'Gallery',
+      social:         'Social Lounge',
+      media:          'Media',
+      reading:        'Reading',
+      event:          'Event',
+      cafe:           'Café',
+      collection:     'Collection / Archive',
+      learning:       'Learning / Seminar',
+      faculty:        'Faculty / Research',
+      administration: 'Administration',
+      support:        'Staff Support',
+      services:       'Services / Restroom',
+      loading:        'Loading / Receiving',
+      storage:        'Storage',
+      mechanical:     'Mechanical',
+      technology:     'Technology / IT',
+      circulation:    'Circulation / Stairs',
+    };
+
+    function getColor(type, category) {
+      return CAT_COLORS[category] || '#667788';
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // PARSE PROGRAM TEXT
+    // Strips {} from /-delimited fields; skips ## lines and blanks.
+    // Returns array of { type, area, level, category, w, h }
+    // ─────────────────────────────────────────────────────────
+    function parseProgramText(raw) {
+      const entries = [];
+      for (const line of raw.trim().split('\n')) {
+        const t = line.trim();
+        if (!t || t.startsWith('#')) continue;
+        const parts = t.split('/').map(p => p.replace(/[{}]/g, '').trim());
+        if (parts.length < 5) continue;
+        const type  = parts[0].toLowerCase().replace(/\s+/g, '_');
+        const area  = parseFloat(parts[1]);
+        const level = parseInt(parts[2], 10);
+        let category, dims;
+        if (parts[3].includes(',')) {
+          dims     = parts[3];
+          category = (parts[4] || 'private').trim().toLowerCase();
+        } else {
+          category = parts[3].trim().toLowerCase();
+          dims     = parts[4] || '10,10';
+        }
+        const [ws, hs] = dims.split(',');
+        const w = parseFloat(ws) || 10;
+        const h = parseFloat(hs) || 10;
+        if (isNaN(area) || isNaN(level)) continue;
+        entries.push({ type, area, level, category, w, h });
+      }
+      return entries;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // MUTABLE SCENE GLOBALS  (updated by Apply)
+    // ─────────────────────────────────────────────────────────
+    let PROGRAM_DATA = parseProgramText(RAW_PROGRAM);
+    let SITE_W  = 70;
+    let SITE_D  = 70;
+    let FLOOR_H = 4.0;
+    let SLAB_GAP = 0.15;  // fractional gap between slab top and next floor
+
+    // Core type keys used for perimeter anchoring
+    const FIRE_STAIR_FREIGHT = 'fire_stair_and_freight_elevator';
+    const FIRE_STAIR_ELEV1   = 'fire_stair_and_elevator_1';
+    const FIRE_STAIR_ELEV2   = 'fire_stair_and_elevator_2';
+    const OPEN_STAIR         = 'open_stair';
+    const SERVICE_CORRIDOR   = 'service_corridor';
+
+    // ─────────────────────────────────────────────────────────
+    // THREE.JS SETUP
+    // ─────────────────────────────────────────────────────────
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.90;
+    document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1A1A1A);
+    scene.fog = new THREE.FogExp2(0x1A1A1A, 0.0011);
+
+    const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.5, 2000);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.minDistance = 20;
+    controls.maxDistance = 600;
+    controls.maxPolarAngle = Math.PI * 0.50;
+
+    // ── Lighting ──
+    scene.add(new THREE.AmbientLight(0xffffff, 0.52));
+    const sun = new THREE.DirectionalLight(0xfff8ec, 1.5);
+    sun.position.set(80, 100, 60);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.near = 1;
+    sun.shadow.camera.far  = 500;
+    sun.shadow.camera.left  = -100;
+    sun.shadow.camera.right =  100;
+    sun.shadow.camera.top   =  100;
+    sun.shadow.camera.bottom = -60;
+    sun.shadow.bias = -0.0005;
+    scene.add(sun);
+    const fill = new THREE.DirectionalLight(0xc8d8e8, 0.35);
+    fill.position.set(-60, 40, -80);
+    scene.add(fill);
+
+    // ─────────────────────────────────────────────────────────
+    // SCENE GROUPS
+    // ─────────────────────────────────────────────────────────
+    let sceneGroup  = new THREE.Group();
+    scene.add(sceneGroup);
+    let floorGroups = {};
+    let labelObjects = [];
+
+    // ─────────────────────────────────────────────────────────
+    // MATERIAL HELPERS
+    // ─────────────────────────────────────────────────────────
+    function getMat(hexColor, opacity = 0.85) {
+      return new THREE.MeshStandardMaterial({
+        color:       new THREE.Color(hexColor),
+        roughness:   0.72,
+        metalness:   0.04,
+        transparent: true,
+        opacity,
+      });
+    }
+
+    const edgeMat = new THREE.LineBasicMaterial({
+      color: new THREE.Color('#ffffff'),
+      opacity: 0.20,
+      transparent: true,
+    });
+
+    const groundMat = new THREE.MeshStandardMaterial({
+      color:     new THREE.Color('#111111'),
+      roughness: 1.0,
+      metalness: 0,
+    });
+
+    // ─────────────────────────────────────────────────────────
+    // GROUND + SITE OUTLINE
+    // ─────────────────────────────────────────────────────────
+    function buildGround() {
+      const geo  = new THREE.PlaneGeometry(300, 300);
+      const mesh = new THREE.Mesh(geo, groundMat);
+      mesh.rotation.x = -Math.PI / 2;
+      mesh.position.set(SITE_W / 2, -0.06, SITE_D / 2);
+      mesh.receiveShadow = true;
+      sceneGroup.add(mesh);
+
+      // Grid centred on site
+      const grid = new THREE.GridHelper(240, 120,
+        new THREE.Color('#242414'), new THREE.Color('#1c1c10'));
+      grid.position.set(SITE_W / 2, 0, SITE_D / 2);
+      sceneGroup.add(grid);
+
+      // Site boundary outline at y = 0
+      const cx = SITE_W / 2, cz = SITE_D / 2;
+      const hw = SITE_W / 2, hd = SITE_D / 2;
+      const pts = [
+        new THREE.Vector3(cx - hw, 0.02, cz - hd),
+        new THREE.Vector3(cx + hw, 0.02, cz - hd),
+        new THREE.Vector3(cx + hw, 0.02, cz + hd),
+        new THREE.Vector3(cx - hw, 0.02, cz + hd),
+        new THREE.Vector3(cx - hw, 0.02, cz - hd),
+      ];
+      const bGeo  = new THREE.BufferGeometry().setFromPoints(pts);
+      const bLine = new THREE.Line(bGeo,
+        new THREE.LineBasicMaterial({ color: '#E8A838', opacity: 0.28, transparent: true }));
+      sceneGroup.add(bLine);
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // LAYOUT ALGORITHM — Tama perimeter-core strip-packing
+    //
+    // Architectural principle:
+    //   Tama has NO central core. Fire stairs sit at the perimeter:
+    //     fire stair + freight elevator  → SW corner  (service side)
+    //     fire stair + elevator 1        → NE corner
+    //     fire stair + elevator 2        → SE corner
+    //   Open stair (L0, L1)             → NW quadrant (near entry)
+    //   Service corridor (B1 only)      → south edge center
+    //
+    // After anchoring cores, remaining entries are column-packed
+    // into three horizontal east-west strip zones:
+    //   center strip   — public programs (priority)
+    //   north strip    — overflow / private back
+    //   south strip    — overflow / private front
+    // Max aspect ratio 1:5 enforced on all blocks.
+    // ─────────────────────────────────────────────────────────
+
+    // Perimeter corner anchors: cornerX 0=west 1=east, cornerZ 0=north 1=south
+    const PERIMETER_ANCHORS = [
+      { key: FIRE_STAIR_FREIGHT, cornerX: 0, cornerZ: 1 },  // SW
+      { key: FIRE_STAIR_ELEV1,   cornerX: 1, cornerZ: 0 },  // NE
+      { key: FIRE_STAIR_ELEV2,   cornerX: 1, cornerZ: 1 },  // SE
+    ];
+
+    function layoutFloor(entries, level) {
+      const cx = SITE_W / 2;
+      const cz = SITE_D / 2;
+      const hw = SITE_W / 2;
+      const hd = SITE_D / 2;
+      const PAD = 0.35;
+
+      const placed  = [];
+      const anchored = new Set(); // track types already placed
+
+      // ── 1. Anchor perimeter fire stairs to corners ──
+      //    Each stair box fits inside a corner zone sized at ~14% of site edge.
+      const cornerFrac = 0.14;
+      const maxCornerW = SITE_W * cornerFrac;
+      const maxCornerD = SITE_D * cornerFrac;
+
+      for (const anchor of PERIMETER_ANCHORS) {
+        const entry = entries.find(e => e.type === anchor.key);
+        if (!entry) continue;
+
+        const pw = Math.min(entry.w, maxCornerW);
+        const ph = Math.min(entry.h, maxCornerD);
+
+        // Push inward from each corner edge by half-dimension + small pad
+        const px = anchor.cornerX === 0
+          ? (cx - hw + pw / 2 + PAD)
+          : (cx + hw - pw / 2 - PAD);
+        const pz = anchor.cornerZ === 0
+          ? (cz - hd + ph / 2 + PAD)
+          : (cz + hd - ph / 2 - PAD);
+
+        placed.push({ ...entry, px, pz, pw, ph });
+        anchored.add(entry.type);
+      }
+
+      // ── 2. Open stair — NW interior, inset from corner, near main entry ──
+      const openStairEntry = entries.find(e => e.type === OPEN_STAIR);
+      if (openStairEntry) {
+        const pw = Math.min(openStairEntry.w, maxCornerW);
+        const ph = Math.min(openStairEntry.h, maxCornerD);
+        // NW corner inset slightly further than the fire stair (no stair anchored there)
+        const px = cx - hw + pw / 2 + PAD + 3;
+        const pz = cz - hd + ph / 2 + PAD + 3;
+        placed.push({ ...openStairEntry, px, pz, pw, ph });
+        anchored.add(openStairEntry.type);
+      }
+
+      // ── 3. Service corridor (B1 only) — south edge, right of center ──
+      if (level === -1) {
+        const sc = entries.find(e => e.type === SERVICE_CORRIDOR);
+        if (sc) {
+          const pw = Math.min(sc.w, SITE_W * 0.30);
+          const ph = Math.min(sc.h, 7);
+          const px = cx + hw * 0.30;  // east-center
+          const pz = cz + hd - ph / 2 - PAD;
+          placed.push({ ...sc, px, pz, pw, ph });
+          anchored.add(sc.type);
+        }
+      }
+
+      // ── 4. Strip-pack remaining entries ──
+      const remaining = entries.filter(e => !anchored.has(e.type));
+
+      // Sort: public-facing categories → center strip priority.
+      // Collection/learning/faculty → secondary strips.
+      // Admin/support/services/infrastructure → edges.
+      const PUBLIC_CATS  = new Set(['entry','gallery','social','media','reading','event','cafe']);
+      const COLLECT_CATS = new Set(['collection','learning','faculty']);
+
+      const publicE  = remaining.filter(e => PUBLIC_CATS.has(e.category))
+                                .sort((a, b) => b.area - a.area);
+      const privateE = remaining.filter(e => COLLECT_CATS.has(e.category))
+                                .sort((a, b) => b.area - a.area);
+      const otherE   = remaining.filter(e => !PUBLIC_CATS.has(e.category) && !COLLECT_CATS.has(e.category))
+                                .sort((a, b) => b.area - a.area);
+      const toPlace  = [...publicE, ...privateE, ...otherE];
+
+      // Three horizontal strip zones occupying the bulk of the 70x70 site.
+      // Center strip spans the middle ±16m in Z; north and south fill the remainder.
+      // X-bounds leave a small margin on both sides.
+      const xMin = cx - hw + PAD;
+      const xMax = cx + hw - PAD;
+      const stripZones = [
+        { x0: xMin, x1: xMax, z0: cz - 14, z1: cz + 14,       label: 'center' },
+        { x0: xMin, x1: xMax, z0: cz - hd + PAD, z1: cz - 14 - PAD, label: 'north'  },
+        { x0: xMin, x1: xMax, z0: cz + 14 + PAD, z1: cz + hd - PAD, label: 'south'  },
+      ].filter(z => (z.x1 - z.x0) > 1 && (z.z1 - z.z0) > 1);
+
+      // Column-packing cursor per zone
+      const state = stripZones.map(z => ({
+        curX:    z.x0,
+        curZ:    z.z0,
+        colMaxX: z.x0,
+      }));
+
+      for (const entry of toPlace) {
+        let wasPlaced = false;
+
+        for (let zi = 0; zi < stripZones.length; zi++) {
+          const zone  = stripZones[zi];
+          const st    = state[zi];
+          const zoneW = zone.x1 - zone.x0;
+          const zoneD = zone.z1 - zone.z0;
+
+          // Clamp dims to zone; enforce max aspect ratio 1:5
+          let bw = Math.min(entry.w, zoneW);
+          let bd = Math.min(entry.h, zoneD);
+          if (bw > 0 && bd / bw > 5) bd = bw * 5;
+          if (bd > 0 && bw / bd > 5) bw = bd * 5;
+          bw = Math.max(bw, 1);
+          bd = Math.max(bd, 1);
+
+          // Column exhausted — try next zone
+          if (st.curX + bw > zone.x1 + 0.01) continue;
+
+          // Row exhausted — advance to next column
+          if (st.curZ + bd > zone.z1 + 0.01) {
+            st.curX = st.colMaxX + PAD;
+            st.curZ = zone.z0;
+            if (st.curX + bw > zone.x1 + 0.01) continue;
+          }
+
+          const px = st.curX + bw / 2;
+          const pz = st.curZ + bd / 2;
+          placed.push({ ...entry, px, pz, pw: bw, ph: bd });
+
+          st.curZ += bd + PAD;
+          if (st.curX + bw > st.colMaxX) st.colMaxX = st.curX + bw;
+          wasPlaced = true;
+          break;
+        }
+
+        if (!wasPlaced) {
+          // Fallback: centre of site at reduced size
+          placed.push({
+            ...entry,
+            px: cx,
+            pz: cz,
+            pw: Math.min(entry.w, hw * 0.8),
+            ph: Math.min(entry.h, hd * 0.8),
+          });
+        }
+      }
+
+      return placed;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // DISPOSE HELPER
+    // ─────────────────────────────────────────────────────────
+    function disposeGroup(group) {
+      group.traverse(obj => {
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+          if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
+          else obj.material.dispose();
+        }
+      });
+      group.clear();
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // CAMERA RECENTRE
+    // ─────────────────────────────────────────────────────────
+    function recentreCamera() {
+      const cx   = SITE_W / 2;
+      const cz   = SITE_D / 2;
+      const lvls = [...new Set(PROGRAM_DATA.map(e => e.level))];
+      const maxL = lvls.length ? Math.max(...lvls) : 1;
+      // Total vertical span: basement below grade + above grade floors
+      const bldgH = (maxL + 2) * FLOOR_H;
+      const diag  = Math.sqrt(SITE_W * SITE_W + SITE_D * SITE_D);
+      controls.target.set(cx, bldgH * 0.25, cz);
+      camera.position.set(cx + diag * 1.35, bldgH * 1.25, cz + diag * 1.15);
+      controls.update();
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // BUILD SCENE
+    // ─────────────────────────────────────────────────────────
+    function buildScene() {
+      disposeGroup(sceneGroup);
+      sceneGroup.clear();
+      labelObjects = [];
+      floorGroups  = {};
+
+      buildGround();
+
+      // Group entries by floor level
+      const byFloor = {};
+      for (const e of PROGRAM_DATA) {
+        if (!byFloor[e.level]) byFloor[e.level] = [];
+        byFloor[e.level].push(e);
+      }
+
+      const levels = Object.keys(byFloor).map(Number).sort((a, b) => a - b);
+      const slabH  = FLOOR_H * (1 - SLAB_GAP);
+
+      for (const level of levels) {
+        const entries = byFloor[level];
+        // yBase: basement at -FLOOR_H, ground at 0, L1 at +FLOOR_H
+        const yBase = level * FLOOR_H;
+
+        const floorGroup = new THREE.Group();
+        floorGroup.name  = `floor_${level}`;
+        sceneGroup.add(floorGroup);
+        floorGroups[level] = floorGroup;
+
+        const layout = layoutFloor(entries, level);
+
+        for (const item of layout) {
+          const color = getColor(item.type, item.category);
+
+          // 4% visual inset per side creates clear gaps between adjacent blocks
+          const bw = item.pw * 0.95;
+          const bd = item.ph * 0.95;
+          const bh = slabH;
+
+          const geo  = new THREE.BoxGeometry(bw, bh, bd);
+          const mat  = getMat(color, 0.85);
+          const mesh = new THREE.Mesh(geo, mat);
+          mesh.position.set(item.px, yBase + bh / 2, item.pz);
+          mesh.castShadow   = true;
+          mesh.receiveShadow = true;
+          mesh.userData = {
+            type:     item.type,
+            area:     item.area,
+            level,
+            category: item.category,
+          };
+          floorGroup.add(mesh);
+
+          // White edge overlay
+          const edgesGeo = new THREE.EdgesGeometry(geo);
+          const edges    = new THREE.LineSegments(edgesGeo, edgeMat.clone());
+          edges.position.copy(mesh.position);
+          edges.userData.isEdge = true;
+          floorGroup.add(edges);
+        }
+
+        // Thin floor-slab outline at slab top edge
+        buildFloorOutline(level, yBase, slabH, floorGroup);
+
+        // Label anchor (left side of site)
+        labelObjects.push({
+          level,
+          worldPos: new THREE.Vector3(-3, yBase + slabH / 2, SITE_D / 2),
+        });
+      }
+
+      buildFloorBar();
+      buildStats();
+      buildLegend();
+      buildLabelElements();
+    }
+
+    // Perimeter outline at slab top level — architectural datum line
+    function buildFloorOutline(level, yBase, slabH, group) {
+      const cx = SITE_W / 2, cz = SITE_D / 2;
+      const hw = SITE_W / 2, hd = SITE_D / 2;
+      const y  = yBase + slabH;
+      const pts = [
+        new THREE.Vector3(cx - hw, y, cz - hd),
+        new THREE.Vector3(cx + hw, y, cz - hd),
+        new THREE.Vector3(cx + hw, y, cz + hd),
+        new THREE.Vector3(cx - hw, y, cz + hd),
+        new THREE.Vector3(cx - hw, y, cz - hd),
+      ];
+      const geo  = new THREE.BufferGeometry().setFromPoints(pts);
+      const line = new THREE.Line(geo,
+        new THREE.LineBasicMaterial({ color: '#E8A838', opacity: 0.15, transparent: true }));
+      line.userData.isEdge = true;
+      group.add(line);
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // UI — STATS PANEL
+    // ─────────────────────────────────────────────────────────
+    function buildStats() {
+      const container = document.getElementById('stats-content');
+      if (!container) return;
+      container.innerHTML = '';
+
+      // Aggregate area by program type
+      const byType = {};
+      for (const e of PROGRAM_DATA) {
+        if (!byType[e.type]) byType[e.type] = { area: 0, category: e.category };
+        byType[e.type].area += e.area;
+      }
+      const totalArea = Object.values(byType).reduce((s, v) => s + v.area, 0);
+
+      // Sort by area descending
+      const sorted = Object.entries(byType).sort((a, b) => b[1].area - a[1].area);
+      for (const [type, { area, category }] of sorted) {
+        const color = getColor(type, category);
+        const label = type.replace(/_/g, ' ');
+        const row   = document.createElement('div');
+        row.className = 'stats-row';
+        row.innerHTML = `
+          <div class="stats-swatch" style="background:${color}"></div>
+          <span class="stats-label">${label}</span>
+          <span class="stats-val">${area.toLocaleString()} m\u00B2</span>`;
+        container.appendChild(row);
+      }
+
+      const hr = document.createElement('hr');
+      hr.className = 'stats-divider';
+      container.appendChild(hr);
+
+      const totalRow = document.createElement('div');
+      totalRow.className = 'stats-total';
+      totalRow.innerHTML = `<span>Total GFA</span><span>${totalArea.toLocaleString()} m\u00B2</span>`;
+      container.appendChild(totalRow);
+
+      // Per-floor breakdown
+      const byFloor = {};
+      for (const e of PROGRAM_DATA) {
+        if (!byFloor[e.level]) byFloor[e.level] = 0;
+        byFloor[e.level] += e.area;
+      }
+      const levels  = Object.keys(byFloor).map(Number).sort((a, b) => a - b);
+      const maxFloor = Math.max(...levels);
+      const siteArea = SITE_W * SITE_D;
+
+      const floorDiv = document.createElement('div');
+      floorDiv.className = 'floor-breakdown';
+      floorDiv.innerHTML = '<div class="floor-breakdown-title">Floor Areas</div>';
+
+      for (const lvl of levels) {
+        const lbl = lvl < 0 ? 'B1 (Basement)' : (lvl === 0 ? 'L0 (Ground)' : `L${lvl}`);
+        const r   = document.createElement('div');
+        r.className = 'stats-row';
+        r.innerHTML = `
+          <span class="stats-label">${lbl}</span>
+          <span class="stats-val">${byFloor[lvl].toLocaleString()} m\u00B2</span>`;
+        floorDiv.appendChild(r);
+      }
+      container.appendChild(floorDiv);
+
+      const meta = document.createElement('div');
+      meta.className = 'stats-meta';
+      meta.innerHTML = `
+        Site: ${SITE_W} \u00D7 ${SITE_D} m &nbsp;= ${siteArea.toLocaleString()} m\u00B2<br>
+        GFA / Site &nbsp;= ${(totalArea / siteArea).toFixed(2)}\u00D7 FAR<br>
+        Building height: ~${((maxFloor + 1) * FLOOR_H).toFixed(1)} m above grade
+      `;
+      container.appendChild(meta);
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // UI — CATEGORY LEGEND  (built from CAT_COLORS / CAT_LABELS)
+    // Only shows categories actually present in PROGRAM_DATA.
+    // ─────────────────────────────────────────────────────────
+    function buildLegend() {
+      const container = document.getElementById('cat-legend-items');
+      if (!container) return;
+      container.innerHTML = '';
+
+      // Collect categories present in the current program data, in palette order
+      const presentCats = new Set(PROGRAM_DATA.map(e => e.category));
+      const orderedCats = Object.keys(CAT_COLORS).filter(c => presentCats.has(c));
+
+      for (const cat of orderedCats) {
+        const color = CAT_COLORS[cat];
+        const label = CAT_LABELS[cat] || cat;
+        const item  = document.createElement('div');
+        item.className = 'cat-legend-item';
+        item.innerHTML = `
+          <div class="cat-swatch" style="background:${color}"></div>
+          <span class="cat-label">${label}</span>`;
+        container.appendChild(item);
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // UI — FLOOR VISIBILITY BAR
+    // ─────────────────────────────────────────────────────────
+    let activeFloor = null;
+
+    function buildFloorBar() {
+      const bar = document.getElementById('floor-bar');
+      bar.innerHTML = '';
+
+      const allBtn = document.createElement('button');
+      allBtn.className = 'floor-btn active';
+      allBtn.textContent = 'ALL';
+      allBtn.onclick = () => setActiveFloor(null);
+      bar.appendChild(allBtn);
+
+      const levels = [...new Set(PROGRAM_DATA.map(e => e.level))].sort((a, b) => a - b);
+      for (const lvl of levels) {
+        const btn = document.createElement('button');
+        btn.className = 'floor-btn';
+        btn.textContent = lvl < 0 ? 'B1' : (lvl === 0 ? 'L0' : `L${lvl}`);
+        btn.dataset.level = lvl;
+        btn.onclick = () => setActiveFloor(lvl);
+        bar.appendChild(btn);
+      }
+    }
+
+    function setActiveFloor(level) {
+      activeFloor = level;
+      // Update button states
+      document.querySelectorAll('#floor-bar .floor-btn').forEach(btn => {
+        const isAll  = btn.textContent === 'ALL';
+        const btnLvl = parseInt(btn.dataset.level);
+        btn.classList.toggle('active', isAll ? level === null : btnLvl === level);
+      });
+      // Fade non-active floors
+      for (const [lvl, group] of Object.entries(floorGroups)) {
+        const isActive = level === null || parseInt(lvl) === level;
+        group.traverse(obj => {
+          if (!obj.material) return;
+          const mats   = Array.isArray(obj.material) ? obj.material : [obj.material];
+          const isEdge = !!obj.userData.isEdge;
+          mats.forEach(m => {
+            m.transparent = true;
+            m.opacity = isActive ? (isEdge ? 0.20 : 0.85) : 0.05;
+          });
+        });
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // UI — PANEL TOGGLE
+    // ─────────────────────────────────────────────────────────
+    function togglePanel(id) {
+      const body      = document.getElementById(`body-${id}`);
+      const arrow     = document.getElementById(`arrow-${id}`);
+      const collapsed = body.classList.toggle('collapsed');
+      arrow.innerHTML = collapsed ? '&#9656;' : '&#9660;';
+    }
+    window.togglePanel = togglePanel;
+
+    // ─────────────────────────────────────────────────────────
+    // UI — APPLY PARAMS
+    // ─────────────────────────────────────────────────────────
+    function applyParams() {
+      const w  = parseFloat(document.getElementById('param-site-w').value);
+      const d  = parseFloat(document.getElementById('param-site-d').value);
+      const fh = parseFloat(document.getElementById('param-floor-h').value);
+      const sg = parseFloat(document.getElementById('param-slab-gap').value);
+      if (w  > 0)    SITE_W   = w;
+      if (d  > 0)    SITE_D   = d;
+      if (fh > 0)    FLOOR_H  = fh;
+      if (!isNaN(sg)) SLAB_GAP = sg / 100;
+      buildScene();
+      recentreCamera();
+    }
+    window.applyParams = applyParams;
+
+    // ─────────────────────────────────────────────────────────
+    // RAYCASTING / TOOLTIP
+    // ─────────────────────────────────────────────────────────
+    const raycaster = new THREE.Raycaster();
+    const mouse     = new THREE.Vector2(-9999, -9999);
+    const tooltip   = document.getElementById('tooltip');
+    let hoveredMesh = null;
+
+    renderer.domElement.addEventListener('mousemove', e => {
+      mouse.x = (e.clientX / window.innerWidth)  * 2 - 1;
+      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      tooltip.style.left = (e.clientX + 14) + 'px';
+      tooltip.style.top  = (e.clientY - 10) + 'px';
+    });
+
+    renderer.domElement.addEventListener('mouseleave', () => {
+      tooltip.style.display = 'none';
+      clearHover();
+    });
+
+    function clearHover() {
+      if (hoveredMesh && hoveredMesh.material && hoveredMesh.material.emissive) {
+        hoveredMesh.material.emissiveIntensity = 0;
+        hoveredMesh.material.emissive.set(0x000000);
+      }
+      hoveredMesh = null;
+    }
+
+    function checkHover() {
+      raycaster.setFromCamera(mouse, camera);
+      const meshes = [];
+      sceneGroup.traverse(obj => { if (obj.isMesh && obj.userData.type) meshes.push(obj); });
+      const hits = raycaster.intersectObjects(meshes, false);
+
+      if (hits.length > 0) {
+        const hit = hits[0].object;
+        if (hit !== hoveredMesh) {
+          clearHover();
+          hoveredMesh = hit;
+          if (hit.material && hit.material.emissive) {
+            hit.material.emissive.set(0xffffff);
+            hit.material.emissiveIntensity = 0.18;
+          }
+        }
+        const d        = hit.userData;
+        const label    = d.type.replace(/_/g, ' ');
+        const floorStr = d.level < 0 ? 'B1' : (d.level === 0 ? 'Ground' : `L${d.level}`);
+        const catColor = CAT_COLORS[d.category] || '#888';
+        tooltip.innerHTML = `
+          <strong>${label}</strong>
+          ${floorStr} &nbsp;&middot;&nbsp; ${d.area.toLocaleString()} m\u00B2<br>
+          <span style="color:${catColor};font-size:9px;text-transform:uppercase;
+                       letter-spacing:0.10em;font-weight:600">${d.category}</span>`;
+        tooltip.style.display = 'block';
+      } else {
+        clearHover();
+        tooltip.style.display = 'none';
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // FLOOR LABELS (projected to screen space)
+    // ─────────────────────────────────────────────────────────
+    let labelEls = [];
+
+    function buildLabelElements() {
+      labelEls.forEach(({ el }) => el.remove());
+      labelEls = [];
+      for (const lo of labelObjects) {
+        const el = document.createElement('div');
+        el.style.cssText = `
+          position:fixed;
+          font-size:9px;
+          font-family:'Montserrat','Helvetica Neue',Helvetica,Arial,sans-serif;
+          font-weight:600;
+          letter-spacing:0.10em;
+          color:#E8A838;
+          opacity:0.60;
+          pointer-events:none;
+          white-space:nowrap;
+          z-index:5;
+          text-transform:uppercase;
+        `;
+        el.textContent = lo.level < 0 ? 'B1' : (lo.level === 0 ? 'L0' : `L${lo.level}`);
+        document.body.appendChild(el);
+        labelEls.push({ el, worldPos: lo.worldPos });
+      }
+    }
+
+    function updateLabels() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      for (const { el, worldPos } of labelEls) {
+        const v  = worldPos.clone().project(camera);
+        const sx = (v.x * 0.5 + 0.5) * w;
+        const sy = (-v.y * 0.5 + 0.5) * h;
+        if (v.z > 1 || sx < 0 || sx > w || sy < 0 || sy > h) {
+          el.style.display = 'none';
+        } else {
+          el.style.display = 'block';
+          el.style.left = (sx - 10) + 'px';
+          el.style.top  = (sy - 6)  + 'px';
+        }
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // FILE LOADING (drag-and-drop + file picker)
+    // ─────────────────────────────────────────────────────────
+    const fileInput  = document.getElementById('file-input');
+    const dropZone   = document.getElementById('drop-zone');
+    const fnDisplay  = document.getElementById('loaded-filename');
+    const ecDisplay  = document.getElementById('load-entry-count');
+    const errDisplay = document.getElementById('load-error');
+
+    function handleProgramFile(file) {
+      if (errDisplay) errDisplay.textContent = '';
+      if (fnDisplay)  fnDisplay.textContent  = '';
+      if (ecDisplay)  ecDisplay.textContent  = '';
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = evt => {
+        const raw = evt.target.result;
+        let parsed;
+        try {
+          parsed = parseProgramText(raw);
+        } catch (err) {
+          if (errDisplay) errDisplay.textContent = 'Parse error: ' + err.message;
+          return;
+        }
+        if (parsed.length === 0) {
+          if (errDisplay) errDisplay.textContent = 'No entries found. Check file format.';
+          return;
+        }
+        PROGRAM_DATA = parsed;
+        const lvls = parsed.map(e => e.level);
+        if (fnDisplay) fnDisplay.textContent =
+          '\u2713 ' + file.name;
+        if (ecDisplay) ecDisplay.textContent =
+          parsed.length + ' entries across ' + new Set(lvls).size + ' floors';
+        buildScene();
+        recentreCamera();
+      };
+      reader.onerror = () => {
+        if (errDisplay) errDisplay.textContent = 'Could not read file.';
+      };
+      reader.readAsText(file);
+    }
+
+    if (fileInput) {
+      fileInput.addEventListener('change', e => {
+        if (e.target.files[0]) handleProgramFile(e.target.files[0]);
+        e.target.value = '';
+      });
+    }
+
+    if (dropZone) {
+      dropZone.addEventListener('dragover',  e => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+      });
+      dropZone.addEventListener('dragleave', () =>
+        dropZone.classList.remove('drag-over'));
+      dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file) handleProgramFile(file);
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // RESIZE
+    // ─────────────────────────────────────────────────────────
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ─────────────────────────────────────────────────────────
+    // ANIMATION LOOP
+    // ─────────────────────────────────────────────────────────
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      checkHover();
+      updateLabels();
+      renderer.render(scene, camera);
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // INIT
+    // ─────────────────────────────────────────────────────────
+    buildScene();
+    recentreCamera();
+    animate();
+
+  </script>
+</body>
+
+</html>

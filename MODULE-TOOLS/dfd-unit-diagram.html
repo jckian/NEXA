@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCI-Arc SP26 — DfD 14ft Cube Unit</title>
+  <meta name="description" content="Design-for-Disassembly 14ft cube frame matrix — partitions bolted to corner connection nodes" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #FAFAFA; --surface: #FFFFFF; --surface-2: #F4F4F6;
+      --border: rgba(20, 24, 32, 0.10); --border-hi: rgba(20, 24, 32, 0.16);
+      --text-hi: #141820; --text-mid: #5A6478; --text-lo: #9BA5B5;
+      --accent: #0000FF;
+      --frame: #8c7359; --node: #4a4a4a; --partition: #18b8c4; --bolt: #1a1d24;
+      --font: 'DM Sans', system-ui, sans-serif; --mono: 'JetBrains Mono', monospace;
+      --radius: 4px;
+    }
+    html, body { width: 100vw; height: 100vh; overflow: hidden; background: var(--bg);
+      font-family: var(--font); color: var(--text-hi); -webkit-font-smoothing: antialiased; }
+    #app { position: fixed; inset: 0; }
+    canvas { display: block; }
+
+    /* ── side panel ── */
+    #panel {
+      position: fixed; top: 16px; right: 16px; width: 280px; max-height: calc(100vh - 32px);
+      overflow-y: auto; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+      padding: 0; z-index: 10;
+    }
+    .hd { padding: 14px 16px 12px; border-bottom: 1px solid var(--border); }
+    .hd h1 { font-size: 13px; font-weight: 600; letter-spacing: 0.01em; }
+    .hd .sub { font-family: var(--mono); font-size: 10px; color: var(--text-lo);
+      margin-top: 4px; text-transform: uppercase; letter-spacing: 0.08em; }
+    .sec { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .sec:last-child { border-bottom: none; }
+    .sec h2 { font-family: var(--mono); font-size: 9px; font-weight: 500; color: var(--text-lo);
+      text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 10px; }
+
+    .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .row:last-child { margin-bottom: 0; }
+    .row label { font-size: 12px; color: var(--text-mid); }
+    .row .val { font-family: var(--mono); font-size: 11px; color: var(--text-hi); min-width: 34px; text-align: right; }
+    input[type="range"] { -webkit-appearance: none; appearance: none; width: 130px; height: 3px;
+      background: var(--border-hi); border-radius: 2px; outline: none; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px;
+      border-radius: 50%; background: var(--accent); cursor: pointer; }
+
+    .toggles { display: flex; flex-direction: column; gap: 2px; }
+    .tg { display: flex; align-items: center; gap: 9px; padding: 5px 6px; border-radius: 3px;
+      cursor: pointer; font-size: 12px; color: var(--text-mid); user-select: none; }
+    .tg:hover { background: var(--surface-2); }
+    .tg .sw { width: 28px; height: 16px; border-radius: 9px; background: var(--border-hi);
+      position: relative; transition: background .15s; flex-shrink: 0; }
+    .tg .sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px;
+      border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+    .tg.on .sw { background: var(--accent); }
+    .tg.on .sw::after { transform: translateX(12px); }
+    .tg .dot { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; margin-left: auto; }
+
+    .btn { width: 100%; padding: 8px; font-family: var(--font); font-size: 12px; font-weight: 500;
+      color: #fff; background: var(--accent); border: none; border-radius: 3px; cursor: pointer; }
+    .btn:hover { filter: brightness(1.1); }
+    .btn.ghost { color: var(--text-mid); background: var(--surface-2); border: 1px solid var(--border); }
+
+    .stat { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px; }
+    .stat:last-child { margin-bottom: 0; }
+    .stat .k { color: var(--text-lo); font-family: var(--mono); font-size: 10px; }
+    .stat .v { font-family: var(--mono); color: var(--text-hi); }
+
+    #hint { position: fixed; bottom: 14px; left: 16px; font-family: var(--mono); font-size: 10px;
+      color: var(--text-lo); z-index: 10; letter-spacing: 0.04em; }
+    #brand { position: fixed; top: 16px; left: 18px; z-index: 10; }
+    #brand .t { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
+    #brand .s { font-family: var(--mono); font-size: 9px; color: var(--text-lo);
+      text-transform: uppercase; letter-spacing: 0.12em; margin-top: 2px; }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <div id="brand">
+    <div class="t">DfD · 14ft Cube Unit</div>
+    <div class="s">Design for Disassembly — bolted frame</div>
+  </div>
+
+  <div id="panel">
+    <div class="hd">
+      <h1>Assembly Parameters</h1>
+      <div class="sub">260620_unitTest_DfD</div>
+    </div>
+
+    <div class="sec">
+      <h2>Cube Matrix</h2>
+      <div class="row"><label>Bays X</label><input type="range" id="nx" min="1" max="6" step="1" value="3"><span class="val" id="nx-v">3</span></div>
+      <div class="row"><label>Bays Y</label><input type="range" id="ny" min="1" max="6" step="1" value="3"><span class="val" id="ny-v">3</span></div>
+      <div class="row"><label>Levels</label><input type="range" id="nz" min="1" max="6" step="1" value="3"><span class="val" id="nz-v">3</span></div>
+    </div>
+
+    <div class="sec">
+      <h2>Partitions (bolt → connection)</h2>
+      <div class="row"><label>Density</label><input type="range" id="dens" min="0" max="100" step="5" value="35"><span class="val" id="dens-v">35%</span></div>
+      <div class="row"><label>On levels</label><input type="range" id="plv" min="1" max="6" step="1" value="1"><span class="val" id="plv-v">1</span></div>
+      <div class="row"><label>Seed</label><input type="range" id="seed" min="0" max="20" step="1" value="3"><span class="val" id="seed-v">3</span></div>
+    </div>
+
+    <div class="sec">
+      <h2>Layers</h2>
+      <div class="toggles">
+        <div class="tg on" data-k="frame"><div class="sw"></div>Frame (column + beam)<div class="dot" style="background:var(--frame)"></div></div>
+        <div class="tg on" data-k="node"><div class="sw"></div>Connection nodes<div class="dot" style="background:var(--node)"></div></div>
+        <div class="tg on" data-k="part"><div class="sw"></div>Partitions<div class="dot" style="background:var(--partition)"></div></div>
+        <div class="tg on" data-k="bolt"><div class="sw"></div>Bolts<div class="dot" style="background:var(--bolt)"></div></div>
+        <div class="tg" data-k="deck"><div class="sw"></div>Decks (hollow floor)<div class="dot" style="background:#cdd8c8"></div></div>
+        <div class="tg" data-k="wire"><div class="sw"></div>Module wireframe<div class="dot" style="background:#bbb"></div></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h2>View</h2>
+      <div class="row" style="gap:8px">
+        <button class="btn ghost" id="iso">Iso</button>
+        <button class="btn ghost" id="joint">Joint detail</button>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h2>Bill of Components</h2>
+      <div id="stats"></div>
+    </div>
+  </div>
+
+  <div id="hint">drag · orbit  |  scroll · zoom  |  right-drag · pan</div>
+
+  <script type="importmap">
+  { "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+  } }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // ─── Real dimensions from 260620_unitTest_DfD.3dm (centimetres → metres) ───
+    const M       = 4.2672;   // module = 14 ft = 426.72 cm cube
+    const MEMBER  = 0.19;     // column / beam section (19 cm)
+    const NODE    = 0.316;    // corner connection block (31.6 cm cube)
+    const PART_T  = 0.24;     // partition thickness (~23.9 cm)
+    const DECK_T  = 0.30;     // hollow deck cassette (~61 cm in model, slimmed for clarity)
+    const BOLT_R  = 0.045;
+    const COL = {
+      frame: 0x8c7359, node: 0x4a4a4a, part: 0x18b8c4, bolt: 0x16191f,
+      deck: 0xcdd8c8, ground: 0xeceef1,
+    };
+
+    // ─── renderer / scene ───
+    const app = document.getElementById('app');
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    app.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xFAFAFA);
+
+    const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 1000);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true; controls.dampingFactor = 0.08;
+
+    // lights
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xd8dde4, 0.85));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.05);
+    sun.position.set(18, 30, 14); sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    const sc = sun.shadow.camera; sc.left = -30; sc.right = 30; sc.top = 30; sc.bottom = -30; sc.far = 120;
+    scene.add(sun);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.set(-12, 10, -16); scene.add(fill);
+
+    // materials
+    const mats = {
+      frame: new THREE.MeshStandardMaterial({ color: COL.frame, roughness: 0.65, metalness: 0.15 }),
+      node:  new THREE.MeshStandardMaterial({ color: COL.node, roughness: 0.45, metalness: 0.55 }),
+      part:  new THREE.MeshStandardMaterial({ color: COL.part, roughness: 0.85, metalness: 0.0,
+              transparent: true, opacity: 0.78, side: THREE.DoubleSide }),
+      bolt:  new THREE.MeshStandardMaterial({ color: COL.bolt, roughness: 0.35, metalness: 0.85 }),
+      deck:  new THREE.MeshStandardMaterial({ color: COL.deck, roughness: 0.9, metalness: 0.0,
+              transparent: true, opacity: 0.6 }),
+    };
+
+    // ground
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400),
+      new THREE.MeshStandardMaterial({ color: COL.ground, roughness: 1 }));
+    ground.rotation.x = -Math.PI / 2; ground.position.y = -0.01; ground.receiveShadow = true;
+    scene.add(ground);
+    const grid = new THREE.GridHelper(400, 400 / M, 0xc4cad2, 0xe2e5ea);
+    grid.position.y = 0; scene.add(grid);
+
+    // ─── state ───
+    const P = { nx: 3, ny: 3, nz: 3, dens: 35, plv: 1, seed: 3 };
+    const show = { frame: true, node: true, part: true, bolt: true, deck: false, wire: false };
+    const groups = {};            // layer -> THREE.Group
+    let counts = {};
+
+    // seeded RNG (mulberry32)
+    function rng(seed) { let a = seed >>> 0; return () => {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }; }
+
+    function box(w, h, d, mat, x, y, z, g) {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+      m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true;
+      g.add(m); return m;
+    }
+    function bolt(len, axis, x, y, z, g) {
+      // shank + hex head, along given axis ('x'|'y'|'z')
+      const shank = new THREE.Mesh(new THREE.CylinderGeometry(BOLT_R, BOLT_R, len, 12), mats.bolt);
+      const head  = new THREE.Mesh(new THREE.CylinderGeometry(BOLT_R * 1.7, BOLT_R * 1.7, BOLT_R * 1.6, 6), mats.bolt);
+      head.position.y = len / 2;
+      const grp = new THREE.Group(); grp.add(shank); grp.add(head);
+      shank.castShadow = head.castShadow = true;
+      if (axis === 'x') grp.rotation.z = Math.PI / 2;
+      if (axis === 'z') grp.rotation.x = Math.PI / 2;
+      grp.position.set(x, y, z); g.add(grp); counts.bolt++;
+    }
+
+    function build() {
+      // reset groups
+      Object.values(groups).forEach(g => { scene.remove(g);
+        g.traverse(o => { if (o.geometry) o.geometry.dispose(); }); });
+      ['frame', 'node', 'part', 'bolt', 'deck', 'wire'].forEach(k => {
+        groups[k] = new THREE.Group(); groups[k].visible = show[k]; scene.add(groups[k]);
+      });
+      counts = { col: 0, beam: 0, node: 0, part: 0, bolt: 0, deck: 0, module: P.nx * P.ny * P.nz };
+
+      const { nx, ny, nz } = P;
+      const off = NODE / 2 + 0.02;           // clear members away from nodes a touch
+
+      // ── connection nodes at every grid intersection ──
+      for (let i = 0; i <= nx; i++)
+        for (let j = 0; j <= ny; j++)
+          for (let k = 0; k <= nz; k++) {
+            box(NODE, NODE, NODE, mats.node, i * M, k * M, j * M, groups.node);
+            counts.node++;
+          }
+
+      // ── columns (vertical members on every grid line) ──
+      const colLen = M - NODE;
+      for (let i = 0; i <= nx; i++)
+        for (let j = 0; j <= ny; j++)
+          for (let k = 0; k < nz; k++) {
+            box(MEMBER, colLen, MEMBER, mats.frame, i * M, k * M + M / 2, j * M, groups.frame);
+            counts.col++;
+          }
+
+      // ── beams (horizontal members at every level) ──
+      const beamLen = M - NODE;
+      for (let k = 0; k <= nz; k++) {
+        // X-beams
+        for (let j = 0; j <= ny; j++)
+          for (let i = 0; i < nx; i++) {
+            box(beamLen, MEMBER, MEMBER, mats.frame, i * M + M / 2, k * M, j * M, groups.frame);
+            counts.beam++;
+          }
+        // Y-beams
+        for (let i = 0; i <= nx; i++)
+          for (let j = 0; j < ny; j++) {
+            box(MEMBER, MEMBER, beamLen, mats.frame, i * M, k * M, j * M + M / 2, groups.frame);
+            counts.beam++;
+          }
+      }
+
+      // ── module wireframe (one cube outline per module) ──
+      if (show.wire || groups.wire) {
+        for (let i = 0; i < nx; i++)
+          for (let j = 0; j < ny; j++)
+            for (let k = 0; k < nz; k++) {
+              const ge = new THREE.BoxGeometry(M, M, M);
+              const eg = new THREE.LineSegments(new THREE.EdgesGeometry(ge),
+                new THREE.LineBasicMaterial({ color: 0x9aa3ad }));
+              eg.position.set(i * M + M / 2, k * M + M / 2, j * M + M / 2);
+              groups.wire.add(eg); ge.dispose();
+            }
+      }
+
+      // ── decks (hollow floor cassette per bay, per level top) ──
+      for (let k = 1; k <= nz; k++)
+        for (let i = 0; i < nx; i++)
+          for (let j = 0; j < ny; j++) {
+            box(M - NODE, DECK_T, M - NODE, mats.deck, i * M + M / 2, k * M - DECK_T / 2 - MEMBER / 2, j * M + M / 2, groups.deck);
+            counts.deck++;
+          }
+
+      // ── partitions bolted to corner connection nodes ──
+      buildPartitions();
+
+      updateStats();
+    }
+
+    // A partition fills one vertical bay-face and bolts its 4 corners to the
+    // surrounding connection nodes (matches the .3dm PARTITION→Connection logic).
+    function buildPartitions() {
+      const { nx, ny, nz, dens, plv } = P;
+      const rand = rng(P.seed * 101 + 7);
+      const prob = dens / 100;
+      const levels = Math.min(plv, nz);
+
+      // bolt offsets: inset partition from the 4 nodes, bolt bridges the gap
+      const inset = NODE / 2 + 0.06;        // clear of node block
+      const zInsetB = NODE / 2 + 0.04;      // off bottom node
+      const zInsetT = NODE / 2 + 0.04;      // off top node
+
+      for (let k = 0; k < levels; k++) {
+        const zb = k * M + zInsetB;
+        const zt = (k + 1) * M - zInsetT;
+        const ph = zt - zb;                 // partition height
+        const zc = (zb + zt) / 2;
+
+        // X-aligned walls: span along X, between nodes (i,j)-(i+1,j), at plane y=j*M
+        for (let j = 0; j <= ny; j++)
+          for (let i = 0; i < nx; i++) {
+            if (rand() > prob) continue;
+            const u0 = i * M + inset, u1 = (i + 1) * M - inset;
+            const w = u1 - u0, uc = (u0 + u1) / 2, yc = j * M;
+            box(w, ph, PART_T, mats.part, uc, zc, yc, groups.part); counts.part++;
+            // 4 bolts: at each end (u0,u1) × each height (zb-ish, zt-ish), axis = X (into nodes)
+            for (const ux of [i * M, (i + 1) * M])
+              for (const bz of [k * M, (k + 1) * M]) {
+                const dir = (ux < uc) ? 1 : -1;
+                bolt(0.34, 'x', ux + dir * 0.17, bz, yc, groups.bolt);
+              }
+          }
+
+        // Y-aligned walls: span along Y, between nodes (i,j)-(i,j+1), at plane x=i*M
+        for (let i = 0; i <= nx; i++)
+          for (let j = 0; j < ny; j++) {
+            if (rand() > prob) continue;
+            const v0 = j * M + inset, v1 = (j + 1) * M - inset;
+            const d = v1 - v0, vc = (v0 + v1) / 2, xc = i * M;
+            box(PART_T, ph, d, mats.part, xc, zc, vc, groups.part); counts.part++;
+            for (const vy of [j * M, (j + 1) * M])
+              for (const bz of [k * M, (k + 1) * M]) {
+                const dir = (vy < vc) ? 1 : -1;
+                bolt(0.34, 'z', xc, bz, vy + dir * 0.17, groups.bolt);
+              }
+          }
+      }
+    }
+
+    function updateStats() {
+      const el = document.getElementById('stats');
+      const rows = [
+        ['Module', `${P.nx}×${P.ny}×${P.nz} = ${counts.module}`],
+        ['Footprint', `${(P.nx * M).toFixed(1)} × ${(P.ny * M).toFixed(1)} m`],
+        ['Height', `${(P.nz * M).toFixed(1)} m  (${P.nz}×14ft)`],
+        ['Columns', counts.col],
+        ['Beams', counts.beam],
+        ['Conn. nodes', counts.node],
+        ['Partitions', counts.part],
+        ['Bolts', counts.bolt],
+      ];
+      el.innerHTML = rows.map(([k, v]) =>
+        `<div class="stat"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('');
+    }
+
+    // ─── camera helpers ───
+    function center() { return new THREE.Vector3(P.nx * M / 2, P.nz * M / 2, P.ny * M / 2); }
+    function frameIso() {
+      const c = center();
+      const r = Math.max(P.nx, P.ny, P.nz) * M * 1.6 + 6;
+      camera.position.set(c.x + r, c.y + r * 0.75, c.z + r);
+      controls.target.copy(c); controls.update();
+    }
+    function frameJoint() {
+      // zoom to a corner connection node where partitions meet
+      const c = new THREE.Vector3(M, M, M);
+      camera.position.set(M + 3.2, M + 2.4, M + 3.2);
+      controls.target.copy(c); controls.update();
+    }
+
+    // ─── UI wiring ───
+    function bindSlider(id, key, fmt) {
+      const s = document.getElementById(id), v = document.getElementById(id + '-v');
+      s.addEventListener('input', () => {
+        P[key] = +s.value; v.textContent = fmt ? fmt(+s.value) : s.value;
+        if (key === 'nz') document.getElementById('plv').max = s.value;
+        build();
+      });
+    }
+    bindSlider('nx', 'nx'); bindSlider('ny', 'ny'); bindSlider('nz', 'nz');
+    bindSlider('dens', 'dens', v => v + '%');
+    bindSlider('plv', 'plv'); bindSlider('seed', 'seed');
+
+    document.querySelectorAll('.tg').forEach(tg => {
+      tg.addEventListener('click', () => {
+        const k = tg.dataset.k; show[k] = !show[k];
+        tg.classList.toggle('on', show[k]);
+        if (groups[k]) groups[k].visible = show[k];
+      });
+    });
+    document.getElementById('iso').addEventListener('click', frameIso);
+    document.getElementById('joint').addEventListener('click', frameJoint);
+
+    // ─── run ───
+    build();
+    (location.hash === '#joint') ? frameJoint() : frameIso();
+    addEventListener('resize', () => {
+      camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+    (function loop() { requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); })();
+  </script>
+</body>
+
+</html>

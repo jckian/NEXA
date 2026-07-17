@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TPAC — Structure + Program Diagram</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --grad-start: #2563eb;
+      --grad-end:   #7c3aed;
+      --grad:       linear-gradient(135deg, #2563eb, #7c3aed);
+      --grad-green: linear-gradient(135deg, #10b981, #059669);
+      --panel-bg:   rgba(6, 6, 18, 0.92);
+      --border:     rgba(120, 80, 255, 0.22);
+      --border-dim: rgba(120, 80, 255, 0.10);
+      --text-hi:    #f0f0ff;
+      --text-mid:   #9898c0;
+      --text-lo:    #44445a;
+      --radius-lg:  12px;
+      --radius-md:  8px;
+      --radius-sm:  5px;
+      --shadow:     0 8px 32px rgba(37,99,235,0.10), 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    body {
+      background: #06060f;
+      font-family: 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      color: var(--text-hi);
+    }
+
+    #canvas-container { position: fixed; inset: 0; }
+
+    /* ── Legend ─────────────────────────────────────────────── */
+    #legend {
+      position: fixed;
+      bottom: 64px;
+      left: 20px;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      border-radius: var(--radius-lg);
+      width: 200px;
+      max-height: 50vh;
+      overflow-y: auto;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      z-index: 10;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(120,80,255,0.3) transparent;
+    }
+    #legend::-webkit-scrollbar { width: 3px; }
+    #legend::-webkit-scrollbar-thumb { background: rgba(120,80,255,0.3); border-radius: 2px; }
+    #legend h2 {
+      font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--text-lo); margin-bottom: 12px;
+      border-bottom: 1px solid var(--border-dim); padding-bottom: 9px; font-weight: 600;
+    }
+    .legend-category {
+      font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-lo); margin: 12px 0 7px;
+      border-top: 1px solid var(--border-dim); padding-top: 10px; font-weight: 600;
+    }
+    .legend-category:first-of-type { border-top: none; margin-top: 4px; }
+    .legend-item { display: flex; align-items: center; gap: 9px; margin-bottom: 7px; font-size: 10px; line-height: 1.3; }
+    .legend-swatch { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.12); }
+    .legend-label { color: var(--text-mid); flex: 1; font-weight: 400; }
+
+    /* ── Info panel ──────────────────────────────────────────── */
+    #info {
+      position: fixed; bottom: 20px; left: 20px;
+      background: var(--panel-bg); border: 1px solid var(--border);
+      padding: 8px 12px; border-radius: var(--radius-md);
+      font-size: 9px; color: var(--text-lo); line-height: 1.7;
+      backdrop-filter: blur(16px); box-shadow: var(--shadow); z-index: 10;
+    }
+
+    /* ── Title ───────────────────────────────────────────────── */
+    #title-block { position: fixed; top: 20px; left: 20px; text-align: left; z-index: 10; pointer-events: none; }
+    #title-block h1 {
+      font-size: 14px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+      background: var(--grad); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    #title-block p { font-size: 9px; letter-spacing: 0.18em; color: var(--text-lo); text-transform: uppercase; margin-top: 5px; font-weight: 400; }
+    #title-block .struct-badge {
+      display: inline-block; margin-top: 6px;
+      font-size: 7px; font-weight: 700; letter-spacing: 0.14em;
+      padding: 2px 8px; border-radius: 20px;
+      background: var(--grad-green); color: #fff; text-transform: uppercase;
+    }
+
+    /* ── HTML Labels ─────────────────────────────────────────── */
+    .volume-label {
+      position: fixed; transform: translate(-50%, -50%);
+      font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.8);
+      pointer-events: none; white-space: nowrap; z-index: 5; opacity: 0.9;
+    }
+    .floor-label {
+      position: fixed; transform: translate(-100%, -50%);
+      font-size: 8px; font-weight: 500; letter-spacing: 0.08em;
+      color: var(--text-mid); text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+      pointer-events: none; white-space: nowrap; z-index: 5;
+    }
+
+    /* ── Floor selector ──────────────────────────────────────── */
+    #floor-selector {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 4px;
+      background: var(--panel-bg); border: 1px solid var(--border);
+      padding: 7px 12px; border-radius: var(--radius-lg);
+      backdrop-filter: blur(16px); box-shadow: var(--shadow);
+      z-index: 10; flex-wrap: wrap; justify-content: center; max-width: 90vw;
+    }
+    .floor-btn {
+      background: rgba(120,80,255,0.06); border: 1px solid var(--border-dim);
+      color: var(--text-lo); font-size: 8px; letter-spacing: 0.06em;
+      padding: 4px 8px; border-radius: var(--radius-sm); cursor: pointer;
+      transition: all 0.2s; font-family: inherit; font-weight: 500;
+    }
+    .floor-btn:hover { background: rgba(120,80,255,0.16); color: var(--text-hi); border-color: var(--border); transform: translateY(-1px); }
+    .floor-btn.active { background: var(--grad); color: #fff; border-color: transparent; box-shadow: 0 2px 10px rgba(124,58,237,0.4); }
+    .floor-btn.all-btn { background: rgba(120,80,255,0.03); color: var(--text-lo); margin-right: 6px; }
+    .floor-btn.all-btn.active { background: var(--grad); color: #fff; border-color: transparent; box-shadow: 0 2px 10px rgba(124,58,237,0.4); }
+
+    /* ── Right-side panels ─── */
+    #right-panels {
+      position: fixed; top: 14px; right: 14px;
+      display: flex; flex-direction: column; gap: 8px; z-index: 10; width: 230px;
+      max-height: calc(100vh - 28px); overflow-y: auto;
+      scrollbar-width: thin; scrollbar-color: rgba(120,80,255,0.3) transparent;
+    }
+    #right-panels::-webkit-scrollbar { width: 3px; }
+    #right-panels::-webkit-scrollbar-thumb { background: rgba(120,80,255,0.3); border-radius: 2px; }
+    .side-panel {
+      background: var(--panel-bg); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); backdrop-filter: blur(16px);
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 12px; cursor: pointer; user-select: none;
+      letter-spacing: 0.18em; font-size: 8px; text-transform: uppercase;
+      color: var(--text-mid); font-weight: 600; transition: background 0.2s;
+    }
+    .panel-header:hover { background: rgba(120,80,255,0.05); }
+    .panel-title { font-size: 8px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-mid); font-weight: 600; }
+    .panel-title.green { color: #10b981; }
+    .panel-arrow { font-size: 8px; color: var(--text-lo); transition: transform 0.2s ease; }
+    .panel-body { padding: 10px 12px; border-top: 1px solid var(--border-dim); }
+    .panel-body.collapsed { display: none; }
+
+    /* Structure layer toggles */
+    .struct-toggle-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px;
+    }
+    .struct-toggle-btn {
+      display: flex; align-items: center; gap: 5px;
+      padding: 5px 8px; border-radius: var(--radius-sm); cursor: pointer;
+      border: 1px solid var(--border); background: rgba(120,80,255,0.06);
+      transition: all 0.2s; font-family: inherit; font-size: 8px;
+      font-weight: 600; letter-spacing: 0.08em; color: var(--text-lo);
+      text-transform: uppercase; text-align: left;
+    }
+    .struct-toggle-btn:hover { border-color: var(--border); color: var(--text-mid); background: rgba(120,80,255,0.12); }
+    .struct-toggle-btn.active { background: var(--grad-green); color: #fff; border-color: transparent; box-shadow: 0 2px 8px rgba(16,185,129,0.35); }
+    .struct-toggle-btn.active .toggle-dot { background: rgba(255,255,255,0.8); }
+    .toggle-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text-lo); flex-shrink: 0; transition: all 0.2s; }
+    .struct-master-btn {
+      width: 100%; padding: 7px; border-radius: var(--radius-sm); cursor: pointer;
+      border: none; background: var(--grad-green); color: #fff; margin-bottom: 10px;
+      font-family: inherit; font-size: 8px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; transition: all 0.2s;
+      box-shadow: 0 2px 12px rgba(16,185,129,0.35);
+    }
+    .struct-master-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 18px rgba(16,185,129,0.5); }
+    .struct-master-btn.hidden-all { background: rgba(120,80,255,0.09); color: var(--text-mid); border: 1px solid var(--border); box-shadow: none; }
+    .struct-opacity-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+    .struct-opacity-row label { font-size: 8px; color: var(--text-lo); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; }
+    .struct-opacity-row input[type=range] { flex: 1; accent-color: #10b981; cursor: pointer; }
+    .struct-opacity-row span { font-size: 9px; color: var(--text-mid); font-weight: 500; width: 28px; text-align: right; }
+
+    /* inputs inside panels */
+    .param-row {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px;
+    }
+    .param-row label { color: var(--text-mid); font-size: 10px; font-weight: 400; }
+    .param-row input[type="number"] {
+      width: 64px; background: rgba(120,80,255,0.07); border: 1px solid var(--border);
+      color: var(--text-hi); padding: 4px 7px; font-size: 10px;
+      border-radius: var(--radius-sm); text-align: right; font-family: inherit; font-weight: 500;
+      transition: border-color 0.2s;
+    }
+    .param-row input[type="number"]:focus { outline: none; border-color: var(--grad-start); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+    .panel-btn {
+      width: 100%; background: var(--grad); border: none; color: #fff;
+      font-size: 9px; letter-spacing: 0.12em; padding: 7px 0;
+      border-radius: var(--radius-sm); cursor: pointer; font-family: inherit; font-weight: 600;
+      margin-top: 4px; text-transform: uppercase; transition: all 0.2s;
+      box-shadow: 0 2px 12px rgba(124,58,237,0.35);
+    }
+    .panel-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 18px rgba(124,58,237,0.5); }
+    .panel-btn:active { transform: translateY(0); }
+
+    /* Stats table */
+    .stats-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 5px; }
+    .stats-swatch { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; margin-top: 1px; }
+    .stats-label { font-size: 10px; color: var(--text-mid); flex: 1; }
+    .stats-val { font-size: 10px; color: var(--text-hi); font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 500; }
+    .stats-divider { border: none; border-top: 1px solid var(--border-dim); margin: 8px 0; }
+    .stats-total { font-size: 10px; color: var(--text-hi); display: flex; justify-content: space-between; font-weight: 500; }
+    .stats-meta { font-size: 9px; color: var(--text-lo); margin-top: 3px; line-height: 1.6; }
+
+    /* File drop */
+    .file-drop-zone {
+      border: 1px dashed rgba(120,80,255,0.25); border-radius: var(--radius-md);
+      padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.2s;
+      position: relative; margin-bottom: 4px; background: rgba(120,80,255,0.03);
+    }
+    .file-drop-zone:hover { border-color: rgba(120,80,255,0.5); background: rgba(120,80,255,0.07); }
+    .file-drop-zone.drag-over { border-color: rgba(37,99,235,0.7); background: rgba(37,99,235,0.08); }
+    .file-drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .file-drop-label { font-size: 8px; color: var(--text-mid); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; }
+    .file-drop-hint { font-size: 9px; color: var(--text-lo); margin-top: 2px; }
+    #loaded-filename {
+      font-size: 9px; background: var(--grad);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-top: 6px; word-break: break-all; min-height: 14px; font-weight: 500;
+    }
+    #load-error { font-size: 9px; color: #f87171; margin-top: 4px; min-height: 12px; }
+    #load-entry-count { font-size: 9px; color: var(--text-lo); margin-top: 2px; }
+    .panel-error { font-size: 10px; color: #f87171; margin-top: 6px; display: none; }
+  </style>
+</head>
+
+<body>
+  <div id="canvas-container"></div>
+
+  <div id="legend"></div>
+
+  <div id="info">
+    Orbit: left-drag &nbsp;|&nbsp; Pan: right-drag &nbsp;|&nbsp; Zoom: scroll &nbsp;|&nbsp; Select floor below
+  </div>
+
+  <div id="floor-selector"></div>
+
+  <div id="title-block">
+    <h1>Taipei Performing Arts Center</h1>
+    <p>OMA — Program + Structure</p>
+    <div class="struct-badge">Structure Layer ON</div>
+  </div>
+
+  <!-- ── Right panels ── -->
+  <div id="right-panels">
+
+    <!-- 1. Load Program -->
+    <div class="side-panel">
+      <div class="panel-header" onclick="togglePanel('load')">
+        <span class="panel-title">Load Program</span>
+        <span class="panel-arrow" id="arrow-load">&#9662;</span>
+      </div>
+      <div class="panel-body collapsed" id="body-load">
+        <div class="file-drop-zone" id="drop-zone">
+          <input type="file" id="file-input" accept=".txt,.md">
+          <div class="file-drop-label">Drop file or click</div>
+          <div class="file-drop-hint">.txt / .md program distribution</div>
+        </div>
+        <div id="loaded-filename"></div>
+        <div id="load-error"></div>
+        <div id="load-entry-count"></div>
+      </div>
+    </div>
+
+    <!-- 2. Site Parameters -->
+    <div class="side-panel">
+      <div class="panel-header" onclick="togglePanel('params')">
+        <span class="panel-title">Parameters</span>
+        <span class="panel-arrow" id="arrow-params">&#9662;</span>
+      </div>
+      <div class="panel-body collapsed" id="body-params">
+        <div class="param-row"><label>Site Width</label><input type="number" id="param-site-w" value="70" min="10" max="300"></div>
+        <div class="param-row"><label>Site Depth</label><input type="number" id="param-site-d" value="70" min="10" max="300"></div>
+        <div class="param-row"><label>Floor Count</label><input type="number" id="param-floors" value="14" min="2" max="40"></div>
+        <div class="param-row"><label>Floor Height (m)</label><input type="number" id="param-floor-h" value="4.5" min="2" max="12" step="0.1"></div>
+        <button class="panel-btn" onclick="applyParams()">Apply</button>
+      </div>
+    </div>
+
+    <!-- 3. Program Statistics -->
+    <div class="side-panel">
+      <div class="panel-header" onclick="togglePanel('stats')">
+        <span class="panel-title">Program Statistics</span>
+        <span class="panel-arrow" id="arrow-stats">&#9656;</span>
+      </div>
+      <div class="panel-body" id="body-stats">
+        <div id="stats-content"></div>
+      </div>
+    </div>
+
+    <!-- 4. Structure Layer — NEW -->
+    <div class="side-panel">
+      <div class="panel-header" onclick="togglePanel('struct')">
+        <span class="panel-title green">Structure Layer</span>
+        <span class="panel-arrow" id="arrow-struct">&#9662;</span>
+      </div>
+      <div class="panel-body collapsed" id="body-struct">
+        <button class="struct-master-btn" id="master-toggle-btn" onclick="toggleAllStructure()">
+          Hide All Structure
+        </button>
+        <div class="struct-toggle-grid">
+          <button class="struct-toggle-btn active" id="tog-mega" onclick="toggleGroup('mega')">
+            <span class="toggle-dot"></span>Mega Columns
+          </button>
+          <button class="struct-toggle-btn active" id="tog-slab" onclick="toggleGroup('slab')">
+            <span class="toggle-dot"></span>Floor Slabs
+          </button>
+          <button class="struct-toggle-btn active" id="tog-core" onclick="toggleGroup('core')">
+            <span class="toggle-dot"></span>Core Walls
+          </button>
+          <button class="struct-toggle-btn active" id="tog-pilotis" onclick="toggleGroup('pilotis')">
+            <span class="toggle-dot"></span>Pilotis
+          </button>
+          <button class="struct-toggle-btn active" id="tog-brace" onclick="toggleGroup('brace')">
+            <span class="toggle-dot"></span>Bracing
+          </button>
+          <button class="struct-toggle-btn active" id="tog-curtain" onclick="toggleGroup('curtain')">
+            <span class="toggle-dot"></span>Curtain Walls
+          </button>
+          <button class="struct-toggle-btn active" id="tog-roof" onclick="toggleGroup('roof')">
+            <span class="toggle-dot"></span>Roof
+          </button>
+          <button class="struct-toggle-btn active" id="tog-facade" onclick="toggleGroup('facade')">
+            <span class="toggle-dot"></span>Facade
+          </button>
+        </div>
+        <div class="struct-opacity-row">
+          <label>Opacity</label>
+          <input type="range" id="struct-opacity" min="0.05" max="1" step="0.05" value="0.72"
+                 oninput="setStructureOpacity(this.value)">
+          <span id="struct-opacity-val">72%</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /#right-panels -->
+
+  <script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+  }
+}
+</script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    /* ═══════════════════════════════════════════════════════════
+       PROGRAM COLOR PALETTE
+    ═══════════════════════════════════════════════════════════ */
+    const TYPE_COLORS = {
+      'event hall': '#e8543a', 'stage': '#c0392b', 'orchestra pit': '#922b21', 'fly tower': '#884400',
+      'lobby': '#f0c040', 'box office': '#ffa726', 'event lounge': '#ce93d8', 'lounge bar': '#ef9a9a',
+      'restaurant': '#f48fb1', 'roof terrace': '#80cbc4', 'viewing platform': '#4dd0e1',
+      'circulation': '#a5d6a7', 'plaza': '#2a2a2a', 'sales and display': '#ffb347', 'fitting rooms': '#f06292',
+      'restroom': '#ffd07a',
+      'backstage': '#7a6e5f', 'rehearsal room': '#9b7d4a', 'dressing room': '#b8860b', 'green room': '#4caf50',
+      'loading': '#546e7a', 'production workshop': '#6d4c41', 'set storage': '#5d4037',
+      'storage': '#4a4a4a', 'mechanical': '#263238', 'staff': '#7986cb', 'IT support': '#5c6bc0',
+      'fire stair and freight elevator': '#ff7043', 'fire stair and elevator 1': '#ffcc02',
+      'fire stair and elevator 2': '#66bb6a', 'fire stair and elevator 3': '#42a5f5',
+    };
+
+    const LEGEND_GROUPS = {
+      'PUBLIC — PERFORMANCE': ['event hall','stage','orchestra pit','fly tower'],
+      'PUBLIC — FRONT OF HOUSE': ['lobby','box office','event lounge','lounge bar','restaurant','roof terrace','viewing platform','circulation','plaza','sales and display','fitting rooms'],
+      'PUBLIC — RESTROOMS': ['restroom'],
+      'PRIVATE / BOH': ['backstage','rehearsal room','dressing room','green room','loading','production workshop','set storage','storage','mechanical','staff','IT support'],
+      'CIRCULATION': ['fire stair and freight elevator','fire stair and elevator 1','fire stair and elevator 2','fire stair and elevator 3'],
+    };
+
+    /* ═══════════════════════════════════════════════════════════
+       FLOOR DATA  (same as tpac-program-diagram.html)
+    ═══════════════════════════════════════════════════════════ */
+    let FLOOR_DATA = [
+      { type:'loading',area:800,level:-1,category:'private',w:20,d:40 },
+      { type:'set storage',area:1200,level:-1,category:'private',w:30,d:40 },
+      { type:'mechanical',area:900,level:-1,category:'private',w:30,d:30 },
+      { type:'storage',area:600,level:-1,category:'private',w:20,d:30 },
+      { type:'production workshop',area:400,level:-1,category:'private',w:20,d:20 },
+      { type:'restroom',area:110,level:-1,category:'public',w:10,d:11 },
+      { type:'fire stair and freight elevator',area:200,level:-1,category:'circulation',w:10,d:20 },
+      { type:'fire stair and elevator 1',area:150,level:-1,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 2',area:150,level:-1,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 3',area:150,level:-1,category:'circulation',w:10,d:15 },
+      { type:'plaza',area:3500,level:0,category:'public',w:70,d:50 },
+      { type:'lobby',area:800,level:0,category:'public',w:20,d:40 },
+      { type:'box office',area:120,level:0,category:'public',w:10,d:12 },
+      { type:'sales and display',area:300,level:0,category:'public',w:15,d:20 },
+      { type:'fitting rooms',area:60,level:0,category:'public',w:6,d:10 },
+      { type:'restroom',area:168,level:0,category:'public',w:12,d:14 },
+      { type:'mechanical',area:400,level:0,category:'private',w:20,d:20 },
+      { type:'storage',area:200,level:0,category:'private',w:10,d:20 },
+      { type:'fire stair and freight elevator',area:200,level:0,category:'circulation',w:10,d:20 },
+      { type:'fire stair and elevator 1',area:150,level:0,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 2',area:150,level:0,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 3',area:150,level:0,category:'circulation',w:10,d:15 },
+      { type:'loading',area:600,level:1,category:'private',w:15,d:40 },
+      { type:'production workshop',area:800,level:1,category:'private',w:20,d:40 },
+      { type:'set storage',area:1000,level:1,category:'private',w:25,d:40 },
+      { type:'mechanical',area:600,level:1,category:'private',w:20,d:30 },
+      { type:'storage',area:400,level:1,category:'private',w:20,d:20 },
+      { type:'restroom',area:110,level:1,category:'public',w:10,d:11 },
+      { type:'fire stair and freight elevator',area:200,level:1,category:'circulation',w:10,d:20 },
+      { type:'fire stair and elevator 1',area:150,level:1,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 2',area:150,level:1,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 3',area:150,level:1,category:'circulation',w:10,d:15 },
+      { type:'backstage',area:1000,level:2,category:'private',w:25,d:40 },
+      { type:'dressing room',area:600,level:2,category:'private',w:15,d:40 },
+      { type:'rehearsal room',area:500,level:2,category:'private',w:20,d:25 },
+      { type:'green room',area:300,level:2,category:'private',w:15,d:20 },
+      { type:'mechanical',area:400,level:2,category:'private',w:20,d:20 },
+      { type:'storage',area:300,level:2,category:'private',w:15,d:20 },
+      { type:'staff',area:200,level:2,category:'private',w:10,d:20 },
+      { type:'restroom',area:110,level:2,category:'public',w:10,d:11 },
+      { type:'fire stair and freight elevator',area:200,level:2,category:'circulation',w:10,d:20 },
+      { type:'fire stair and elevator 1',area:150,level:2,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 2',area:150,level:2,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 3',area:150,level:2,category:'circulation',w:10,d:15 },
+      { type:'stage',area:800,level:3,category:'private',w:25,d:32 },
+      { type:'orchestra pit',area:250,level:3,category:'private',w:10,d:25 },
+      { type:'backstage',area:600,level:3,category:'private',w:15,d:40 },
+      { type:'dressing room',area:400,level:3,category:'private',w:10,d:40 },
+      { type:'green room',area:200,level:3,category:'private',w:10,d:20 },
+      { type:'mechanical',area:300,level:3,category:'private',w:15,d:20 },
+      { type:'lobby',area:600,level:3,category:'public',w:15,d:40 },
+      { type:'event lounge',area:200,level:3,category:'public',w:10,d:20 },
+      { type:'sales and display',area:150,level:3,category:'public',w:10,d:15 },
+      { type:'circulation',area:400,level:3,category:'public',w:6,d:67 },
+      { type:'restroom',area:168,level:3,category:'public',w:12,d:14 },
+      { type:'fire stair and freight elevator',area:200,level:3,category:'circulation',w:10,d:20 },
+      { type:'fire stair and elevator 1',area:150,level:3,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 2',area:150,level:3,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 3',area:150,level:3,category:'circulation',w:10,d:15 },
+      { type:'event hall',area:1800,level:4,category:'public',w:30,d:60,zone:'grand' },
+      { type:'event hall',area:900,level:4,category:'public',w:25,d:36,zone:'blue' },
+      { type:'event hall',area:600,level:4,category:'public',w:20,d:30,zone:'globe' },
+      { type:'lobby',area:500,level:4,category:'public',w:12,d:40 },
+      { type:'lounge bar',area:200,level:4,category:'public',w:10,d:20 },
+      { type:'circulation',area:400,level:4,category:'public',w:6,d:67 },
+      { type:'restroom',area:168,level:4,category:'public',w:12,d:14 },
+      { type:'restroom',area:168,level:4,category:'public',w:12,d:14 },
+      { type:'backstage',area:400,level:4,category:'private',w:10,d:40 },
+      { type:'mechanical',area:200,level:4,category:'private',w:10,d:20 },
+      { type:'fire stair and freight elevator',area:200,level:4,category:'circulation',w:10,d:20 },
+      { type:'fire stair and elevator 1',area:150,level:4,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 2',area:150,level:4,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 3',area:150,level:4,category:'circulation',w:10,d:15 },
+      { type:'event hall',area:1200,level:5,category:'public',w:25,d:48,zone:'grand' },
+      { type:'event hall',area:800,level:5,category:'public',w:22,d:36,zone:'blue' },
+      { type:'event lounge',area:300,level:5,category:'public',w:15,d:20 },
+      { type:'lobby',area:300,level:5,category:'public',w:10,d:30 },
+      { type:'circulation',area:400,level:5,category:'public',w:6,d:67 },
+      { type:'restroom',area:168,level:5,category:'public',w:12,d:14 },
+      { type:'restroom',area:168,level:5,category:'public',w:12,d:14 },
+      { type:'backstage',area:300,level:5,category:'private',w:10,d:30 },
+      { type:'staff',area:150,level:5,category:'private',w:10,d:15 },
+      { type:'mechanical',area:200,level:5,category:'private',w:10,d:20 },
+      { type:'fire stair and freight elevator',area:200,level:5,category:'circulation',w:10,d:20 },
+      { type:'fire stair and elevator 1',area:150,level:5,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 2',area:150,level:5,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 3',area:150,level:5,category:'circulation',w:10,d:15 },
+      { type:'event hall',area:800,level:6,category:'public',w:20,d:40,zone:'grand' },
+      { type:'event hall',area:500,level:6,category:'public',w:18,d:28,zone:'blue' },
+      { type:'viewing platform',area:600,level:6,category:'public',w:10,d:60 },
+      { type:'circulation',area:400,level:6,category:'public',w:6,d:67 },
+      { type:'restroom',area:168,level:6,category:'public',w:12,d:14 },
+      { type:'backstage',area:200,level:6,category:'private',w:10,d:20 },
+      { type:'mechanical',area:300,level:6,category:'private',w:15,d:20 },
+      { type:'storage',area:150,level:6,category:'private',w:10,d:15 },
+      { type:'fire stair and freight elevator',area:200,level:6,category:'circulation',w:10,d:20 },
+      { type:'fire stair and elevator 1',area:150,level:6,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 2',area:150,level:6,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 3',area:150,level:6,category:'circulation',w:10,d:15 },
+      { type:'fly tower',area:900,level:7,category:'private',w:25,d:36,zone:'grand' },
+      { type:'backstage',area:400,level:7,category:'private',w:10,d:40 },
+      { type:'rehearsal room',area:500,level:7,category:'private',w:20,d:25 },
+      { type:'staff',area:200,level:7,category:'private',w:10,d:20 },
+      { type:'mechanical',area:300,level:7,category:'private',w:15,d:20 },
+      { type:'storage',area:200,level:7,category:'private',w:10,d:20 },
+      { type:'viewing platform',area:400,level:7,category:'public',w:8,d:50 },
+      { type:'circulation',area:400,level:7,category:'public',w:6,d:67 },
+      { type:'restroom',area:110,level:7,category:'public',w:10,d:11 },
+      { type:'fire stair and freight elevator',area:200,level:7,category:'circulation',w:10,d:20 },
+      { type:'fire stair and elevator 1',area:150,level:7,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 2',area:150,level:7,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 3',area:150,level:7,category:'circulation',w:10,d:15 },
+      { type:'fly tower',area:900,level:8,category:'private',w:25,d:36,zone:'grand' },
+      { type:'backstage',area:300,level:8,category:'private',w:10,d:30 },
+      { type:'mechanical',area:400,level:8,category:'private',w:20,d:20 },
+      { type:'staff',area:150,level:8,category:'private',w:10,d:15 },
+      { type:'storage',area:150,level:8,category:'private',w:10,d:15 },
+      { type:'circulation',area:400,level:8,category:'public',w:6,d:67 },
+      { type:'restroom',area:110,level:8,category:'public',w:10,d:11 },
+      { type:'fire stair and freight elevator',area:200,level:8,category:'circulation',w:10,d:20 },
+      { type:'fire stair and elevator 1',area:150,level:8,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 2',area:150,level:8,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 3',area:150,level:8,category:'circulation',w:10,d:15 },
+      { type:'fly tower',area:900,level:9,category:'private',w:25,d:36,zone:'grand' },
+      { type:'mechanical',area:500,level:9,category:'private',w:20,d:25 },
+      { type:'staff',area:150,level:9,category:'private',w:10,d:15 },
+      { type:'storage',area:150,level:9,category:'private',w:10,d:15 },
+      { type:'restroom',area:110,level:9,category:'public',w:10,d:11 },
+      { type:'fire stair and freight elevator',area:200,level:9,category:'circulation',w:10,d:20 },
+      { type:'fire stair and elevator 1',area:150,level:9,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 2',area:150,level:9,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 3',area:150,level:9,category:'circulation',w:10,d:15 },
+      { type:'staff',area:1200,level:10,category:'private',w:30,d:40 },
+      { type:'rehearsal room',area:400,level:10,category:'private',w:20,d:20 },
+      { type:'IT support',area:150,level:10,category:'private',w:10,d:15 },
+      { type:'mechanical',area:300,level:10,category:'private',w:15,d:20 },
+      { type:'storage',area:150,level:10,category:'private',w:10,d:15 },
+      { type:'restroom',area:168,level:10,category:'public',w:12,d:14 },
+      { type:'fire stair and freight elevator',area:200,level:10,category:'circulation',w:10,d:20 },
+      { type:'fire stair and elevator 1',area:150,level:10,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 2',area:150,level:10,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 3',area:150,level:10,category:'circulation',w:10,d:15 },
+      { type:'staff',area:800,level:11,category:'private',w:20,d:40 },
+      { type:'rehearsal room',area:500,level:11,category:'private',w:20,d:25 },
+      { type:'green room',area:200,level:11,category:'private',w:10,d:20 },
+      { type:'IT support',area:100,level:11,category:'private',w:10,d:10 },
+      { type:'mechanical',area:200,level:11,category:'private',w:10,d:20 },
+      { type:'storage',area:150,level:11,category:'private',w:10,d:15 },
+      { type:'restroom',area:168,level:11,category:'public',w:12,d:14 },
+      { type:'fire stair and freight elevator',area:200,level:11,category:'circulation',w:10,d:20 },
+      { type:'fire stair and elevator 1',area:150,level:11,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 2',area:150,level:11,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 3',area:150,level:11,category:'circulation',w:10,d:15 },
+      { type:'roof terrace',area:1000,level:12,category:'public',w:25,d:40 },
+      { type:'restaurant',area:400,level:12,category:'public',w:20,d:20 },
+      { type:'lounge bar',area:150,level:12,category:'public',w:10,d:15 },
+      { type:'restroom',area:168,level:12,category:'public',w:12,d:14 },
+      { type:'mechanical',area:300,level:12,category:'private',w:15,d:20 },
+      { type:'fire stair and freight elevator',area:200,level:12,category:'circulation',w:10,d:20 },
+      { type:'fire stair and elevator 1',area:150,level:12,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 2',area:150,level:12,category:'circulation',w:10,d:15 },
+      { type:'fire stair and elevator 3',area:150,level:12,category:'circulation',w:10,d:15 },
+    ];
+
+    /* ═══════════════════════════════════════════════════════════
+       CANONICAL PROGRAM LOADER
+    ═══════════════════════════════════════════════════════════ */
+    (async function loadCanonicalProgram() {
+      try {
+        const resp = await fetch('references/TPAC-PROGRAM-DISTRIBUTION.txt');
+        if (resp.ok) {
+          const txt = await resp.text();
+          const parsed = parseProgramText(txt);
+          if (parsed.length > 0) {
+            FLOOR_DATA = parsed;
+            buildLegend();
+            buildScene({ siteW: 70, siteD: 70, floorCount: 14, floorHeight: 4.5 });
+            buildStructureLayer();
+            buildStats();
+            return;
+          }
+        }
+      } catch(e) {}
+    })();
+
+    function parseProgramText(text) {
+      const entries = [];
+      const re = /\{([^}]+)\}\/\{([^}]+)\}\/\{([^}]+)\}\/\{([^}]+)\}\/\{([^}]+)\}/g;
+      let m;
+      while ((m = re.exec(text)) !== null) {
+        const [, type, area, level, category, dims] = m;
+        const [w, d] = dims.split(',').map(s => parseFloat(s.trim()));
+        const lvl = parseInt(level.trim(), 10);
+        if (!isNaN(lvl) && !isNaN(w) && !isNaN(d))
+          entries.push({ type: type.trim(), area: parseFloat(area), level: lvl, category: category.trim(), w, d });
+      }
+      return entries;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SCENE SETUP
+    ═══════════════════════════════════════════════════════════ */
+    const container = document.getElementById('canvas-container');
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    container.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x06060f);
+    scene.fog = new THREE.FogExp2(0x06060f, 0.0028);
+
+    const camera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.5, 1000);
+    camera.position.set(115, 90, 105);
+    camera.lookAt(0, 25, 0);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, 25, 0);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.minDistance = 20;
+    controls.maxDistance = 500;
+    controls.maxPolarAngle = Math.PI / 2.05;
+    controls.update();
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+    const sun = new THREE.DirectionalLight(0xfff5e0, 1.6);
+    sun.position.set(70, 100, 60); sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.near = 1; sun.shadow.camera.far = 400;
+    sun.shadow.camera.left = -120; sun.shadow.camera.right = 120;
+    sun.shadow.camera.top = 120; sun.shadow.camera.bottom = -120;
+    sun.shadow.bias = -0.0005;
+    scene.add(sun);
+    const fill = new THREE.DirectionalLight(0xc8d8ff, 0.3);
+    fill.position.set(-50, 40, -70); scene.add(fill);
+
+    /* ─── Material helpers ─── */
+    const _mc = {};
+    function getSlabMat(hex, opacity = 0.82) {
+      const k = hex + '_' + opacity;
+      if (!_mc[k]) _mc[k] = new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(hex), opacity, transparent: opacity < 1,
+        roughness: 0.7, metalness: 0.03, side: THREE.DoubleSide, depthWrite: opacity >= 0.99
+      });
+      return _mc[k];
+    }
+    function getEdgeMat(hex) {
+      const k = 'edge_' + hex;
+      if (!_mc[k]) _mc[k] = new THREE.LineBasicMaterial({ color: new THREE.Color(hex), opacity: 0.4, transparent: true });
+      return _mc[k];
+    }
+
+    let SITE_W_GLOBAL = 70, SITE_D_GLOBAL = 70, SITE_BOUNDARY_EPS = 0.15;
+    function addSlab(sx, sy, sz, cx, cy, cz, typeKey, opacity) {
+      const hex = TYPE_COLORS[typeKey] || '#888888';
+      let halfX = sx/2, halfZ = sz/2;
+      const mhX = Math.max(0.01, SITE_W_GLOBAL/2 - SITE_BOUNDARY_EPS);
+      const mhZ = Math.max(0.01, SITE_D_GLOBAL/2 - SITE_BOUNDARY_EPS);
+      if (halfX > mhX) halfX = mhX; if (halfZ > mhZ) halfZ = mhZ;
+      sx = Math.max(0.01, halfX*2); sz = Math.max(0.01, halfZ*2);
+      cx = Math.max(-SITE_W_GLOBAL/2+halfX+SITE_BOUNDARY_EPS, Math.min(SITE_W_GLOBAL/2-halfX-SITE_BOUNDARY_EPS, cx));
+      cz = Math.max(-SITE_D_GLOBAL/2+halfZ+SITE_BOUNDARY_EPS, Math.min(SITE_D_GLOBAL/2-halfZ-SITE_BOUNDARY_EPS, cz));
+      const geo = new THREE.BoxGeometry(sx, sy, sz);
+      const mesh = new THREE.Mesh(geo, getSlabMat(hex, opacity));
+      mesh.position.set(cx, cy, cz); mesh.castShadow = true; mesh.receiveShadow = true;
+      mesh.userData.typeKey = typeKey; mesh.userData.isBuilt = true; scene.add(mesh);
+      const edges = new THREE.EdgesGeometry(geo, 10);
+      const lines = new THREE.LineSegments(edges, getEdgeMat(hex));
+      lines.position.set(cx, cy, cz); lines.userData.typeKey = typeKey; lines.userData.isBuilt = true; scene.add(lines);
+      return { mesh, lines };
+    }
+
+    /* ─── Label system ─── */
+    let VOLUME_LABEL_DATA = [], FLOOR_LABEL_DATA = [], volumeLabelEls = [], floorLabelEls = [];
+    const _v3 = new THREE.Vector3();
+    function clearLabelEls() {
+      volumeLabelEls.forEach(el => el.remove()); floorLabelEls.forEach(el => el.remove());
+      volumeLabelEls = []; floorLabelEls = [];
+    }
+    function projectToScreen(worldPos) {
+      _v3.copy(worldPos).project(camera);
+      return { x: (_v3.x*.5+.5)*renderer.domElement.clientWidth, y: (-_v3.y*.5+.5)*renderer.domElement.clientHeight, behind: _v3.z > 1 };
+    }
+    function updateLabels() {
+      VOLUME_LABEL_DATA.forEach(({world}, i) => {
+        const {x, y, behind} = projectToScreen(world);
+        volumeLabelEls[i].style.display = behind ? 'none' : 'block';
+        volumeLabelEls[i].style.left = x+'px'; volumeLabelEls[i].style.top = y+'px';
+      });
+      FLOOR_LABEL_DATA.forEach(({world}, i) => {
+        const {x, y, behind} = projectToScreen(world);
+        floorLabelEls[i].style.display = behind ? 'none' : 'block';
+        floorLabelEls[i].style.left = (x-2)+'px'; floorLabelEls[i].style.top = y+'px';
+      });
+    }
+
+    let floorMeshes = {}, activeFloor = null;
+    function getShaftObjects() { return scene.children.filter(o => o.userData.isShaft); }
+    function applyFloorFocus(selectedKey, floorKeys) {
+      floorKeys.forEach(k => {
+        const isActive = (selectedKey === null || k === selectedKey);
+        const targetOpacity = isActive ? null : 0.06;
+        (floorMeshes[k] || []).forEach(({mesh, lines, baseOpacity}) => {
+          if (!mesh.userData._opacitySetThisFrame) {
+            const op = targetOpacity === null ? baseOpacity : targetOpacity;
+            mesh.material.opacity = op; mesh.material.transparent = op < 1;
+            lines.material.opacity = targetOpacity === null ? 0.4 : 0.04;
+            mesh.userData._opacitySetThisFrame = true;
+          }
+        });
+      });
+      scene.children.forEach(o => { if (o.userData._opacitySetThisFrame) delete o.userData._opacitySetThisFrame; });
+      getShaftObjects().forEach(o => {
+        if (o.isMesh) o.material.opacity = selectedKey === null ? 0.88 : 0.1;
+        else o.material.opacity = selectedKey === null ? 0.4 : 0.05;
+      });
+    }
+
+    function buildLegend() {
+      const legend = document.getElementById('legend'); if (!legend) return;
+      legend.innerHTML = '<h2>Program Types</h2>';
+      const activeTypes = new Set(FLOOR_DATA.map(e => e.type));
+      Object.entries(LEGEND_GROUPS).forEach(([groupName, types]) => {
+        const visible = types.filter(t => TYPE_COLORS[t] && activeTypes.has(t));
+        if (!visible.length) return;
+        const groupHead = document.createElement('div'); groupHead.className = 'legend-category'; groupHead.textContent = groupName;
+        legend.appendChild(groupHead);
+        visible.forEach(typeKey => {
+          const row = document.createElement('div'); row.className = 'legend-item';
+          row.innerHTML = `<div class="legend-swatch" style="background:${TYPE_COLORS[typeKey]}"></div><span class="legend-label">${typeKey}</span>`;
+          legend.appendChild(row);
+        });
+      });
+    }
+
+    function disposeAndClear() {
+      const toRemove = scene.children.filter(o => o.userData.isBuilt || o.userData.isShaft || o instanceof THREE.GridHelper);
+      toRemove.forEach(o => { scene.remove(o); if (o.geometry) o.geometry.dispose(); if (o.material) { if (Array.isArray(o.material)) o.material.forEach(m => m.dispose()); else o.material.dispose(); } });
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       BUILD MASSING SCENE
+    ═══════════════════════════════════════════════════════════ */
+    function buildScene(params) {
+      const { siteW, siteD, floorCount, floorHeight } = params;
+      const SITE_W = siteW, SITE_D = siteD, FLOOR_STEP = floorHeight;
+      const SLAB_H = FLOOR_STEP * 0.85, PILOTIS_H = 6.0, SLAB_OPACITY = 0.80;
+      const CUBE_W = SITE_W * 0.5, CUBE_D = SITE_D * 0.5;
+      const CUBE_HALF_X = CUBE_W/2, CUBE_HALF_Z = CUBE_D/2;
+      const GRAND_PROTRUDE_W = CUBE_W*0.8, GRAND_D = CUBE_D*0.8;
+      const GRAND_X_START = CUBE_HALF_X, GRAND_X_CENTER = GRAND_X_START + GRAND_PROTRUDE_W/2;
+      const BLUE_PROTRUDE_W = CUBE_W*0.63, BLUE_D = CUBE_D*0.63;
+      const BLUE_X_START = -CUBE_HALF_X, BLUE_X_CENTER = BLUE_X_START - BLUE_PROTRUDE_W/2;
+      const GLOBE_PROTRUDE_D = CUBE_D*0.63, GLOBE_W = CUBE_W*0.63;
+      const GLOBE_Z_START = -CUBE_HALF_Z, GLOBE_Z_CENTER = GLOBE_Z_START - GLOBE_PROTRUDE_D/2;
+      const topLevel = floorCount - 2;
+      const FLOOR_KEYS = ['-1', '0']; const FLOOR_LABELS_DISPLAY = ['B1', 'L0'];
+      for (let i = 1; i <= topLevel; i++) { FLOOR_KEYS.push(String(i)); FLOOR_LABELS_DISPLAY.push('L'+i); }
+      const FLOOR_Y = {'-1': -FLOOR_STEP, '0': 0};
+      for (let i = 1; i <= topLevel; i++) FLOOR_Y[String(i)] = PILOTIS_H + (i-1)*FLOOR_STEP;
+      const CUBE_Y_BOTTOM = FLOOR_Y['-1'], CUBE_Y_TOP = FLOOR_Y[String(topLevel)] + FLOOR_STEP;
+      const CUBE_TOTAL_H = CUBE_Y_TOP - CUBE_Y_BOTTOM, CUBE_CY = (CUBE_Y_TOP + CUBE_Y_BOTTOM)/2;
+      const TOTAL_H = CUBE_Y_TOP, BOUNDARY_EPS = 0.15;
+      SITE_W_GLOBAL = siteW; SITE_D_GLOBAL = siteD; SITE_BOUNDARY_EPS = BOUNDARY_EPS;
+      function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+      const BACK_TYPES = new Set(['backstage','rehearsal room','dressing room','green room','loading','production workshop','set storage','storage','mechanical','staff','IT support','fly tower','stage','orchestra pit']);
+      const FRONT_TYPES = new Set(['lobby','box office','lounge bar','event lounge','restaurant','roof terrace','viewing platform','circulation','plaza','restroom','sales and display','fitting rooms']);
+      const CIRC_TYPES = new Set(['fire stair and freight elevator','fire stair and elevator 1','fire stair and elevator 2','fire stair and elevator 3']);
+
+      disposeAndClear(); clearLabelEls();
+      floorMeshes = {}; FLOOR_KEYS.forEach(k => { floorMeshes[k] = []; });
+      function registerSlab(levelKey, slabResult, baseOpacity) { if (floorMeshes[levelKey]) floorMeshes[levelKey].push({mesh:slabResult.mesh,lines:slabResult.lines,baseOpacity}); }
+
+      // Ground plane
+      const geoGround = new THREE.PlaneGeometry(SITE_W, SITE_D); geoGround.rotateX(-Math.PI/2);
+      const meshGround = new THREE.Mesh(geoGround, getSlabMat('#1a1a1a', 1.0)); meshGround.receiveShadow = true; meshGround.userData.isBuilt = true; scene.add(meshGround);
+      const outLine = new THREE.LineSegments(new THREE.EdgesGeometry(geoGround), new THREE.LineBasicMaterial({color:0x444444})); outLine.position.y = 0.02; outLine.userData.isBuilt = true; scene.add(outLine);
+      const grid = new THREE.GridHelper(SITE_W, 10, 0x1e1e1e, 0x181818); grid.position.y = 0.01; grid.userData.isBuilt = true; scene.add(grid);
+
+      // Pilotis
+      const colMat = new THREE.MeshPhysicalMaterial({color:0xb0a090,roughness:0.7});
+      const r = Math.min(CUBE_HALF_X*0.7, 14);
+      [[-r*.86,-r*.86],[-r*.86,r*.86],[r*.86,-r*.86],[r*.86,r*.86],[0,-r],[0,r],[-r,0],[r,0]].forEach(([cx,cz]) => {
+        const m = new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.5,PILOTIS_H,8), colMat);
+        m.position.set(cx,PILOTIS_H/2,cz); m.castShadow = true; m.userData.isBuilt = true; scene.add(m);
+      });
+
+      // Ghost wireframe
+      const ghostGeo = new THREE.BoxGeometry(CUBE_W, CUBE_TOTAL_H, CUBE_D);
+      const ghost = new THREE.Mesh(ghostGeo, new THREE.MeshPhysicalMaterial({color:0xffffff,opacity:0.12,transparent:true,wireframe:true,depthWrite:false}));
+      ghost.position.set(0,CUBE_CY,0); ghost.userData.isBuilt = true; scene.add(ghost);
+
+      // Circulation shafts
+      [{type:'fire stair and freight elevator',w:10,d:12,cx:-CUBE_HALF_X+5.2,cz:CUBE_HALF_Z-6.2},
+       {type:'fire stair and elevator 1',w:8,d:8,cx:CUBE_HALF_X-4.2,cz:CUBE_HALF_Z-4.2},
+       {type:'fire stair and elevator 2',w:8,d:8,cx:CUBE_HALF_X-4.2,cz:-CUBE_HALF_Z+4.2},
+       {type:'fire stair and elevator 3',w:8,d:8,cx:-CUBE_HALF_X+4.2,cz:-CUBE_HALF_Z+4.2}].forEach(({type,w,d,cx,cz}) => {
+        const hex = TYPE_COLORS[type];
+        const shaftGeo = new THREE.BoxGeometry(w, CUBE_TOTAL_H, d);
+        const sm = new THREE.Mesh(shaftGeo, getSlabMat(hex, 0.88));
+        sm.position.set(cx,CUBE_CY,cz); sm.castShadow = true; sm.userData.typeKey = type; sm.userData.isShaft = true; scene.add(sm);
+        const sl = new THREE.LineSegments(new THREE.EdgesGeometry(shaftGeo,5), getEdgeMat(hex));
+        sl.position.set(cx,CUBE_CY,cz); sl.userData.isShaft = true; scene.add(sl);
+      });
+
+      // Per-floor slabs
+      const MECH_X_START = CUBE_HALF_X * 0.49;
+      function layoutStrips(entryList, zoneXMin, zoneXMax, zoneZMin, zoneZMax, slabCY, levelKey) {
+        if (!entryList.length) return;
+        const sumArea = entryList.reduce((s,e) => s+e.area, 0);
+        const zoneXW = zoneXMax-zoneXMin, zoneZD = zoneZMax-zoneZMin;
+        const totalArea = Math.max(sumArea, zoneXW*zoneZD);
+        let curX = zoneXMin;
+        const minWidth = 0.3, maxZoneX = zoneXMax-BOUNDARY_EPS, minZoneX = zoneXMin+BOUNDARY_EPS;
+        const chunks = []; let curChunk = [];
+        entryList.forEach(e => {
+          const frac = e.area/totalArea, w = zoneXW*frac;
+          const isSkinny = (zoneZD/w) > 4.0;
+          if (!curChunk.length) { curChunk.push({e,w,frac}); curChunk.isSkinny = isSkinny; }
+          else if (curChunk.isSkinny === isSkinny) curChunk.push({e,w,frac});
+          else { chunks.push(curChunk); curChunk = [{e,w,frac}]; curChunk.isSkinny = isSkinny; }
+        });
+        if (curChunk.length) chunks.push(curChunk);
+        chunks.forEach(chunk => {
+          const chunkVolW = chunk.reduce((s,it) => s+it.w, 0); if (chunkVolW <= 0.01) return;
+          if (!chunk.isSkinny || chunk.length===1) {
+            const slabDepth = Math.max(0.1, Math.min(zoneZD-0.12, zoneZD-BOUNDARY_EPS*2));
+            const cz = clamp((zoneZMin+zoneZMax)/2, -siteD/2+slabDepth/2+BOUNDARY_EPS, siteD/2-slabDepth/2-BOUNDARY_EPS);
+            chunk.forEach(it => {
+              let slabW = Math.max(it.w, minWidth);
+              const maxRem = maxZoneX - curX; if (maxRem <= minWidth) return;
+              if (slabW > maxRem) slabW = Math.max(minWidth, maxRem);
+              if (slabW-0.12>0.01) registerSlab(levelKey, addSlab(slabW-0.12,SLAB_H,Math.max(0.01,slabDepth),curX+slabW/2,slabCY,cz,it.e.type,SLAB_OPACITY), SLAB_OPACITY);
+              curX += slabW;
+            });
+          } else {
+            const sorted = [...chunk].sort((a,b)=>b.e.area-a.e.area);
+            let r1=[],r2=[],a1=0,a2=0;
+            sorted.forEach(it => { if(a1<=a2){r1.push(it);a1+=it.e.area;}else{r2.push(it);a2+=it.e.area;} });
+            if(!a1)a1=1; if(!a2&&r2.length)a2=1;
+            const z1d=zoneZD*(a1/(a1+a2)), z2d=zoneZD-z1d;
+            if(r1.length){
+              const cz1=clamp(zoneZMin+z1d/2,-siteD/2+z1d/2+BOUNDARY_EPS,siteD/2-z1d/2-BOUNDARY_EPS),d1=Math.max(0.1,z1d-BOUNDARY_EPS*2);
+              let rx=curX; r1.forEach(it=>{let sw=Math.max((it.e.area/a1)*chunkVolW,minWidth);const mr=Math.max(minWidth,maxZoneX-rx);if(sw>mr)sw=mr;if(sw-0.12>0.01&&d1>0.01)registerSlab(levelKey,addSlab(sw-0.12,SLAB_H,d1,rx+sw/2,slabCY,cz1,it.e.type,SLAB_OPACITY),SLAB_OPACITY);rx+=sw;});
+            }
+            if(r2.length){
+              const cz2=clamp(zoneZMin+z1d+z2d/2,-siteD/2+z2d/2+BOUNDARY_EPS,siteD/2-z2d/2-BOUNDARY_EPS),d2=Math.max(0.1,z2d-BOUNDARY_EPS*2);
+              let rx=curX; r2.forEach(it=>{let sw=Math.max((it.e.area/a2)*chunkVolW,minWidth);const mr=Math.max(minWidth,maxZoneX-rx);if(sw>mr)sw=mr;if(sw-0.12>0.01&&d2>0.01)registerSlab(levelKey,addSlab(sw-0.12,SLAB_H,d2,rx+sw/2,slabCY,cz2,it.e.type,SLAB_OPACITY),SLAB_OPACITY);rx+=sw;});
+            }
+            curX += chunkVolW;
+          }
+        });
+      }
+
+      FLOOR_KEYS.forEach(levelKey => {
+        const level = parseInt(levelKey, 10);
+        const floorY = FLOOR_Y[levelKey]; if (floorY === undefined) return;
+        const slabCY = floorY + SLAB_H/2;
+        let dataEntries = FLOOR_DATA.filter(e => e.level === level && !CIRC_TYPES.has(e.type));
+        if (!dataEntries.length) dataEntries = [{type:'restroom',area:168,level,category:'public',w:12,d:14}];
+        else if (!dataEntries.some(e=>['toilets','restroom'].includes(e.type))) dataEntries = [...dataEntries, {type:'restroom',area:168,level,category:'public',w:12,d:14}];
+        const grandEntries=dataEntries.filter(e=>e.zone==='grand'), blueEntries=dataEntries.filter(e=>e.zone==='blue');
+        const globeEntries=dataEntries.filter(e=>e.zone==='globe'), cubeEntries=dataEntries.filter(e=>!e.zone);
+        const backEntries=cubeEntries.filter(e=>BACK_TYPES.has(e.type)), frontEntries=cubeEntries.filter(e=>FRONT_TYPES.has(e.type));
+        const mechEntries=backEntries.filter(e=>e.type==='mechanical'), nonMechBack=backEntries.filter(e=>e.type!=='mechanical');
+        const zMaxCube=CUBE_HALF_Z-0.3, zMinCube=-CUBE_HALF_Z+0.3, splitZ=zMaxCube-(zMaxCube-zMinCube)*0.4;
+        layoutStrips(nonMechBack,-CUBE_HALF_X+10.3,MECH_X_START,splitZ+0.2,zMaxCube,slabCY,levelKey);
+        layoutStrips(mechEntries,MECH_X_START,CUBE_HALF_X-10.3,splitZ+0.2,zMaxCube,slabCY,levelKey);
+        layoutStrips(frontEntries,-CUBE_HALF_X+10.3,CUBE_HALF_X-10.3,zMinCube,splitZ-0.2,slabCY,levelKey);
+        grandEntries.forEach(e => {
+          let w=Math.min(GRAND_PROTRUDE_W-0.3,GRAND_PROTRUDE_W*0.95), d=Math.min(GRAND_D-0.3,GRAND_D*0.95);
+          w=Math.min(w,siteW-BOUNDARY_EPS*2); d=Math.min(d,siteD-BOUNDARY_EPS*2);
+          const cx=clamp(GRAND_X_START+w/2+3.5,-siteW/2+w/2+BOUNDARY_EPS,siteW/2-w/2-BOUNDARY_EPS);
+          const cz=clamp(0,-siteD/2+d/2+BOUNDARY_EPS,siteD/2-d/2-BOUNDARY_EPS);
+          registerSlab(levelKey, addSlab(Math.max(0.01,w),SLAB_H,Math.max(0.01,d),cx,slabCY,cz,e.type,SLAB_OPACITY), SLAB_OPACITY);
+          const lw=(cx-w/2)-GRAND_X_START; if(lw>0.1) registerSlab(levelKey,addSlab(Math.max(0.01,lw-0.05),SLAB_H,Math.max(0.01,Math.min(14,d*0.7)),GRAND_X_START+lw/2,slabCY,cz,'circulation',SLAB_OPACITY),SLAB_OPACITY);
+        });
+        blueEntries.forEach(e => {
+          let w=Math.min(BLUE_PROTRUDE_W-0.3,BLUE_PROTRUDE_W*0.95), d=Math.min(BLUE_D-0.3,BLUE_D*0.95);
+          w=Math.min(w,siteW-BOUNDARY_EPS*2); d=Math.min(d,siteD-BOUNDARY_EPS*2);
+          const cx=clamp(BLUE_X_START-w/2-3.5,-siteW/2+w/2+BOUNDARY_EPS,siteW/2-w/2-BOUNDARY_EPS);
+          const cz=clamp(0,-siteD/2+d/2+BOUNDARY_EPS,siteD/2-d/2-BOUNDARY_EPS);
+          registerSlab(levelKey, addSlab(Math.max(0.01,w),SLAB_H,Math.max(0.01,d),cx,slabCY,cz,e.type,SLAB_OPACITY), SLAB_OPACITY);
+          const lw=BLUE_X_START-(cx+w/2); if(lw>0.1) registerSlab(levelKey,addSlab(Math.max(0.01,lw-0.05),SLAB_H,Math.max(0.01,Math.min(12,d*0.7)),BLUE_X_START-lw/2,slabCY,cz,'circulation',SLAB_OPACITY),SLAB_OPACITY);
+        });
+        globeEntries.forEach(e => {
+          let w=Math.min(GLOBE_W-0.3,GLOBE_W*0.95), d=Math.min(GLOBE_PROTRUDE_D-0.3,GLOBE_PROTRUDE_D*0.95);
+          w=Math.min(w,siteW-BOUNDARY_EPS*2); d=Math.min(d,siteD-BOUNDARY_EPS*2);
+          const cz=clamp(GLOBE_Z_START-d/2-3.5,-siteD/2+d/2+BOUNDARY_EPS,siteD/2-d/2-BOUNDARY_EPS);
+          const cx=clamp(0,-siteW/2+w/2+BOUNDARY_EPS,siteW/2-w/2-BOUNDARY_EPS);
+          registerSlab(levelKey, addSlab(Math.max(0.01,w),SLAB_H,Math.max(0.01,d),cx,slabCY,cz,e.type,SLAB_OPACITY), SLAB_OPACITY);
+          const ld=GLOBE_Z_START-(cz+d/2); if(ld>0.1) registerSlab(levelKey,addSlab(Math.max(0.01,Math.min(14,w*0.7)),SLAB_H,Math.max(0.01,ld-0.05),cx,slabCY,GLOBE_Z_START-ld/2,'circulation',SLAB_OPACITY),SLAB_OPACITY);
+        });
+      });
+
+      // Plaza slab
+      const plazaGeo = new THREE.BoxGeometry(SITE_W, 0.25, SITE_D);
+      const plazaMesh = new THREE.Mesh(plazaGeo, getSlabMat(TYPE_COLORS['plaza'], 0.95));
+      plazaMesh.position.set(0, 0.125, 0); plazaMesh.receiveShadow = true;
+      plazaMesh.userData.typeKey = 'plaza'; plazaMesh.userData.isBuilt = true; scene.add(plazaMesh);
+      const plazaLines = new THREE.LineSegments(new THREE.EdgesGeometry(plazaGeo), getEdgeMat(TYPE_COLORS['plaza']));
+      plazaLines.position.set(0, 0.125, 0); plazaLines.userData.isBuilt = true; scene.add(plazaLines);
+      if (floorMeshes['0']) floorMeshes['0'].push({mesh:plazaMesh,lines:plazaLines,baseOpacity:0.95});
+
+      // Labels
+      const midKey = String(Math.floor(topLevel/2));
+      const midY = FLOOR_Y[midKey] ?? CUBE_CY;
+      VOLUME_LABEL_DATA = [
+        {text:'Central Cube',world:new THREE.Vector3(0,CUBE_Y_TOP+3.5,0)},
+        {text:'Grand Theater',world:new THREE.Vector3(GRAND_X_CENTER+2,midY+SLAB_H*1.5,0)},
+        {text:'Blue Box',world:new THREE.Vector3(BLUE_X_CENTER-2,midY+SLAB_H*1.5,0)},
+        {text:'Globe Playhouse',world:new THREE.Vector3(0,midY+SLAB_H*1.5,GLOBE_Z_CENTER-3)},
+        {text:'Public Plaza',world:new THREE.Vector3(-CUBE_HALF_X*1.5,1.5,CUBE_HALF_Z*1.5)},
+      ];
+      volumeLabelEls = VOLUME_LABEL_DATA.map(({text}) => { const el=document.createElement('div'); el.className='volume-label'; el.textContent=text; document.body.appendChild(el); return el; });
+      FLOOR_LABEL_DATA = FLOOR_KEYS.map((k,i) => ({text:FLOOR_LABELS_DISPLAY[i], world:new THREE.Vector3(-CUBE_HALF_X-1.5, FLOOR_Y[k]+SLAB_H/2, 0)}));
+      floorLabelEls = FLOOR_LABEL_DATA.map(({text}) => { const el=document.createElement('div'); el.className='floor-label'; el.textContent=text; document.body.appendChild(el); return el; });
+
+      // Floor selector
+      const selectorEl = document.getElementById('floor-selector'); selectorEl.innerHTML = ''; activeFloor = null;
+      const allBtn = document.createElement('button'); allBtn.className='floor-btn all-btn active'; allBtn.textContent='ALL';
+      allBtn.addEventListener('click', () => { activeFloor=null; applyFloorFocus(null,FLOOR_KEYS); selectorEl.querySelectorAll('.floor-btn').forEach(b=>b.classList.remove('active')); allBtn.classList.add('active'); });
+      selectorEl.appendChild(allBtn);
+      FLOOR_KEYS.forEach((k,i) => {
+        const btn=document.createElement('button'); btn.className='floor-btn'; btn.textContent=FLOOR_LABELS_DISPLAY[i];
+        btn.addEventListener('click', ()=>{ activeFloor=k; applyFloorFocus(k,FLOOR_KEYS); selectorEl.querySelectorAll('.floor-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); });
+        selectorEl.appendChild(btn);
+      });
+
+      camera.position.set(siteW*1.5, siteW*1.2, siteW*1.4);
+      controls.target.set(0, TOTAL_H*0.4, 0); controls.update();
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       STRUCTURE LAYER — translated from tpac_architecture_generator.py
+       Coordinate mapping: Python(px, py, pz) → Three.js(px, pz, py)
+       (Blender Z-up → Three.js Y-up)
+    ═══════════════════════════════════════════════════════════ */
+
+    // Structure sub-groups (Three.Group objects)
+    const structureGroups = {};
+    const structureGroupNames = ['mega','slab','core','pilotis','brace','curtain','roof','facade'];
+    let globalStructureOpacity = 0.72;
+
+    // Structure materials (shared, mutable opacity via uniform scale)
+    function sMat(hexColor, opts={}) {
+      return new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(hexColor),
+        metalness: opts.metalness ?? 0,
+        roughness: opts.roughness ?? 0.6,
+        transparent: opts.transparent ?? true,
+        opacity: opts.opacity ?? globalStructureOpacity,
+        side: opts.side ?? THREE.DoubleSide,
+        depthWrite: opts.depthWrite ?? false,
+      });
+    }
+
+    let S_MATS = {};  // rebuilt each time buildStructureLayer() is called
+
+    // Helper: box from Python Blender Z-up coords → Three.js Y-up
+    // px,py = horizontal (Blender X, Y), pz = Blender Z (height)
+    // sx,sy = horizontal size, sz = vertical size
+    function sbox(grp, px, py, pz, sx, sy, sz, mat) {
+      const geo = new THREE.BoxGeometry(sx, sz, sy);
+      const mesh = new THREE.Mesh(geo, mat.clone());
+      mesh.userData.isStructure = true;
+      mesh.position.set(px, pz, py);
+      grp.add(mesh);
+      return mesh;
+    }
+
+    // Helper: cylinder from Blender Z-up coords
+    function scyl(grp, px, py, pz_base, radius, height, mat, segs=12) {
+      const geo = new THREE.CylinderGeometry(radius, radius, height, segs);
+      const mesh = new THREE.Mesh(geo, mat.clone());
+      mesh.userData.isStructure = true;
+      mesh.position.set(px, pz_base + height/2, py);
+      grp.add(mesh);
+      return mesh;
+    }
+
+    // Curtain wall face perpendicular to Python-Y (Three.js Z) — cw_face_y equivalent
+    // yp=Python Y → Three.js Z, x0/x1 span, z0/z1 height
+    function cwFaceZ(grp, yp, x0, x1, z0, z1, nPanels, matPanel, matMullion) {
+      const w = x1-x0, h = z1-z0;
+      // Main glazing face
+      sbox(grp, (x0+x1)/2, yp, (z0+z1)/2, w, 0.10, h, matPanel);
+      // Vertical mullions
+      const ps = w / nPanels;
+      for (let i = 0; i <= nPanels; i++) {
+        sbox(grp, x0 + ps*i, yp, (z0+z1)/2, 0.12, 0.12, h, matMullion);
+      }
+      // Horizontal sill at z0 and head at z1
+      sbox(grp, (x0+x1)/2, yp, z0 + 0.25, w, 0.10, 0.5, matMullion);
+      sbox(grp, (x0+x1)/2, yp, z1 - 0.25, w, 0.10, 0.5, matMullion);
+    }
+
+    // Curtain wall face perpendicular to Python-X (Three.js X) — cw_face_x equivalent
+    // xp=Python X → Three.js X, y0/y1 Python Y (Three.js Z), z0/z1 height
+    function cwFaceX(grp, xp, y0, y1, z0, z1, nPanels, matPanel, matMullion) {
+      const d = y1-y0, h = z1-z0;
+      sbox(grp, xp, (y0+y1)/2, (z0+z1)/2, 0.10, d, h, matPanel);
+      const ps = d / nPanels;
+      for (let i = 0; i <= nPanels; i++) {
+        sbox(grp, xp, y0 + ps*i, (z0+z1)/2, 0.12, 0.12, h, matMullion);
+      }
+      sbox(grp, xp, (y0+y1)/2, z0 + 0.25, 0.10, d, 0.5, matMullion);
+      sbox(grp, xp, (y0+y1)/2, z1 - 0.25, 0.10, d, 0.5, matMullion);
+    }
+
+    function disposeStructure() {
+      structureGroupNames.forEach(name => {
+        const grp = structureGroups[name];
+        if (!grp) return;
+        grp.traverse(o => { if (o.isMesh) { o.geometry?.dispose(); o.material?.dispose(); } });
+        scene.remove(grp);
+        delete structureGroups[name];
+      });
+    }
+
+    function buildStructureLayer() {
+      disposeStructure();
+
+      // Rebuild materials with current opacity
+      const op = globalStructureOpacity;
+      S_MATS = {
+        steel:      sMat('#888890', { metalness:0.9, roughness:0.3, opacity: op }),
+        concrete:   sMat('#c0bab4', { metalness:0.0, roughness:0.8, opacity: op }),
+        glazing:    sMat('#99c8e0', { metalness:0.05, roughness:0.05, opacity: Math.min(op*0.32, 0.28) }),
+        mullion:    sMat('#606065', { metalness:0.85, roughness:0.25, opacity: op }),
+        panelGrand: sMat('#d4c8b8', { metalness:0.3, roughness:0.4, opacity: op }),
+        panelBlue:  sMat('#9AAEC0', { metalness:0.4, roughness:0.35, opacity: op }),
+        panelGlobe: sMat('#C0B4A8', { metalness:0.3, roughness:0.45, opacity: op }),
+        slab:       sMat('#a8a298', { metalness:0.0, roughness:0.9, opacity: op*0.75 }),
+        roof:       sMat('#707075', { metalness:0.8, roughness:0.4, opacity: op }),
+        facade:     sMat('#b8b0a5', { metalness:0.2, roughness:0.5, opacity: op }),
+      };
+
+      // Create sub-groups
+      structureGroupNames.forEach(name => {
+        const grp = new THREE.Group();
+        grp.userData.isStructureGroup = name;
+        grp.visible = true;
+        structureGroups[name] = grp;
+        scene.add(grp);
+      });
+
+      const G = structureGroups;
+
+      /* ── 1. MEGA COLUMNS ── */
+      // Python: for (cx,cy,w,d) in [(-12.3,11.3,10,12),(13.3,13.3,8,8),(13.3,-13.3,8,8),(-13.3,-13.3,8,8)]
+      // full height: zbot=-4.5 → ztop=60, h=64.5, zc=27.75
+      const ZBOT=-4.5, ZTOP=60.0, FULL_H=ZTOP-ZBOT, FULL_CZ=(ZBOT+ZTOP)/2;
+      [[-12.3, 11.3, 10, 12], [13.3, 13.3, 8, 8], [13.3, -13.3, 8, 8], [-13.3, -13.3, 8, 8]].forEach(([cx,cy,w,d]) => {
+        sbox(G.mega, cx, cy, FULL_CZ, w, d, FULL_H, S_MATS.concrete);
+      });
+
+      /* ── 2. STRUCTURAL FLOOR SLABS ── */
+      const LEVELS_Z = [-4.5,0,6,10.5,15,19.5,24,28.5,33,37.5,42,46.5,51,55.5,59.3];
+      const t = 0.4;
+      // Cube slabs
+      LEVELS_Z.forEach(z => sbox(G.slab, 0, 0, z-t/2, 34.6, 34.6, t, S_MATS.slab));
+      // Grand Theater slabs
+      [19.5, 45.8].forEach(z => sbox(G.slab, 21.5, 0, z-t/2, 26.6, 26.6, t, S_MATS.slab));
+      // Blue Box slabs
+      [19.5, 27.8].forEach(z => sbox(G.slab, -24.35, 0, z-t/2, 20.9, 21, t, S_MATS.slab));
+      // Globe slabs
+      [19.5, 27.8].forEach(z => sbox(G.slab, 0, -24.35, z-t/2, 21, 20.9, t, S_MATS.slab));
+
+      /* ── 3. CORE WALLS ── */
+      // CR|BOH: (0,3.5,30),(16,0.35,60)
+      sbox(G.core, 0, 3.5, 30, 16, 0.35, 60, S_MATS.concrete);
+      // CR|N: (0,17,30),(18,0.35,60)
+      sbox(G.core, 0, 17, 30, 18, 0.35, 60, S_MATS.concrete);
+      // CR|S: (0,-17,30),(18,0.35,60)
+      sbox(G.core, 0, -17, 30, 18, 0.35, 60, S_MATS.concrete);
+      // Basement walls
+      [['N',(0,17.3,-2.25),(34.6,0.4,4.5)],['S',(0,-17.3,-2.25),(34.6,0.4,4.5)],['E',(17.3,0,-2.25),(0.4,34.6,4.5)],['W',(-17.3,0,-2.25),(0.4,34.6,4.5)]].forEach(([,p,s]) => {
+        sbox(G.core, p[0], p[1], p[2], s[0], s[1], s[2], S_MATS.concrete);
+      });
+
+      /* ── 4. PILOTIS (cylindrical, radius=0.45, height=6) ── */
+      // Grid from Python lines 138-150
+      const pilotisPositions = [];
+      for (const x of [-4,0,4]) for (const y of [-12,-6,0,6,12]) { if(!(Math.abs(x)>6&&Math.abs(y)>6)) pilotisPositions.push([x,y]); }
+      for (const x of [-8,8]) for (const y of [-4,0,4]) pilotisPositions.push([x,y]);
+      pilotisPositions.forEach(([px,py]) => scyl(G.pilotis, px, py, 0, 0.45, 6, S_MATS.concrete, 8));
+
+      /* ── 5. TRANSFER TRUSSES & BRACING ── */
+      // Transfer trusses at Grand Theater junction (z=18.5 and z=23)
+      const tw=1.2, td=0.8;
+      [[-8,8],[8,-8].map(([a])=>a)].flat();
+      sbox(G.brace, 8.7, -8, 18.5, tw, 26.6, td, S_MATS.steel);
+      sbox(G.brace, 8.7,  8, 18.5, tw, 26.6, td, S_MATS.steel);
+      sbox(G.brace, 8.7, -8, 23,   tw, 26.6, td, S_MATS.steel);
+      sbox(G.brace, 8.7,  8, 23,   tw, 26.6, td, S_MATS.steel);
+      // Blue Box trusses
+      sbox(G.brace, -14.3, -6, 18.5, tw, 20.9, td, S_MATS.steel);
+      sbox(G.brace, -14.3,  6, 18.5, tw, 20.9, td, S_MATS.steel);
+      sbox(G.brace, -14.3, -6, 23,   tw, 20.9, td, S_MATS.steel);
+      sbox(G.brace, -14.3,  6, 23,   tw, 20.9, td, S_MATS.steel);
+      // Globe trusses
+      sbox(G.brace, -6, -14.3, 18.5, 20.9, tw, td, S_MATS.steel);
+      sbox(G.brace,  6, -14.3, 18.5, 20.9, tw, td, S_MATS.steel);
+      sbox(G.brace, -6, -14.3, 23,   20.9, tw, td, S_MATS.steel);
+      sbox(G.brace,  6, -14.3, 23,   20.9, tw, td, S_MATS.steel);
+      // Edge beams
+      const ew=0.6, eh=0.8;
+      [19.5, 45.8].forEach(z => {
+        sbox(G.brace, 21.5,  13.3, z, 26.6, ew, eh, S_MATS.steel);
+        sbox(G.brace, 21.5, -13.3, z, 26.6, ew, eh, S_MATS.steel);
+        sbox(G.brace, 34.8,    0, z, ew, 26.6, eh, S_MATS.steel);
+      });
+      [19.5, 27.8].forEach(z => {
+        sbox(G.brace, -24.35,  10.5, z, 20.9, ew, eh, S_MATS.steel);
+        sbox(G.brace, -24.35, -10.5, z, 20.9, ew, eh, S_MATS.steel);
+        sbox(G.brace, -34.8,     0, z, ew, 21, eh, S_MATS.steel);
+        sbox(G.brace,  10.5, -24.35, z, ew, 20.9, eh, S_MATS.steel);
+        sbox(G.brace, -10.5, -24.35, z, ew, 20.9, eh, S_MATS.steel);
+        sbox(G.brace,     0, -34.8, z, 21, ew, eh, S_MATS.steel);
+      });
+
+      /* ── 6. CURTAIN WALLS ── */
+      // Grand Theater (east face + N/S faces)
+      cwFaceX(G.curtain, 34.8, -13.3, 13.3, 19.5, 45.8, 8, S_MATS.panelGrand, S_MATS.mullion);
+      cwFaceZ(G.curtain, 13.3, 8.2, 34.8, 19.5, 45.8, 8, S_MATS.panelGrand, S_MATS.mullion);
+      cwFaceZ(G.curtain, -13.3, 8.2, 34.8, 19.5, 45.8, 8, S_MATS.panelGrand, S_MATS.mullion);
+
+      // Blue Box (west face + N/S faces)
+      cwFaceX(G.curtain, -34.8, -10.5, 10.5, 19.5, 32.3, 7, S_MATS.panelBlue, S_MATS.mullion);
+      cwFaceZ(G.curtain,  10.5, -34.8, -13.9, 19.5, 32.3, 7, S_MATS.panelBlue, S_MATS.mullion);
+      cwFaceZ(G.curtain, -10.5, -34.8, -13.9, 19.5, 32.3, 7, S_MATS.panelBlue, S_MATS.mullion);
+
+      // Globe Playhouse (south face + E/W faces)
+      cwFaceZ(G.curtain, -34.8, -10.5, 10.5, 19.5, 23.3, 7, S_MATS.panelGlobe, S_MATS.mullion);
+      cwFaceX(G.curtain, -10.5, -34.8, -13.9, 19.5, 23.3, 7, S_MATS.panelGlobe, S_MATS.mullion);
+      cwFaceX(G.curtain,  10.5, -34.8, -13.9, 19.5, 23.3, 7, S_MATS.panelGlobe, S_MATS.mullion);
+
+      // Central Cube faces (glazing panels, 4 sides)
+      cwFaceZ(G.curtain,  17.3, -17.3, 17.3, 0, 60, 12, S_MATS.glazing, S_MATS.mullion);  // North
+      cwFaceZ(G.curtain, -17.3, -17.3, 17.3, 0, 60, 12, S_MATS.glazing, S_MATS.mullion);  // South
+      cwFaceX(G.curtain,  17.3, -17.3, 17.3, 0, 60, 12, S_MATS.glazing, S_MATS.mullion);  // East
+      cwFaceX(G.curtain, -17.3, -17.3, 17.3, 0, 60, 12, S_MATS.glazing, S_MATS.mullion);  // West
+
+      /* ── 7. ROOF ── */
+      // Grand Theater roof
+      sbox(G.roof, 21.5, 0, 46.05, 27, 27, 0.15, S_MATS.roof);
+      sbox(G.roof, 21.5, 0, 47,    12,  8, 2,    S_MATS.steel);
+      sbox(G.roof, 25,   0, 46.5,  14, 14, 1,    S_MATS.steel);
+      // Blue Box roof
+      sbox(G.roof, -24.35, 0, 32.55, 21.3, 21.4, 0.15, S_MATS.roof);
+      sbox(G.roof, -24.35, 0, 33.3,   8,    6,   1.6,  S_MATS.steel);
+      // Globe Playhouse roof
+      sbox(G.roof, 0, -24.35, 23.55, 21.4, 21.3, 0.15, S_MATS.roof);
+      sbox(G.roof, 0, -24.35, 24.3,   6,    8,   1.6,  S_MATS.steel);
+      // Central cube roof
+      sbox(G.roof, 0, 0, 59.5, 34.6, 34.6, 0.4, S_MATS.roof);
+      // Parapet strips
+      sbox(G.roof, 0,     17.3, 59.9, 34.6, 0.25, 1.2, S_MATS.concrete);
+      sbox(G.roof, 0,    -17.3, 59.9, 34.6, 0.25, 1.2, S_MATS.concrete);
+      sbox(G.roof, 17.3,  0,    59.9, 0.25, 34.6, 1.2, S_MATS.concrete);
+      sbox(G.roof, -17.3, 0,    59.9, 0.25, 34.6, 1.2, S_MATS.concrete);
+      // Fly tower crown details
+      for (let x of [12,17,22,27,32]) sbox(G.roof, x, 0, 46, 0.6, 26, 0.15, S_MATS.steel);
+      for (let y of [-10,-5,0,5,10])  sbox(G.roof, 21.5, y, 46, 26, 0.6, 0.15, S_MATS.steel);
+
+      /* ── 8. FACADE ARTICULATION ── */
+      // Grand Theater east facade panels
+      for (let i = 0; i < 5; i++) {
+        const z = 22 + i*5;
+        for (let j = 0; j < 5; j++) {
+          const yp = [-9,-4.5,0,4.5,9][j];
+          sbox(G.facade, 35.1, yp, z, 0.15, 3.8, 4.2, S_MATS.panelGrand);
+        }
+      }
+      sbox(G.facade, 21.5, 0, 19.3, 26.6, 26.6, 0.15, S_MATS.panelGrand);
+      // Blue Box west facade
+      for (let i = 0; i < 4; i++) {
+        const z = 21 + i*2;
+        for (let j = 0; j < 5; j++) {
+          const yp = [-7,-3.5,0,3.5,7][j];
+          sbox(G.facade, -35.1, yp, z, 0.12, 3, 1.5, S_MATS.panelBlue);
+        }
+      }
+      sbox(G.facade, -24.35, 0, 19.3, 20.9, 21, 0.15, S_MATS.panelBlue);
+      // Globe south facade
+      for (let i = 0; i < 4; i++) {
+        const z = 21 + i*2;
+        for (let j = 0; j < 5; j++) {
+          const xp = [-7,-3.5,0,3.5,7][j];
+          sbox(G.facade, xp, -35.1, z, 3, 0.12, 1.5, S_MATS.panelGlobe);
+        }
+      }
+      sbox(G.facade, 0, -24.35, 19.3, 21, 20.9, 0.15, S_MATS.panelGlobe);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       STRUCTURE VISIBILITY CONTROLS
+    ═══════════════════════════════════════════════════════════ */
+    let structureVisible = true;
+    const groupState = {};
+    structureGroupNames.forEach(n => groupState[n] = true);
+
+    window.toggleGroup = function(name) {
+      groupState[name] = !groupState[name];
+      if (structureGroups[name]) structureGroups[name].visible = groupState[name];
+      const btn = document.getElementById('tog-' + name);
+      if (btn) btn.classList.toggle('active', groupState[name]);
+      updateMasterBtn();
+    };
+
+    window.toggleAllStructure = function() {
+      structureVisible = !structureVisible;
+      structureGroupNames.forEach(n => {
+        groupState[n] = structureVisible;
+        if (structureGroups[n]) structureGroups[n].visible = structureVisible;
+        const btn = document.getElementById('tog-' + n);
+        if (btn) btn.classList.toggle('active', structureVisible);
+      });
+      updateMasterBtn();
+    };
+
+    function updateMasterBtn() {
+      const masterBtn = document.getElementById('master-toggle-btn');
+      const anyOn = structureGroupNames.some(n => groupState[n]);
+      structureVisible = anyOn;
+      if (masterBtn) {
+        masterBtn.textContent = anyOn ? 'Hide All Structure' : 'Show All Structure';
+        masterBtn.classList.toggle('hidden-all', !anyOn);
+      }
+    }
+
+    window.setStructureOpacity = function(val) {
+      globalStructureOpacity = parseFloat(val);
+      const pct = Math.round(globalStructureOpacity * 100);
+      document.getElementById('struct-opacity-val').textContent = pct + '%';
+      // Rebuild structure with new opacity
+      buildStructureLayer();
+      // Restore visibility states
+      structureGroupNames.forEach(n => {
+        if (structureGroups[n]) structureGroups[n].visible = groupState[n];
+      });
+    };
+
+    /* ═══════════════════════════════════════════════════════════
+       PANEL TOGGLE
+    ═══════════════════════════════════════════════════════════ */
+    window.togglePanel = function(id) {
+      const body = document.getElementById('body-'+id);
+      const arrow = document.getElementById('arrow-'+id);
+      if (!body || !arrow) return;
+      const collapsed = body.classList.toggle('collapsed');
+      arrow.innerHTML = collapsed ? '&#9656;' : '&#9662;';
+    };
+
+    /* ═══════════════════════════════════════════════════════════
+       PROGRAM STATS
+    ═══════════════════════════════════════════════════════════ */
+    function buildStats() {
+      const el = document.getElementById('stats-content'); if (!el) return;
+      const byType = {};
+      FLOOR_DATA.forEach(e => { byType[e.type] = (byType[e.type]||0) + e.area; });
+      const total = Object.values(byType).reduce((s,v)=>s+v,0);
+      const sorted = Object.entries(byType).sort((a,b)=>b[1]-a[1]);
+      el.innerHTML = '';
+      sorted.slice(0,20).forEach(([type,area]) => {
+        const hex = TYPE_COLORS[type]||'#888';
+        const row = document.createElement('div'); row.className = 'stats-row';
+        row.innerHTML = `<div class="stats-swatch" style="background:${hex}"></div><span class="stats-label">${type}</span><span class="stats-val">${area.toLocaleString()} m²</span>`;
+        el.appendChild(row);
+      });
+      const div = document.createElement('hr'); div.className='stats-divider'; el.appendChild(div);
+      const tot = document.createElement('div'); tot.className='stats-total';
+      tot.innerHTML = `<span>Total GFA</span><span>${total.toLocaleString()} m²</span>`; el.appendChild(tot);
+      const meta = document.createElement('div'); meta.className='stats-meta';
+      meta.textContent = `${FLOOR_DATA.length} program entries · ${new Set(FLOOR_DATA.map(e=>e.level)).size} floors`; el.appendChild(meta);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       FILE LOAD
+    ═══════════════════════════════════════════════════════════ */
+    window.applyParams = function() {
+      const siteW = parseFloat(document.getElementById('param-site-w').value) || 70;
+      const siteD = parseFloat(document.getElementById('param-site-d').value) || 70;
+      const floorCount = parseInt(document.getElementById('param-floors').value) || 14;
+      const floorHeight = parseFloat(document.getElementById('param-floor-h').value) || 4.5;
+      buildLegend(); buildScene({ siteW, siteD, floorCount, floorHeight }); buildStructureLayer(); buildStats();
+    };
+
+    function handleFile(file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const parsed = parseProgramText(e.target.result);
+        const errEl = document.getElementById('load-error');
+        const fnEl = document.getElementById('loaded-filename');
+        const cntEl = document.getElementById('load-entry-count');
+        if (!parsed.length) { errEl.textContent='No valid entries found.'; return; }
+        errEl.textContent='';
+        fnEl.textContent = file.name;
+        cntEl.textContent = parsed.length + ' entries loaded';
+        FLOOR_DATA = parsed; buildLegend();
+        buildScene({ siteW: parseFloat(document.getElementById('param-site-w').value)||70, siteD: parseFloat(document.getElementById('param-site-d').value)||70, floorCount: parseInt(document.getElementById('param-floors').value)||14, floorHeight: parseFloat(document.getElementById('param-floor-h').value)||4.5 });
+        buildStructureLayer(); buildStats();
+      };
+      reader.readAsText(file);
+    }
+
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    if (fileInput) fileInput.addEventListener('change', e => { if(e.target.files[0]) handleFile(e.target.files[0]); });
+    if (dropZone) {
+      dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+      dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       POSTMESSAGE (from index.html parent)
+    ═══════════════════════════════════════════════════════════ */
+    window.addEventListener('message', e => {
+      if (e.data?.action === 'applyParams') {
+        buildLegend();
+        buildScene({ siteW:e.data.siteW||70, siteD:e.data.siteD||70, floorCount:e.data.floorCount||14, floorHeight:e.data.floorH||4.5 });
+        buildStructureLayer(); buildStats();
+      }
+    });
+
+    /* ═══════════════════════════════════════════════════════════
+       INITIAL BUILD
+    ═══════════════════════════════════════════════════════════ */
+    buildLegend();
+    buildScene({ siteW: 70, siteD: 70, floorCount: 14, floorHeight: 4.5 });
+    buildStructureLayer();
+    buildStats();
+
+    /* ─── Render loop ─── */
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+      updateLabels();
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      const W = container.clientWidth, H = container.clientHeight;
+      camera.aspect = W/H; camera.updateProjectionMatrix();
+      renderer.setSize(W, H);
+    });
+
+  </script>
+</body>
+</html>

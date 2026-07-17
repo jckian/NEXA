@@ -1,0 +1,711 @@
+## 53W53 Program Distribution — Floor by Floor
+## Source: 53W53-PROGRAM.md + ProgramFormat.txt
+## Format: {program type}/{area in m2}/{floor level}/{program category}/{width,length}
+##
+## Building: Jean Nouvel — 53 West 53rd Street, NYC (2019)
+## Site: 40×40m constrained Midtown Manhattan lot
+## Floors: B1 to L73 | Floor-to-floor: 4.5m | Total Height: ~333m
+## Structural System: Diagrid concrete exoskeleton — structure at perimeter, compact central core
+##
+## ── TAPERING FOOTPRINT ──────────────────────────────────────────────────
+## Floors  0– 3   podium:          40×40m  (~1600 m² gross)
+## Floors  4–11   lower res:       35×35m  (~1225 m² gross)
+## Floors 12–16   amenity zone:    30×32m  (~960 m² gross)
+## Floors 17–25   mid res A:       28×28m  (~784 m² gross)
+## Floors 26–35   mid res B:       25×25m  (~625 m² gross)
+## Floors 36–45   upper mid res:   22×22m  (~484 m² gross)
+## Floors 46–47   crown lounge:    20×20m  (~400 m² gross)
+## Floors 48–55   upper res A:     18×18m  (~324 m² gross)
+## Floors 56–60   upper res B:     15×15m  (~225 m² gross)
+## Floors 61–65   spire zone A:    12×12m  (~144 m² gross)
+## Floors 66–70   spire zone B:     9×9m   (~81  m² gross)
+## Floors 71–73   spire zone C:     6×6m   (~36  m² gross)
+##
+## ── PROGRAM TYPE → CATEGORY ──────────────────────────────────────────────
+## museum gallery          → public
+## exhibition hall         → public
+## lobby                   → public
+## reception               → public
+## restaurant              → public
+## private dining          → public
+## lounge bar              → public
+## museum shop             → public
+## event lounge            → public
+## residents lounge        → public
+## screening room          → public
+## library                 → public
+## restroom                → public
+## gym                     → private
+## pool                    → private
+## spa                     → private
+## changing room           → private
+## residence duplex        → private
+## residence corner        → private
+## residence full floor    → private
+## residence penthouse     → private
+## art storage             → private
+## wine cellar             → private
+## kitchen                 → private
+## staff                   → private
+## storage                 → private
+## mechanical              → private
+## IT support              → private
+## loading                 → private
+## service corridor        → private
+## fire stair and freight elevator  → circulation
+## fire stair and elevator 1        → circulation
+## fire stair and elevator 2        → circulation
+## ─────────────────────────────────────────────────────────────────────────
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## B1  Basement  −4.5 m   BOH infrastructure, loading, MEP
+## ─────────────────────────────────────────────────────────────────────────
+{loading}/{300}/{-1}/{private}/{15,20}
+{storage}/{400}/{-1}/{private}/{20,20}
+{mechanical}/{350}/{-1}/{private}/{15,24}
+{wine cellar}/{80}/{-1}/{private}/{8,10}
+{service corridor}/{150}/{-1}/{private}/{6,25}
+{restroom}/{80}/{-1}/{public}/{8,10}
+{fire stair and freight elevator}/{200}/{-1}/{circulation}/{10,20}
+{fire stair and elevator 1}/{150}/{-1}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{-1}/{circulation}/{10,13}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L0  Ground  0 m   MoMA integration / arrival lobby / restaurant
+## ─────────────────────────────────────────────────────────────────────────
+{lobby}/{600}/{0}/{public}/{20,30}
+{reception}/{100}/{0}/{public}/{10,10}
+{museum gallery}/{500}/{0}/{public}/{20,25}
+{restaurant}/{400}/{0}/{public}/{16,25}
+{museum shop}/{150}/{0}/{public}/{10,15}
+{restroom}/{168}/{0}/{public}/{12,14}
+{loading}/{120}/{0}/{private}/{8,15}
+{storage}/{80}/{0}/{private}/{8,10}
+{mechanical}/{100}/{0}/{private}/{8,13}
+{fire stair and freight elevator}/{200}/{0}/{circulation}/{10,20}
+{fire stair and elevator 1}/{150}/{0}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{0}/{circulation}/{10,13}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L1  +4.5 m   MoMA Gallery — primary exhibition floor
+## ─────────────────────────────────────────────────────────────────────────
+{museum gallery}/{1000}/{1}/{public}/{25,40}
+{exhibition hall}/{350}/{1}/{public}/{14,25}
+{restroom}/{168}/{1}/{public}/{12,14}
+{art storage}/{120}/{1}/{private}/{8,15}
+{staff}/{60}/{1}/{private}/{6,10}
+{IT support}/{40}/{1}/{private}/{5,8}
+{fire stair and freight elevator}/{200}/{1}/{circulation}/{10,20}
+{fire stair and elevator 1}/{150}/{1}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{1}/{circulation}/{10,13}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L2  +9.0 m   MoMA Gallery — secondary exhibition floor
+## ─────────────────────────────────────────────────────────────────────────
+{museum gallery}/{1000}/{2}/{public}/{25,40}
+{exhibition hall}/{350}/{2}/{public}/{14,25}
+{restroom}/{168}/{2}/{public}/{12,14}
+{art storage}/{120}/{2}/{private}/{8,15}
+{staff}/{60}/{2}/{private}/{6,10}
+{IT support}/{40}/{2}/{private}/{5,8}
+{fire stair and freight elevator}/{200}/{2}/{circulation}/{10,20}
+{fire stair and elevator 1}/{150}/{2}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{2}/{circulation}/{10,13}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L3  +13.5 m   Transition — signature restaurant floor
+## ─────────────────────────────────────────────────────────────────────────
+{restaurant}/{600}/{3}/{public}/{20,30}
+{private dining}/{150}/{3}/{public}/{10,15}
+{lounge bar}/{120}/{3}/{public}/{10,12}
+{museum shop}/{120}/{3}/{public}/{10,12}
+{restroom}/{168}/{3}/{public}/{12,14}
+{kitchen}/{120}/{3}/{private}/{10,12}
+{storage}/{80}/{3}/{private}/{8,10}
+{fire stair and freight elevator}/{200}/{3}/{circulation}/{10,20}
+{fire stair and elevator 1}/{150}/{3}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{3}/{circulation}/{10,13}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L4–L11  Lower Residential   2 half-floor units per level
+## Footprint: 35×35m | Net (minus core ~480 m²): ~745 m²
+## ─────────────────────────────────────────────────────────────────────────
+
+## L4
+{residence duplex}/{280}/{4}/{private}/{14,20}
+{residence corner}/{280}/{4}/{private}/{14,20}
+{restroom}/{60}/{4}/{public}/{6,10}
+{storage}/{40}/{4}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{4}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{4}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{4}/{circulation}/{10,13}
+
+## L5
+{residence duplex}/{280}/{5}/{private}/{14,20}
+{residence corner}/{280}/{5}/{private}/{14,20}
+{restroom}/{60}/{5}/{public}/{6,10}
+{storage}/{40}/{5}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{5}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{5}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{5}/{circulation}/{10,13}
+
+## L6
+{residence duplex}/{280}/{6}/{private}/{14,20}
+{residence corner}/{280}/{6}/{private}/{14,20}
+{restroom}/{60}/{6}/{public}/{6,10}
+{storage}/{40}/{6}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{6}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{6}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{6}/{circulation}/{10,13}
+
+## L7
+{residence duplex}/{280}/{7}/{private}/{14,20}
+{residence corner}/{280}/{7}/{private}/{14,20}
+{restroom}/{60}/{7}/{public}/{6,10}
+{storage}/{40}/{7}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{7}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{7}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{7}/{circulation}/{10,13}
+
+## L8
+{residence duplex}/{280}/{8}/{private}/{14,20}
+{residence corner}/{280}/{8}/{private}/{14,20}
+{restroom}/{60}/{8}/{public}/{6,10}
+{storage}/{40}/{8}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{8}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{8}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{8}/{circulation}/{10,13}
+
+## L9
+{residence duplex}/{280}/{9}/{private}/{14,20}
+{residence corner}/{280}/{9}/{private}/{14,20}
+{restroom}/{60}/{9}/{public}/{6,10}
+{storage}/{40}/{9}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{9}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{9}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{9}/{circulation}/{10,13}
+
+## L10
+{residence duplex}/{280}/{10}/{private}/{14,20}
+{residence corner}/{280}/{10}/{private}/{14,20}
+{restroom}/{60}/{10}/{public}/{6,10}
+{storage}/{40}/{10}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{10}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{10}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{10}/{circulation}/{10,13}
+
+## L11
+{residence duplex}/{280}/{11}/{private}/{14,20}
+{residence corner}/{280}/{11}/{private}/{14,20}
+{restroom}/{60}/{11}/{public}/{6,10}
+{storage}/{40}/{11}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{11}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{11}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{11}/{circulation}/{10,13}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L12–L16  Amenity Zone   Buffer between public base and private tower
+## Footprint: 30×32m | Net (minus core ~450 m²): ~510 m²
+## ─────────────────────────────────────────────────────────────────────────
+
+## L12  Fitness
+{gym}/{260}/{12}/{private}/{16,16}
+{changing room}/{80}/{12}/{private}/{8,10}
+{storage}/{40}/{12}/{private}/{5,8}
+{restroom}/{80}/{12}/{public}/{8,10}
+{staff}/{40}/{12}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{12}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{12}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{12}/{circulation}/{10,13}
+
+## L13  Aquatics + Spa
+{pool}/{200}/{13}/{private}/{14,14}
+{spa}/{120}/{13}/{private}/{10,12}
+{changing room}/{80}/{13}/{private}/{8,10}
+{restroom}/{80}/{13}/{public}/{8,10}
+{storage}/{30}/{13}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{13}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{13}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{13}/{circulation}/{10,13}
+
+## L14  Residents Lounge + Private Dining
+{residents lounge}/{200}/{14}/{public}/{14,14}
+{private dining}/{120}/{14}/{public}/{10,12}
+{lounge bar}/{80}/{14}/{public}/{8,10}
+{restroom}/{80}/{14}/{public}/{8,10}
+{kitchen}/{60}/{14}/{private}/{6,10}
+{fire stair and freight elevator}/{170}/{14}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{14}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{14}/{circulation}/{10,13}
+
+## L15  Media + Library
+{screening room}/{180}/{15}/{public}/{12,15}
+{library}/{120}/{15}/{public}/{10,12}
+{residents lounge}/{100}/{15}/{public}/{10,10}
+{restroom}/{80}/{15}/{public}/{8,10}
+{IT support}/{40}/{15}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{15}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{15}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{15}/{circulation}/{10,13}
+
+## L16  Amenity Sky Terrace (enclosed)
+{event lounge}/{200}/{16}/{public}/{14,14}
+{residents lounge}/{120}/{16}/{public}/{10,12}
+{lounge bar}/{80}/{16}/{public}/{8,10}
+{restroom}/{80}/{16}/{public}/{8,10}
+{storage}/{30}/{16}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{16}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{16}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{16}/{circulation}/{10,13}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L17–L25  Mid Residential A   2 units per floor
+## Footprint: 28×28m | Net (minus core ~450 m²): ~334 m²
+## ─────────────────────────────────────────────────────────────────────────
+
+## L17
+{residence corner}/{200}/{17}/{private}/{13,15}
+{residence corner}/{130}/{17}/{private}/{10,13}
+{restroom}/{60}/{17}/{public}/{6,10}
+{storage}/{30}/{17}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{17}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{17}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{17}/{circulation}/{10,13}
+
+## L18
+{residence corner}/{200}/{18}/{private}/{13,15}
+{residence corner}/{130}/{18}/{private}/{10,13}
+{restroom}/{60}/{18}/{public}/{6,10}
+{storage}/{30}/{18}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{18}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{18}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{18}/{circulation}/{10,13}
+
+## L19
+{residence corner}/{200}/{19}/{private}/{13,15}
+{residence corner}/{130}/{19}/{private}/{10,13}
+{restroom}/{60}/{19}/{public}/{6,10}
+{storage}/{30}/{19}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{19}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{19}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{19}/{circulation}/{10,13}
+
+## L20
+{residence corner}/{200}/{20}/{private}/{13,15}
+{residence corner}/{130}/{20}/{private}/{10,13}
+{restroom}/{60}/{20}/{public}/{6,10}
+{storage}/{30}/{20}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{20}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{20}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{20}/{circulation}/{10,13}
+
+## L21
+{residence corner}/{200}/{21}/{private}/{13,15}
+{residence corner}/{130}/{21}/{private}/{10,13}
+{restroom}/{60}/{21}/{public}/{6,10}
+{storage}/{30}/{21}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{21}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{21}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{21}/{circulation}/{10,13}
+
+## L22
+{residence corner}/{200}/{22}/{private}/{13,15}
+{residence corner}/{130}/{22}/{private}/{10,13}
+{restroom}/{60}/{22}/{public}/{6,10}
+{storage}/{30}/{22}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{22}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{22}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{22}/{circulation}/{10,13}
+
+## L23
+{residence corner}/{200}/{23}/{private}/{13,15}
+{residence corner}/{130}/{23}/{private}/{10,13}
+{restroom}/{60}/{23}/{public}/{6,10}
+{storage}/{30}/{23}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{23}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{23}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{23}/{circulation}/{10,13}
+
+## L24
+{residence corner}/{200}/{24}/{private}/{13,15}
+{residence corner}/{130}/{24}/{private}/{10,13}
+{restroom}/{60}/{24}/{public}/{6,10}
+{storage}/{30}/{24}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{24}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{24}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{24}/{circulation}/{10,13}
+
+## L25
+{residence corner}/{200}/{25}/{private}/{13,15}
+{residence corner}/{130}/{25}/{private}/{10,13}
+{restroom}/{60}/{25}/{public}/{6,10}
+{storage}/{30}/{25}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{25}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{25}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{25}/{circulation}/{10,13}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L26–L35  Mid Residential B   2 smaller units per floor
+## Footprint: 25×25m | Net (minus core ~450 m²): ~175 m²
+## ─────────────────────────────────────────────────────────────────────────
+
+## L26
+{residence corner}/{150}/{26}/{private}/{12,13}
+{residence corner}/{100}/{26}/{private}/{10,10}
+{restroom}/{50}/{26}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{26}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{26}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{26}/{circulation}/{10,13}
+
+## L27
+{residence corner}/{150}/{27}/{private}/{12,13}
+{residence corner}/{100}/{27}/{private}/{10,10}
+{restroom}/{50}/{27}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{27}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{27}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{27}/{circulation}/{10,13}
+
+## L28
+{residence corner}/{150}/{28}/{private}/{12,13}
+{residence corner}/{100}/{28}/{private}/{10,10}
+{restroom}/{50}/{28}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{28}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{28}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{28}/{circulation}/{10,13}
+
+## L29
+{residence corner}/{150}/{29}/{private}/{12,13}
+{residence corner}/{100}/{29}/{private}/{10,10}
+{restroom}/{50}/{29}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{29}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{29}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{29}/{circulation}/{10,13}
+
+## L30
+{residence corner}/{150}/{30}/{private}/{12,13}
+{residence corner}/{100}/{30}/{private}/{10,10}
+{restroom}/{50}/{30}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{30}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{30}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{30}/{circulation}/{10,13}
+
+## L31
+{residence corner}/{150}/{31}/{private}/{12,13}
+{residence corner}/{100}/{31}/{private}/{10,10}
+{restroom}/{50}/{31}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{31}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{31}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{31}/{circulation}/{10,13}
+
+## L32
+{residence corner}/{150}/{32}/{private}/{12,13}
+{residence corner}/{100}/{32}/{private}/{10,10}
+{restroom}/{50}/{32}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{32}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{32}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{32}/{circulation}/{10,13}
+
+## L33
+{residence corner}/{150}/{33}/{private}/{12,13}
+{residence corner}/{100}/{33}/{private}/{10,10}
+{restroom}/{50}/{33}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{33}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{33}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{33}/{circulation}/{10,13}
+
+## L34
+{residence corner}/{150}/{34}/{private}/{12,13}
+{residence corner}/{100}/{34}/{private}/{10,10}
+{restroom}/{50}/{34}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{34}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{34}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{34}/{circulation}/{10,13}
+
+## L35
+{residence corner}/{150}/{35}/{private}/{12,13}
+{residence corner}/{100}/{35}/{private}/{10,10}
+{restroom}/{50}/{35}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{35}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{35}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{35}/{circulation}/{10,13}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L36–L45  Upper Mid Residential   1 full-floor unit per level
+## Footprint: 22×22m | Net (minus core ~450 m²): ~34 m² → unit fills plate margin
+## ─────────────────────────────────────────────────────────────────────────
+
+## L36
+{residence full floor}/{180}/{36}/{private}/{13,14}
+{restroom}/{50}/{36}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{36}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{36}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{36}/{circulation}/{10,13}
+
+## L37
+{residence full floor}/{180}/{37}/{private}/{13,14}
+{restroom}/{50}/{37}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{37}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{37}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{37}/{circulation}/{10,13}
+
+## L38
+{residence full floor}/{180}/{38}/{private}/{13,14}
+{restroom}/{50}/{38}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{38}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{38}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{38}/{circulation}/{10,13}
+
+## L39
+{residence full floor}/{180}/{39}/{private}/{13,14}
+{restroom}/{50}/{39}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{39}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{39}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{39}/{circulation}/{10,13}
+
+## L40
+{residence full floor}/{180}/{40}/{private}/{13,14}
+{restroom}/{50}/{40}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{40}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{40}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{40}/{circulation}/{10,13}
+
+## L41
+{residence full floor}/{180}/{41}/{private}/{13,14}
+{restroom}/{50}/{41}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{41}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{41}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{41}/{circulation}/{10,13}
+
+## L42
+{residence full floor}/{170}/{42}/{private}/{12,14}
+{restroom}/{50}/{42}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{42}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{42}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{42}/{circulation}/{10,13}
+
+## L43
+{residence full floor}/{170}/{43}/{private}/{12,14}
+{restroom}/{50}/{43}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{43}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{43}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{43}/{circulation}/{10,13}
+
+## L44
+{residence full floor}/{160}/{44}/{private}/{12,13}
+{restroom}/{50}/{44}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{44}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{44}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{44}/{circulation}/{10,13}
+
+## L45
+{residence full floor}/{160}/{45}/{private}/{12,13}
+{restroom}/{50}/{45}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{45}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{45}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{45}/{circulation}/{10,13}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L46–L47  Crown Lounge   Residents-only sky lounge
+## Footprint: 20×20m
+## ─────────────────────────────────────────────────────────────────────────
+
+## L46
+{event lounge}/{200}/{46}/{public}/{14,14}
+{lounge bar}/{80}/{46}/{public}/{8,10}
+{restroom}/{80}/{46}/{public}/{8,10}
+{storage}/{30}/{46}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{46}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{46}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{46}/{circulation}/{10,13}
+
+## L47
+{event lounge}/{200}/{47}/{public}/{14,14}
+{lounge bar}/{80}/{47}/{public}/{8,10}
+{restroom}/{80}/{47}/{public}/{8,10}
+{storage}/{30}/{47}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{47}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{47}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{47}/{circulation}/{10,13}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L48–L55  Upper Residential A   Full-floor penthouses, tapering
+## Footprint: 18×18m | Core ~450 m² → floor area mostly core at this height
+## ─────────────────────────────────────────────────────────────────────────
+
+## L48
+{residence penthouse}/{180}/{48}/{private}/{13,14}
+{restroom}/{40}/{48}/{public}/{5,8}
+{fire stair and freight elevator}/{150}/{48}/{circulation}/{10,15}
+{fire stair and elevator 1}/{130}/{48}/{circulation}/{10,13}
+{fire stair and elevator 2}/{110}/{48}/{circulation}/{10,11}
+
+## L49
+{residence penthouse}/{170}/{49}/{private}/{13,13}
+{restroom}/{40}/{49}/{public}/{5,8}
+{fire stair and freight elevator}/{150}/{49}/{circulation}/{10,15}
+{fire stair and elevator 1}/{130}/{49}/{circulation}/{10,13}
+{fire stair and elevator 2}/{110}/{49}/{circulation}/{10,11}
+
+## L50
+{residence penthouse}/{160}/{50}/{private}/{12,13}
+{restroom}/{40}/{50}/{public}/{5,8}
+{fire stair and freight elevator}/{150}/{50}/{circulation}/{10,15}
+{fire stair and elevator 1}/{130}/{50}/{circulation}/{10,13}
+{fire stair and elevator 2}/{110}/{50}/{circulation}/{10,11}
+
+## L51
+{residence penthouse}/{150}/{51}/{private}/{12,12}
+{restroom}/{40}/{51}/{public}/{5,8}
+{fire stair and freight elevator}/{150}/{51}/{circulation}/{10,15}
+{fire stair and elevator 1}/{130}/{51}/{circulation}/{10,13}
+{fire stair and elevator 2}/{110}/{51}/{circulation}/{10,11}
+
+## L52
+{residence penthouse}/{140}/{52}/{private}/{12,12}
+{restroom}/{40}/{52}/{public}/{5,8}
+{fire stair and freight elevator}/{150}/{52}/{circulation}/{10,15}
+{fire stair and elevator 1}/{130}/{52}/{circulation}/{10,13}
+{fire stair and elevator 2}/{110}/{52}/{circulation}/{10,11}
+
+## L53
+{residence penthouse}/{130}/{53}/{private}/{11,12}
+{restroom}/{40}/{53}/{public}/{5,8}
+{fire stair and freight elevator}/{150}/{53}/{circulation}/{10,15}
+{fire stair and elevator 1}/{130}/{53}/{circulation}/{10,13}
+{fire stair and elevator 2}/{110}/{53}/{circulation}/{10,11}
+
+## L54
+{residence penthouse}/{120}/{54}/{private}/{11,11}
+{restroom}/{40}/{54}/{public}/{5,8}
+{fire stair and freight elevator}/{150}/{54}/{circulation}/{10,15}
+{fire stair and elevator 1}/{130}/{54}/{circulation}/{10,13}
+{fire stair and elevator 2}/{110}/{54}/{circulation}/{10,11}
+
+## L55
+{residence penthouse}/{110}/{55}/{private}/{10,11}
+{restroom}/{40}/{55}/{public}/{5,8}
+{fire stair and freight elevator}/{150}/{55}/{circulation}/{10,15}
+{fire stair and elevator 1}/{130}/{55}/{circulation}/{10,13}
+{fire stair and elevator 2}/{110}/{55}/{circulation}/{10,11}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L56–L60  Upper Residential B   Very thin plates, summit penthouses
+## Footprint: 15×15m
+## ─────────────────────────────────────────────────────────────────────────
+
+## L56
+{residence penthouse}/{100}/{56}/{private}/{10,10}
+{restroom}/{30}/{56}/{public}/{5,6}
+{fire stair and freight elevator}/{120}/{56}/{circulation}/{8,15}
+{fire stair and elevator 1}/{100}/{56}/{circulation}/{8,13}
+{fire stair and elevator 2}/{90}/{56}/{circulation}/{8,11}
+
+## L57
+{residence penthouse}/{90}/{57}/{private}/{9,10}
+{restroom}/{30}/{57}/{public}/{5,6}
+{fire stair and freight elevator}/{120}/{57}/{circulation}/{8,15}
+{fire stair and elevator 1}/{100}/{57}/{circulation}/{8,13}
+{fire stair and elevator 2}/{90}/{57}/{circulation}/{8,11}
+
+## L58
+{residence penthouse}/{80}/{58}/{private}/{9,9}
+{restroom}/{30}/{58}/{public}/{5,6}
+{fire stair and freight elevator}/{120}/{58}/{circulation}/{8,15}
+{fire stair and elevator 1}/{100}/{58}/{circulation}/{8,13}
+{fire stair and elevator 2}/{90}/{58}/{circulation}/{8,11}
+
+## L59
+{residence penthouse}/{70}/{59}/{private}/{8,9}
+{restroom}/{30}/{59}/{public}/{5,6}
+{fire stair and freight elevator}/{120}/{59}/{circulation}/{8,15}
+{fire stair and elevator 1}/{100}/{59}/{circulation}/{8,13}
+{fire stair and elevator 2}/{90}/{59}/{circulation}/{8,11}
+
+## L60
+{residence penthouse}/{60}/{60}/{private}/{8,8}
+{restroom}/{30}/{60}/{public}/{5,6}
+{fire stair and freight elevator}/{120}/{60}/{circulation}/{8,15}
+{fire stair and elevator 1}/{100}/{60}/{circulation}/{8,13}
+{fire stair and elevator 2}/{90}/{60}/{circulation}/{8,11}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L61–L65  Spire Zone A   Mechanical + structural — no occupied program
+## Footprint: 12×12m
+## ─────────────────────────────────────────────────────────────────────────
+{mechanical}/{80}/{61}/{private}/{8,10}
+{fire stair and freight elevator}/{80}/{61}/{circulation}/{7,11}
+{fire stair and elevator 1}/{70}/{61}/{circulation}/{7,10}
+{fire stair and elevator 2}/{60}/{61}/{circulation}/{6,10}
+
+{mechanical}/{70}/{62}/{private}/{7,10}
+{fire stair and freight elevator}/{80}/{62}/{circulation}/{7,11}
+{fire stair and elevator 1}/{70}/{62}/{circulation}/{7,10}
+{fire stair and elevator 2}/{60}/{62}/{circulation}/{6,10}
+
+{mechanical}/{60}/{63}/{private}/{6,10}
+{fire stair and freight elevator}/{80}/{63}/{circulation}/{7,11}
+{fire stair and elevator 1}/{70}/{63}/{circulation}/{7,10}
+{fire stair and elevator 2}/{60}/{63}/{circulation}/{6,10}
+
+{mechanical}/{50}/{64}/{private}/{6,8}
+{fire stair and freight elevator}/{60}/{64}/{circulation}/{6,10}
+{fire stair and elevator 1}/{50}/{64}/{circulation}/{5,10}
+{fire stair and elevator 2}/{50}/{64}/{circulation}/{5,10}
+
+{mechanical}/{40}/{65}/{private}/{5,8}
+{fire stair and freight elevator}/{60}/{65}/{circulation}/{6,10}
+{fire stair and elevator 1}/{50}/{65}/{circulation}/{5,10}
+{fire stair and elevator 2}/{50}/{65}/{circulation}/{5,10}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L66–L70  Spire Zone B   Structural diagrid spire — service only
+## Footprint: 9×9m
+## ─────────────────────────────────────────────────────────────────────────
+{mechanical}/{30}/{66}/{private}/{5,6}
+{fire stair and freight elevator}/{50}/{66}/{circulation}/{5,10}
+{fire stair and elevator 1}/{40}/{66}/{circulation}/{5,8}
+
+{mechanical}/{25}/{67}/{private}/{5,5}
+{fire stair and freight elevator}/{50}/{67}/{circulation}/{5,10}
+{fire stair and elevator 1}/{40}/{67}/{circulation}/{5,8}
+
+{mechanical}/{20}/{68}/{private}/{4,5}
+{fire stair and freight elevator}/{50}/{68}/{circulation}/{5,10}
+{fire stair and elevator 1}/{40}/{68}/{circulation}/{5,8}
+
+{mechanical}/{15}/{69}/{private}/{3,5}
+{fire stair and freight elevator}/{40}/{69}/{circulation}/{4,10}
+{fire stair and elevator 1}/{30}/{69}/{circulation}/{4,8}
+
+{mechanical}/{10}/{70}/{private}/{2,5}
+{fire stair and freight elevator}/{30}/{70}/{circulation}/{3,10}
+{fire stair and elevator 1}/{20}/{70}/{circulation}/{3,7}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L71–L73  Spire Zone C   Crown apex — diagrid structural tips
+## Footprint: 6×6m
+## ─────────────────────────────────────────────────────────────────────────
+{mechanical}/{20}/{71}/{private}/{4,5}
+{fire stair and freight elevator}/{20}/{71}/{circulation}/{4,5}
+
+{mechanical}/{12}/{72}/{private}/{3,4}
+{fire stair and freight elevator}/{15}/{72}/{circulation}/{3,5}
+
+{mechanical}/{6}/{73}/{private}/{2,3}
+{fire stair and freight elevator}/{8}/{73}/{circulation}/{2,4}

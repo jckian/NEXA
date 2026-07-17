@@ -1,0 +1,219 @@
+## Taipei Performing Arts Center — OMA (Program + Architectural Analysis)
+
+
+
+# 1. Key Building Data (Quantitative)
+
+| Parameter            | Value                                          |
+| -------------------- | ---------------------------------------------- |
+| **Total Floor Area** | ~58,600 m² ([ArchDaily][1])                    |
+| **Height**           | ~63 m ([Designboom][2])                        |
+| **Floors**           | 12 above ground + 1 basement ([moc.gov.tw][3]) |
+| **Total Capacity**   | ~3,100 seats ([Wikipedia][4])                  |
+| **Main Volume**      | Central cube + 3 protruding auditoria          |
+| **Completion**       | 2022                                           |
+
+---
+
+# 2. Core Organization (Critical Architectural Logic)
+
+### Number of cores (interpretation in architectural terms)
+
+* **1 primary mega-core (central cube)**
+* Acts as:
+
+  * Structural hub
+  * Circulation condenser
+  * Shared BOH (back-of-house)
+  * Stage/service infrastructure
+
+**Important:**
+Unlike conventional theaters (multiple isolated cores), TPAC **collapses all cores into a single infrastructural block**, which:
+
+* Serves **all three theaters simultaneously**
+* Enables **stage merging (Super Theater)**
+* Reduces redundancy in circulation + services
+
+👉 Architecturally, this is closer to:
+
+* **Infrastructure-core typology (OMA / Bigness)**
+* Not a typical “multi-core public building”
+
+---
+
+# 3. Dimensions & Spatial Composition
+
+### Overall Envelope
+
+* Approx. **60–65 m cube-equivalent bounding volume**
+* Central cube = dominant regulating geometry
+
+### Theater Volumes (Plug-in System)
+
+| Theater             | Capacity                | Geometry                      | Position                |
+| ------------------- | ----------------------- | ----------------------------- | ----------------------- |
+| **Grand Theater**   | ~1500                   | Asymmetrical (shoebox hybrid) | One side of cube        |
+| **Globe Playhouse** | ~800                    | Sphere                        | Cantilevered (“planet”) |
+| **Blue Box**        | ~800 (or ~500 flexible) | Orthogonal box                | Opposite side           |
+
+([moc.gov.tw][3])
+
+---
+
+# 4. Program Breakdown
+
+## A. Primary Performance Program
+
+* Grand Theater (large productions)
+* Globe Playhouse (experimental proscenium inside sphere)
+* Blue Box (flexible / black box)
+
+## B. Hybrid / Transformative Program
+
+* **Super Theater mode**
+
+  * Grand Theater + Blue Box combined
+  * ~100m long continuous performance space ([Archilovers][5])
+
+## C. Back-of-House (Shared)
+
+* Stage machinery
+* Loading docks
+* Rehearsal spaces
+* Dressing rooms
+
+👉 **Key point:**
+All BOH is **centralized**, not duplicated per theater.
+
+## D. Public Program
+
+* Lobby system embedded in cube
+* Circulation loop (public path)
+* Viewing platforms into backstage
+
+## E. Urban Interface
+
+* Elevated mass creates:
+
+  * **Ground-level public plaza**
+  * Integration with Shilin Night Market
+
+---
+
+# 5. Circulation Strategy (Non-standard)
+
+### Public Loop (Critical Innovation)
+
+* Continuous path wrapping the cube
+* Exposes:
+
+  * Backstage operations
+  * Technical spaces
+
+👉 Breaks conventional:
+
+* Front-of-house / back-of-house separation
+
+---
+
+# 6. Architectural Concept (OMA Logic)
+
+## A. “Plug-in Theater” System
+
+* Independent volumes inserted into central infrastructure
+* Allows:
+
+  * Autonomy
+  * Interoperability
+
+## B. Anti-Typology Theater Design
+
+OMA rejects:
+
+* Standard:
+
+  * “2 halls + black box” layout
+
+Instead proposes:
+
+* **Recombinable theater ecology**
+
+---
+
+## C. Bigness (Koolhaas Theory Applied)
+
+Key characteristics present:
+
+* Programmatic stacking without hierarchy
+* Infrastructure dominates form
+* Exterior expresses internal autonomy
+* Scale disconnects façade from interior logic
+
+---
+
+## D. Formal Strategy
+
+* **Cube → infrastructure**
+* **Sphere → iconic / anomalous**
+* **Box → neutral flexible volume**
+
+👉 Composition = **collision of primitives**
+
+---
+
+# 7. Structural + Spatial Implications
+
+* Large cantilever (Globe sphere)
+* Transfer structures within cube
+* Shared stage wall between theaters (for merging)
+
+---
+
+# 8. Architectural Significance
+
+TPAC is important because it:
+
+1. **Rewrites theater typology**
+
+   * From isolated halls → combinatory system
+
+2. **Blurs public vs production**
+
+   * Exposes backstage as spectacle
+
+3. **Operates as urban condenser**
+
+   * Not just a building, but an **event machine**
+
+---
+
+# 9. Critical Reading (for your design work)
+
+Given your current **concert hall + MCP system**, TPAC suggests:
+
+### Useful Transfers:
+
+* Centralized BOH core (you should adopt this)
+* Multi-hall interoperability
+* Public circulation as architectural generator
+
+### Avoid blindly copying:
+
+* Extreme formal fragmentation (hard to control in parametric systems)
+* Structural complexity without logic
+
+---
+
+# If you want next step
+
+I can translate this into:
+
+* A **parametric program diagram (for your Blender MCP)**
+* Or a **rule-based prompt like OMA logic**
+* Or compare it with **Berlin Philharmonie / EMPAC** for concert hall-specific adaptation
+
+[1]: https://www.archdaily.com/981894/taipei-performing-arts-center-oma?utm_source=chatgpt.com "Taipei Performing Arts Center / OMA | ArchDaily"
+[2]: https://www.designboom.com/architecture/oma-taipei-performing-arts-center-breaks-ground/?utm_source=chatgpt.com "OMA: taipei performing arts center breaks ground"
+[3]: https://www.moc.gov.tw/en/News_Content2.aspx?n=507&s=223140&utm_source=chatgpt.com "Taipei Performing Arts Center"
+[4]: https://en.wikipedia.org/wiki/Taipei_Performing_Arts_Center?utm_source=chatgpt.com "Taipei Performing Arts Center"
+[5]: https://www.archilovers.com/projects/15658/taipei-performing-arts-centre.html?utm_source=chatgpt.com "Taipei Performing Arts Centre | OMA - Office for Metropolitan Architecture, KRIS YAO | ARTECH"

@@ -1,0 +1,5 @@
+﻿Layer,Name,Material ID,Layer Thickness,%,DfD
+1,High Density Polyethylene (HDPE),18a5fb9d-d1ca-4448-86e1-0b8865ea8f10,6,1,0
+2,Extruded Polystyrene Foam (XPS),2790eed5-d3d3-416f-9e26-24481f689672,139.7,1,0
+3,Douglas Fir,d62d58c4-dc07-4c96-bd6a-251f17edc019,184.15,0.09375,0
+4,Gypsum,2ba8bbd3-16f6-40ff-bf4a-36a120445779,9.525,1,0

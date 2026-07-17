@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Structure Zone Classifier — Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0E0F14;
+      --surface: #161820;
+      --surface-2: #1C1E28;
+      --surface-3: #22253A;
+      --border: rgba(255,255,255,0.07);
+      --border-hi: rgba(255,255,255,0.13);
+      --text-hi: #F0F2FF;
+      --text-mid: #8A90B4;
+      --text-lo: #4A5070;
+      --font: 'DM Sans', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --sidebar-w: 300px;
+      --col-skin:     #3B82F6;
+      --col-foam:     #10B981;
+      --col-frame-o:  #F59E0B;
+      --col-frame-c:  #8B5CF6;
+      --col-core:     #EF4444;
+      --col-longspan: #F97316;
+      --col-mega:     #EC4899;
+      --col-outrig:   #06B6D4;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: var(--font);
+      color: var(--text-hi);
+      height: 100vh;
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      grid-template-rows: 44px 1fr;
+      grid-template-areas: "hd hd" "sidebar main";
+      overflow: hidden;
+    }
+
+    /* ── TOPBAR ── */
+    header {
+      grid-area: hd;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      z-index: 100;
+    }
+
+    .hd-logo { font-family: var(--mono); font-size: 9px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-lo); }
+    .hd-sep { width: 1px; height: 18px; background: var(--border-hi); }
+    .hd-title { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--text-hi); }
+    .hd-badge { font-family: var(--mono); font-size: 7px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #10B981; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25); border-radius: 3px; padding: 2px 6px; }
+    .hd-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+    .btn-s {
+      height: 26px; padding: 0 12px; border-radius: 3px; border: 1px solid var(--border-hi);
+      background: transparent; color: var(--text-mid);
+      font-family: var(--mono); font-size: 8px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .btn-s:hover { background: var(--surface-3); color: var(--text-hi); }
+    .btn-s.active { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.4); color: #3B82F6; }
+    .btn-primary { background: #3B82F6; color: #fff; border-color: transparent; }
+    .btn-primary:hover { background: #2563EB; }
+
+    /* ── SIDEBAR ── */
+    #sidebar {
+      grid-area: sidebar;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sb-scroll { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent; }
+
+    .sb-section { border-bottom: 1px solid var(--border); padding: 12px 14px; }
+
+    .sb-label {
+      font-family: var(--mono); font-size: 7px; font-weight: 500;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-lo);
+      margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+    }
+    .sb-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .pr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .pr label { font-size: 10px; color: var(--text-mid); }
+    .pr input[type="number"], .pr input[type="text"] {
+      background: var(--surface-3); border: 1px solid var(--border-hi); border-radius: 3px;
+      color: var(--text-hi); font-family: var(--mono); font-size: 10px; padding: 3px 7px; width: 72px; outline: none;
+    }
+    .pr input:focus { border-color: #3B82F6; }
+
+    .tog-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+    .tog-row label { font-size: 10px; color: var(--text-mid); }
+    .tog { width: 30px; height: 16px; background: var(--surface-3); border: 1px solid var(--border-hi); border-radius: 8px; cursor: pointer; position: relative; transition: background 0.2s; }
+    .tog.on { background: #3B82F6; border-color: transparent; }
+    .tog::after { content: ''; position: absolute; width: 10px; height: 10px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: left 0.2s; }
+    .tog.on::after { left: 16px; }
+
+    /* Zone cards */
+    .zc {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 3px;
+      padding: 7px 8px; cursor: pointer; transition: all 0.15s; margin-bottom: 4px;
+    }
+    .zc:hover { border-color: var(--border-hi); background: var(--surface-3); }
+    .zc.sel { border-color: rgba(59,130,246,0.5); background: rgba(59,130,246,0.06); }
+
+    .zc-top { display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
+    .zc-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .zc-name { font-size: 10px; font-weight: 500; color: var(--text-hi); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .zc-tag { font-family: var(--mono); font-size: 7px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 1px 4px; border-radius: 2px; }
+    .zc-meta { font-family: var(--mono); font-size: 8px; color: var(--text-lo); line-height: 1.4; }
+    .zc-mod { display: inline-block; font-family: var(--mono); font-size: 7px; color: var(--text-mid); background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 2px; padding: 0px 3px; margin-top: 2px; margin-right: 2px; }
+
+    .btn-add {
+      width: 100%; height: 28px; background: transparent; border: 1px dashed var(--border-hi);
+      border-radius: 3px; color: var(--text-lo); font-family: var(--mono); font-size: 8px; font-weight: 500;
+      letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; margin-top: 4px;
+    }
+    .btn-add:hover { border-color: #3B82F6; color: #3B82F6; background: rgba(59,130,246,0.05); }
+
+    /* ── Legend panel ── */
+    .legend-section { padding: 10px 14px; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .lg-item { display: flex; align-items: center; gap: 5px; font-size: 8px; color: var(--text-mid); margin-bottom: 3px; }
+    .lg-dot { width: 6px; height: 6px; border-radius: 2px; flex-shrink: 0; }
+
+    /* ── MAIN 3D ── */
+    #main { grid-area: main; position: relative; overflow: hidden; }
+    #canvas3d { width: 100%; height: 100%; display: block; }
+
+    /* Floating info card */
+    #info-card {
+      position: absolute; bottom: 20px; right: 20px; width: 280px;
+      background: rgba(22,24,32,0.92); backdrop-filter: blur(12px);
+      border: 1px solid var(--border-hi); border-radius: 6px;
+      padding: 14px 16px; z-index: 50;
+      opacity: 0; transform: translateY(8px); transition: all 0.25s;
+      pointer-events: none;
+    }
+    #info-card.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .ic-title { font-size: 12px; font-weight: 600; color: var(--text-hi); margin-bottom: 8px; }
+    .ic-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .ic-k { font-size: 9px; color: var(--text-mid); }
+    .ic-v { font-family: var(--mono); font-size: 9px; color: var(--text-hi); }
+    .ic-v.ac { color: #3B82F6; }
+    .ic-tag { display: inline-block; font-family: var(--mono); font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; margin-top: 6px; }
+
+    /* Floating lateral card */
+    #lat-card {
+      position: absolute; top: 16px; right: 20px;
+      background: rgba(22,24,32,0.88); backdrop-filter: blur(12px);
+      border: 1px solid var(--border-hi); border-radius: 6px;
+      padding: 10px 14px; z-index: 50;
+      opacity: 0; transition: opacity 0.25s;
+    }
+    #lat-card.show { opacity: 1; }
+    .lat-label { font-family: var(--mono); font-size: 7px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-lo); margin-bottom: 6px; }
+    .lat-badges { display: flex; gap: 5px; flex-wrap: wrap; }
+    .lat-badge {
+      font-family: var(--mono); font-size: 8px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 3px;
+    }
+    .lat-meta { font-family: var(--mono); font-size: 8px; color: var(--text-lo); margin-top: 6px; line-height: 1.5; }
+
+    /* Floor toolbar (vertical) */
+    #floor-bar {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      display: flex; flex-direction: column; gap: 2px; z-index: 50;
+    }
+    .fb { width: 28px; height: 18px; border-radius: 2px; border: 1px solid var(--border); background: rgba(22,24,32,0.7); color: var(--text-lo);
+      font-family: var(--mono); font-size: 7px; font-weight: 500; cursor: pointer; transition: all 0.12s; display: flex; align-items: center; justify-content: center; }
+    .fb:hover { background: var(--surface-3); color: var(--text-hi); }
+    .fb.act { background: rgba(59,130,246,0.2); border-color: rgba(59,130,246,0.5); color: #3B82F6; }
+
+    /* Color mode toggle */
+    #color-toggle {
+      position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 2px; background: rgba(22,24,32,0.8); backdrop-filter: blur(8px);
+      border: 1px solid var(--border-hi); border-radius: 4px; padding: 3px; z-index: 50;
+    }
+
+    /* Modal */
+    #modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: center; justify-content: center; }
+    #modal-overlay.show { display: flex; }
+    #modal { background: var(--surface); border: 1px solid var(--border-hi); border-radius: 6px; width: 440px; padding: 20px; box-shadow: 0 24px 64px rgba(0,0,0,0.5); }
+    .m-title { font-size: 12px; font-weight: 600; color: var(--text-hi); margin-bottom: 14px; }
+    .mf { margin-bottom: 10px; }
+    .mf label { display: block; font-family: var(--mono); font-size: 7px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-lo); margin-bottom: 4px; }
+    .mf input, .mf select { width: 100%; background: var(--surface-3); border: 1px solid var(--border-hi); border-radius: 3px; color: var(--text-hi); font-family: var(--mono); font-size: 10px; padding: 6px 8px; outline: none; }
+    .mf input:focus, .mf select:focus { border-color: #3B82F6; }
+    .mg2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .m-act { display: flex; gap: 6px; justify-content: flex-end; margin-top: 14px; }
+
+    /* Output popup */
+    #output-panel {
+      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+      width: 500px; max-height: 240px; overflow-y: auto;
+      background: rgba(22,24,32,0.92); backdrop-filter: blur(12px);
+      border: 1px solid var(--border-hi); border-radius: 6px;
+      padding: 12px 16px; z-index: 50;
+      display: none;
+      font-family: var(--mono); font-size: 8px; color: var(--text-mid); line-height: 1.8; white-space: pre;
+      scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent;
+    }
+    #output-panel.show { display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="hd-logo">Voro</span>
+  <div class="hd-sep"></div>
+  <span class="hd-title">Structure Zone Classifier</span>
+  <span class="hd-badge">dev</span>
+  <div class="hd-right">
+    <button class="btn-s" onclick="loadPreset('tpac')" id="p-tpac">TPAC</button>
+    <button class="btn-s" onclick="loadPreset('53w53')" id="p-53w53">53W53</button>
+    <button class="btn-s" onclick="loadPreset('tama')" id="p-tama">TAMA</button>
+    <div class="hd-sep"></div>
+    <button class="btn-s" onclick="toggleOutput()" id="btn-output">Output</button>
+    <button class="btn-s btn-primary" onclick="runClassifier()">▶ Classify</button>
+  </div>
+</header>
+
+<aside id="sidebar">
+  <div class="sb-scroll">
+    <div class="sb-section">
+      <div class="sb-label">Building Globals</div>
+      <div class="pr"><label>Total floors</label><input type="number" id="g-hfloors" value="14" min="1" max="100" /></div>
+      <div class="pr"><label>Height (m)</label><input type="number" id="g-height" value="60" min="10" max="500" /></div>
+      <div class="pr"><label>Podium top</label><input type="number" id="g-podium-top" value="3" min="0" max="20" /></div>
+      <div class="pr"><label>MEP floors</label><input type="text" id="g-mep" value="7" style="width:80px;" /></div>
+      <div class="pr"><label>Site W (m)</label><input type="number" id="g-siteW" value="80" min="10" max="200" /></div>
+      <div class="pr"><label>Site D (m)</label><input type="number" id="g-siteD" value="110" min="10" max="200" /></div>
+      <div class="tog-row"><label>Taper</label><div class="tog" id="tog-taper" onclick="toggleG('taper')"></div></div>
+      <div class="tog-row"><label>Low-rise span</label><div class="tog" id="tog-lowrise" onclick="toggleG('lowrise')"></div></div>
+    </div>
+    <div class="sb-section" style="flex:1;">
+      <div class="sb-label">Program Zones <span id="zone-count" style="color:var(--text-lo);font-size:7px;"></span></div>
+      <div id="zone-list"></div>
+      <button class="btn-add" onclick="openModal()">+ Add Zone</button>
+    </div>
+  </div>
+  <div class="legend-section">
+    <div class="sb-label">Structure Legend</div>
+    <div id="legend-list"></div>
+  </div>
+</aside>
+
+<main id="main">
+  <canvas id="canvas3d"></canvas>
+
+  <!-- Color mode toggle -->
+  <div id="color-toggle">
+    <button class="btn-s active" id="cm-struct" onclick="setColorMode('struct')">Structure</button>
+    <button class="btn-s" id="cm-type" onclick="setColorMode('type')">Program</button>
+  </div>
+
+  <!-- Floor bar -->
+  <div id="floor-bar"></div>
+
+  <!-- Lateral system card -->
+  <div id="lat-card"></div>
+
+  <!-- Selected zone info -->
+  <div id="info-card"></div>
+
+  <!-- Output panel -->
+  <div id="output-panel"></div>
+</main>
+
+<!-- Add Zone Modal -->
+<div id="modal-overlay">
+  <div id="modal">
+    <div class="m-title">Add Program Zone</div>
+    <div class="mf"><label>Type</label><input type="text" id="m-type" placeholder="offices" /></div>
+    <div class="mg2">
+      <div class="mf"><label>Area (m²)</label><input type="number" id="m-area" value="500" min="10" /></div>
+      <div class="mf"><label>Floor level</label><input type="number" id="m-level" value="1" min="-3" max="100" /></div>
+      <div class="mf"><label>Width (m)</label><input type="number" id="m-w" value="20" min="1" /></div>
+      <div class="mf"><label>Depth (m)</label><input type="number" id="m-d" value="25" min="1" /></div>
+    </div>
+    <div class="mg2">
+      <div class="mf"><label>Category</label>
+        <select id="m-cat"><option value="public">public</option><option value="private">private</option><option value="circulation">circulation</option></select>
+      </div>
+      <div class="mf"><label>Perimeter?</label>
+        <select id="m-perim"><option value="false">No</option><option value="true">Yes</option></select>
+      </div>
+    </div>
+    <div class="m-act">
+      <button class="btn-s" onclick="closeModal()">Cancel</button>
+      <button class="btn-s btn-primary" onclick="addZone()">Add</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════
+let zones = [];
+let building = { hfloors: 14, height: 60, podiumTop: 3, mepFloors: [7], taper: false, lowRiseSpan: false, siteW: 80, siteD: 110 };
+let classified = [];
+let selectedIdx = -1;
+let colorMode = 'struct'; // 'struct' | 'type'
+let activeFloor = null;   // null = all
+let meshes = [];          // { mesh, entry, result, idx }
+
+const STRUCT_COLORS = {
+  'SKIN': 0x3B82F6, 'FOAM': 0x10B981,
+  'FRAME.office': 0xF59E0B, 'FRAME.cellular': 0x8B5CF6,
+  'CORE': 0xEF4444,
+};
+const STRUCT_HEX = {
+  'SKIN': '#3B82F6', 'FOAM': '#10B981',
+  'FRAME.office': '#F59E0B', 'FRAME.cellular': '#8B5CF6',
+  'CORE': '#EF4444',
+};
+const MOD_HEX = { 'LONGSPAN': '#F97316', 'MEGA': '#EC4899', 'OUTRIGGER': '#06B6D4' };
+
+const TYPE_COLORS = {
+  'event hall': '#e8543a', 'stage': '#c0392b', 'fly tower': '#884400',
+  'lobby': '#f0c040', 'lounge bar': '#ef9a9a', 'event lounge': '#ce93d8',
+  'restaurant': '#f48fb1', 'roof terrace': '#80cbc4', 'viewing platform': '#4dd0e1',
+  'circulation': '#a5d6a7', 'restroom': '#ffd07a',
+  'backstage': '#8c8277', 'rehearsal room': '#a88f6a', 'dressing room': '#c49a2a',
+  'storage': '#8b96a4', 'mechanical': '#6b7e8a', 'staff': '#7986cb',
+  'offices': '#4A90D9', 'apartments': '#5BA3E8', 'residential': '#357ABD',
+  'retail': '#ffb347', 'reading hall': '#4CAF50', 'stacks': '#2E6898',
+  'study zone': '#AAB4C4', 'sky lobby': '#7C3AED', 'gallery': '#2C7873',
+  'fire stair and elevator 1': '#ffcc02', 'fire stair and elevator 2': '#66bb6a',
+  'fire stair and elevator 3': '#42a5f5', 'fire stair and freight elevator': '#ff7043',
+};
+
+function getStructColor(tag) {
+  if (!tag) return 0x4A5070;
+  const base = tag.split('+')[0].trim();
+  return STRUCT_COLORS[base] || 0x4A5070;
+}
+
+function getStructHex(tag) {
+  if (!tag) return '#4A5070';
+  const base = tag.split('+')[0].trim();
+  return STRUCT_HEX[base] || '#4A5070';
+}
+
+function getTypeColorHex(type) {
+  const t = (type || '').toLowerCase();
+  for (const [k, v] of Object.entries(TYPE_COLORS)) {
+    if (t.includes(k) || k.includes(t)) return v;
+  }
+  return '#607080';
+}
+
+// ══════════════════════════════════════════════════════════
+//  THREE.JS SETUP
+// ══════════════════════════════════════════════════════════
+const canvas = document.getElementById('canvas3d');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0E0F14);
+scene.fog = new THREE.FogExp2(0x0E0F14, 0.004);
+
+const camera = new THREE.PerspectiveCamera(45, 1, 0.5, 2000);
+camera.position.set(120, 80, 120);
+
+const controls = new THREE.OrbitControls(camera, canvas);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.target.set(0, 20, 0);
+
+// Lights
+const amb = new THREE.AmbientLight(0xffffff, 0.4);
+scene.add(amb);
+const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+dir.position.set(60, 100, 40);
+dir.castShadow = true;
+dir.shadow.mapSize.set(1024, 1024);
+dir.shadow.camera.near = 1; dir.shadow.camera.far = 400;
+dir.shadow.camera.left = -100; dir.shadow.camera.right = 100;
+dir.shadow.camera.top = 100; dir.shadow.camera.bottom = -100;
+scene.add(dir);
+scene.add(new THREE.HemisphereLight(0x6688cc, 0x222233, 0.3));
+
+// Raycaster for click
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+function onResize() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  renderer.setSize(rect.width, rect.height);
+  camera.aspect = rect.width / rect.height;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', onResize);
+onResize();
+
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+// ══════════════════════════════════════════════════════════
+//  CLASSIFIER — HYBRID-STRUCTURE-RULES.md
+// ══════════════════════════════════════════════════════════
+function classify_module(entry, bld) {
+  const span = Math.max(entry.w, entry.d);
+  const aspect = Math.max(entry.w, entry.d) / Math.min(entry.w, entry.d);
+  const tall = bld.hfloors >= 20;
+
+  // A0 — SKIN
+  if (tall && bld.taper && entry.perimeter) return 'SKIN';
+  // A1 — FOAM
+  if (bld.lowRiseSpan && entry.category === 'public'
+    && span >= 3 && span <= 12 && aspect <= 2
+    && (entry.level === 0 || entry.level >= bld.hfloors - 1)) return 'FOAM';
+  // A2 — FRAME
+  if (entry.category === 'public' || span >= 9) return 'FRAME.office';
+  return 'FRAME.cellular';
+}
+
+function apply_modifiers(entry, bld) {
+  const span = Math.max(entry.w, entry.d);
+  const type = (entry.type || '').toLowerCase();
+  // M0 — CORE
+  if (/fire stair|elevator|core/.test(type)) return ['CORE'];
+  const mods = [];
+  // M1 — MEGA
+  if (entry.level === 0 && entry.category === 'public') mods.push('MEGA');
+  // M2 — LONGSPAN
+  if (span >= 15 || (entry.category === 'public' && entry.area >= 400)
+    || /hall|theater|event|auditorium|lobby|gallery|lounge|playhouse/.test(type)) mods.push('LONGSPAN');
+  // M3 — OUTRIGGER
+  if (bld.mepFloors.includes(entry.level) && bld.hfloors >= 20) mods.push('OUTRIGGER');
+  return mods;
+}
+
+function select_lateral(bld) {
+  const slender = bld.height / 30 > 7;
+  if (bld.taper || slender) return 'SKIN';
+  if (bld.hfloors >= 20) return 'CORE+OUTRIGGER';
+  if (bld.lowRiseSpan) return 'FOAM+CORE';
+  return 'CORE+MEGA';
+}
+
+function find_transfer_floors(cls, bld) {
+  const tf = new Set();
+  if (bld.podiumTop > 0) tf.add(bld.podiumTop + 1);
+  cls.forEach(c => { if (c._struct && c._struct.includes('LONGSPAN')) tf.add(c.entry.level + 1); });
+  return [...tf].sort((a, b) => a - b);
+}
+
+// ══════════════════════════════════════════════════════════
+//  SCENE BUILDER
+// ══════════════════════════════════════════════════════════
+function buildScene() {
+  // Clear old meshes
+  meshes.forEach(m => { scene.remove(m.mesh); m.mesh.geometry.dispose(); m.mesh.material.dispose(); });
+  meshes = [];
+  // Remove environment objects
+  for (let i = scene.children.length - 1; i >= 0; i--) {
+    const o = scene.children[i];
+    if (o.userData && o.userData.isEnv) {
+      if (o.geometry) o.geometry.dispose();
+      if (o.material) o.material.dispose();
+      scene.remove(o);
+    }
+  }
+
+  const { siteW, siteD, hfloors } = building;
+  const floorH = building.height / Math.max(1, hfloors);
+
+  // Ground plane
+  const geoGround = new THREE.PlaneGeometry(siteW * 3, siteD * 3);
+  geoGround.rotateX(-Math.PI / 2);
+  const mGround = new THREE.Mesh(geoGround, new THREE.MeshStandardMaterial({ color: 0x0a0b10, roughness: 1 }));
+  mGround.position.y = -0.1; mGround.receiveShadow = true;
+  mGround.userData.isEnv = true; scene.add(mGround);
+
+  // Site boundary
+  const bPts = [[-siteW/2,0,-siteD/2],[siteW/2,0,-siteD/2],[siteW/2,0,siteD/2],[-siteW/2,0,siteD/2],[-siteW/2,0,-siteD/2]].map(p => new THREE.Vector3(...p));
+  const bLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(bPts), new THREE.LineBasicMaterial({ color: 0x2a3040, opacity: 0.6, transparent: true }));
+  bLine.userData.isEnv = true; scene.add(bLine);
+
+  // Grid
+  const grid = new THREE.GridHelper(Math.max(siteW, siteD) * 3, 60, new THREE.Color(0x181a28), new THREE.Color(0x12121e));
+  grid.userData.isEnv = true; scene.add(grid);
+
+  // Group zones by level
+  const byLevel = {};
+  classified.forEach((r, i) => {
+    const lv = r.entry.level;
+    if (!byLevel[lv]) byLevel[lv] = [];
+    byLevel[lv].push({ ...r, idx: i });
+  });
+
+  // Layout + build blocks
+  for (const [lvStr, items] of Object.entries(byLevel)) {
+    const lv = parseInt(lvStr);
+    const yBase = lv * floorH;
+
+    // Simple bin-packing: cores in center, others around
+    const cores = items.filter(r => r._struct === 'CORE');
+    const others = items.filter(r => r._struct !== 'CORE');
+
+    // Core cluster at center
+    let coreX = 0;
+    const coreW_total = cores.reduce((s, c) => s + Math.min(c.entry.w, siteW * 0.15), 0) + Math.max(0, cores.length - 1) * 1;
+    let cx = -coreW_total / 2;
+
+    cores.forEach(r => {
+      const bw = Math.min(r.entry.w, siteW * 0.15);
+      const bd = Math.min(r.entry.d, siteD * 0.15);
+      const px = cx + bw / 2;
+      const pz = 0;
+      addBlock(r, px, yBase, pz, bw, bd, floorH);
+      cx += bw + 1;
+    });
+
+    // Remaining entries — simple row layout
+    const sorted = [...others].sort((a, b) => b.entry.area - a.entry.area);
+    // Available zone around core
+    const coreHalfW = coreW_total / 2 + 2;
+    const zones_layout = [
+      { x0: -siteW * 0.45, x1: -coreHalfW, z0: -siteD * 0.45, z1: siteD * 0.45 },  // West
+      { x0: coreHalfW, x1: siteW * 0.45, z0: -siteD * 0.45, z1: siteD * 0.45 },      // East
+      { x0: -coreHalfW, x1: coreHalfW, z0: -siteD * 0.45, z1: -siteD * 0.12 },       // North
+      { x0: -coreHalfW, x1: coreHalfW, z0: siteD * 0.12, z1: siteD * 0.45 },         // South
+    ].filter(z => (z.x1 - z.x0) > 2 && (z.z1 - z.z0) > 2);
+
+    zones_layout.forEach(z => { z.curX = z.x0; z.curZ = z.z0; z.colMaxX = z.x0; });
+    let rr = 0;
+
+    sorted.forEach(r => {
+      let placed = false;
+      for (let a = 0; a < zones_layout.length; a++) {
+        const zi = (rr + a) % zones_layout.length;
+        const z = zones_layout[zi];
+        let bw = Math.min(r.entry.w, z.x1 - z.x0);
+        let bd = Math.min(r.entry.d, z.z1 - z.z0);
+        bw = Math.max(bw, 1); bd = Math.max(bd, 1);
+
+        if (z.curX + bw > z.x1 + 0.1) continue;
+        if (z.curZ + bd > z.z1 + 0.1) {
+          z.curX = z.colMaxX + 1; z.curZ = z.z0;
+          if (z.curX + bw > z.x1 + 0.1) continue;
+        }
+        const px = z.curX + bw / 2;
+        const pz = z.curZ + bd / 2;
+        addBlock(r, px, yBase, pz, bw, bd, floorH);
+        z.curZ += bd + 1;
+        if (z.curX + bw > z.colMaxX) z.colMaxX = z.curX + bw;
+        rr = (zi + 1) % zones_layout.length;
+        placed = true;
+        break;
+      }
+      if (!placed) {
+        addBlock(r, 0, yBase, 0, Math.min(r.entry.w, siteW * 0.3), Math.min(r.entry.d, siteD * 0.3), floorH);
+      }
+    });
+  }
+
+  // Transfer floor indicators
+  const transfers = find_transfer_floors(classified, building);
+  transfers.forEach(tl => {
+    const y = tl * floorH - 0.05;
+    const pts = [
+      new THREE.Vector3(-siteW * 0.48, y, -siteD * 0.48),
+      new THREE.Vector3(siteW * 0.48, y, -siteD * 0.48),
+      new THREE.Vector3(siteW * 0.48, y, siteD * 0.48),
+      new THREE.Vector3(-siteW * 0.48, y, siteD * 0.48),
+      new THREE.Vector3(-siteW * 0.48, y, -siteD * 0.48),
+    ];
+    const tLine = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(pts),
+      new THREE.LineDashedMaterial({ color: 0xF97316, dashSize: 2, gapSize: 1.5, opacity: 0.6, transparent: true })
+    );
+    tLine.computeLineDistances();
+    tLine.userData.isEnv = true;
+    scene.add(tLine);
+  });
+
+  // Camera
+  const maxH = (Math.max(...zones.map(z => z.level), 0) + 2) * floorH;
+  const diag = Math.sqrt(siteW * siteW + siteD * siteD);
+  controls.target.set(0, maxH * 0.35, 0);
+  camera.position.set(diag * 0.9, maxH * 0.8, diag * 0.8);
+  controls.update();
+
+  // Build floor bar
+  buildFloorBar();
+}
+
+function addBlock(r, px, yBase, pz, bw, bd, floorH) {
+  const isMech = /mechanical/.test(r.entry.type);
+  const bh = (isMech ? 0.65 : 0.88) * floorH;
+  const cy = yBase + bh / 2;
+
+  const color = colorMode === 'struct'
+    ? getStructColor(r._struct)
+    : new THREE.Color(getTypeColorHex(r.entry.type)).getHex();
+
+  const shrink = 0.92;
+  const geo = new THREE.BoxGeometry(bw * shrink, bh, bd * shrink);
+  const mat = new THREE.MeshPhysicalMaterial({
+    color,
+    roughness: 0.65,
+    metalness: 0.05,
+    transparent: true,
+    opacity: 0.88,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(px, cy, pz);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  mesh.userData = { idx: r.idx, level: r.entry.level, structTag: r._struct, type: r.entry.type };
+  scene.add(mesh);
+
+  // Edge wireframe
+  const edgeGeo = new THREE.EdgesGeometry(geo);
+  const edgeMat = new THREE.LineBasicMaterial({ color: 0xffffff, opacity: 0.08, transparent: true });
+  const edges = new THREE.LineSegments(edgeGeo, edgeMat);
+  edges.position.copy(mesh.position);
+  edges.userData.isEnv = true;
+  scene.add(edges);
+
+  meshes.push({ mesh, entry: r.entry, result: r, idx: r.idx });
+}
+
+// ══════════════════════════════════════════════════════════
+//  RUN CLASSIFIER
+// ══════════════════════════════════════════════════════════
+function runClassifier() {
+  readGlobals();
+
+  classified = zones.map((z, i) => {
+    let module = classify_module(z, building);
+    let mods = apply_modifiers(z, building);
+    if (mods.length === 1 && mods[0] === 'CORE') {
+      return { entry: z, _struct: 'CORE', module: 'CORE', mods: [] };
+    }
+    const tag = mods.length > 0 ? `${module}+${mods.join('+')}` : module;
+    return { entry: z, _struct: tag, module, mods };
+  });
+
+  buildScene();
+  renderSidebar();
+  renderLateral();
+  renderLegend();
+}
+
+function readGlobals() {
+  building.hfloors = parseInt(document.getElementById('g-hfloors').value) || 14;
+  building.height = parseInt(document.getElementById('g-height').value) || 60;
+  building.podiumTop = parseInt(document.getElementById('g-podium-top').value) || 0;
+  building.mepFloors = document.getElementById('g-mep').value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+  building.siteW = parseFloat(document.getElementById('g-siteW').value) || 80;
+  building.siteD = parseFloat(document.getElementById('g-siteD').value) || 110;
+}
+
+// ══════════════════════════════════════════════════════════
+//  SIDEBAR RENDER
+// ══════════════════════════════════════════════════════════
+function renderSidebar() {
+  const list = document.getElementById('zone-list');
+  list.innerHTML = '';
+  document.getElementById('zone-count').textContent = `(${zones.length})`;
+
+  zones.forEach((z, i) => {
+    const r = classified[i];
+    const tag = r ? r._struct : '—';
+    const hex = getStructHex(tag);
+    const mods = r ? r.mods : [];
+
+    const card = document.createElement('div');
+    card.className = 'zc' + (selectedIdx === i ? ' sel' : '');
+    card.onclick = () => selectZone(i);
+
+    card.innerHTML = `
+      <div class="zc-top">
+        <div class="zc-dot" style="background:${hex}"></div>
+        <div class="zc-name">${z.type}</div>
+        <div class="zc-tag" style="background:${hex}22;color:${hex}">${shortTag(tag)}</div>
+      </div>
+      <div class="zc-meta">L${z.level}  ${z.area}m²  ${z.w}×${z.d}  ${z.category}</div>
+      ${mods.map(m => `<span class="zc-mod" style="color:${MOD_HEX[m]||'var(--text-mid)'}">+${m}</span>`).join('')}
+    `;
+    list.appendChild(card);
+  });
+}
+
+function shortTag(tag) {
+  if (!tag) return '?';
+  if (tag === 'CORE') return 'CORE';
+  const base = tag.split('+')[0];
+  if (base === 'SKIN') return 'SKIN';
+  if (base === 'FOAM') return 'FOAM';
+  if (base === 'FRAME.office') return 'FR·O';
+  if (base === 'FRAME.cellular') return 'FR·C';
+  return base.substring(0, 4).toUpperCase();
+}
+
+function renderLateral() {
+  const lateral = select_lateral(building);
+  const transfers = find_transfer_floors(classified, building);
+  const card = document.getElementById('lat-card');
+  card.classList.add('show');
+
+  const parts = lateral.split('+');
+  card.innerHTML = `
+    <div class="lat-label">Global Lateral System</div>
+    <div class="lat-badges">
+      ${parts.map(p => {
+        const c = STRUCT_HEX[p] || '#888';
+        return `<div class="lat-badge" style="background:${c}22;color:${c};border:1px solid ${c}44">${p}</div>`;
+      }).join('')}
+    </div>
+    <div class="lat-meta">
+      Transfer: ${transfers.length > 0 ? transfers.map(t => 'L' + t).join(', ') : 'none'}<br>
+      MEP: ${building.mepFloors.map(f => 'L' + f).join(', ') || 'none'}<br>
+      Floors: ${building.hfloors} · ${building.hfloors >= 20 ? 'Tall' : 'Low/Mid'}
+    </div>
+  `;
+}
+
+function renderLegend() {
+  const el = document.getElementById('legend-list');
+  const items = [
+    ['SKIN', '#3B82F6'], ['FOAM', '#10B981'],
+    ['FR·Office', '#F59E0B'], ['FR·Cell', '#8B5CF6'],
+    ['CORE', '#EF4444'], ['+LONGSPAN', '#F97316'],
+    ['+MEGA', '#EC4899'], ['+OUTRIGGER', '#06B6D4'],
+  ];
+  el.innerHTML = items.map(([l, c]) => `<div class="lg-item"><div class="lg-dot" style="background:${c}"></div>${l}</div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+//  INTERACTION
+// ══════════════════════════════════════════════════════════
+function selectZone(idx) {
+  selectedIdx = idx;
+  renderSidebar();
+  highlightMesh(idx);
+
+  const r = classified[idx];
+  if (!r) return;
+  const z = r.entry;
+  const hex = getStructHex(r._struct);
+  const span = Math.max(z.w, z.d);
+  const aspect = (Math.max(z.w, z.d) / Math.min(z.w, z.d)).toFixed(2);
+
+  const ic = document.getElementById('info-card');
+  ic.classList.add('show');
+  ic.innerHTML = `
+    <div class="ic-title">${z.type}</div>
+    <div class="ic-row"><span class="ic-k">Level</span><span class="ic-v">L${z.level}</span></div>
+    <div class="ic-row"><span class="ic-k">Area</span><span class="ic-v">${z.area} m²</span></div>
+    <div class="ic-row"><span class="ic-k">Span</span><span class="ic-v">${span} m</span></div>
+    <div class="ic-row"><span class="ic-k">Aspect</span><span class="ic-v">${aspect}</span></div>
+    <div class="ic-row"><span class="ic-k">Category</span><span class="ic-v">${z.category}</span></div>
+    <div class="ic-row"><span class="ic-k">Perimeter</span><span class="ic-v">${z.perimeter ? 'Yes' : 'No'}</span></div>
+    <div class="ic-row"><span class="ic-k">Module</span><span class="ic-v ac">${r.module}</span></div>
+    <div class="ic-row"><span class="ic-k">Modifiers</span><span class="ic-v">${r.mods.length ? r.mods.join(', ') : '—'}</span></div>
+    <div class="ic-tag" style="background:${hex}22;color:${hex};border:1px solid ${hex}44">${r._struct}</div>
+  `;
+}
+
+function highlightMesh(idx) {
+  meshes.forEach(m => {
+    if (m.idx === idx) {
+      m.mesh.material.opacity = 1.0;
+      m.mesh.material.emissive = new THREE.Color(0xffffff);
+      m.mesh.material.emissiveIntensity = 0.15;
+    } else {
+      m.mesh.material.opacity = selectedIdx >= 0 ? 0.25 : 0.88;
+      m.mesh.material.emissive = new THREE.Color(0x000000);
+      m.mesh.material.emissiveIntensity = 0;
+    }
+  });
+}
+
+// Click on 3D blocks
+canvas.addEventListener('click', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(meshes.map(m => m.mesh));
+  if (hits.length > 0) {
+    const idx = hits[0].object.userData.idx;
+    if (idx !== undefined) selectZone(idx);
+  } else {
+    // Deselect
+    selectedIdx = -1;
+    meshes.forEach(m => { m.mesh.material.opacity = 0.88; m.mesh.material.emissive = new THREE.Color(0); m.mesh.material.emissiveIntensity = 0; });
+    document.getElementById('info-card').classList.remove('show');
+    renderSidebar();
+  }
+});
+
+// ══════════════════════════════════════════════════════════
+//  FLOOR BAR
+// ══════════════════════════════════════════════════════════
+function buildFloorBar() {
+  const bar = document.getElementById('floor-bar');
+  bar.innerHTML = '';
+
+  const levels = [...new Set(zones.map(z => z.level))].sort((a, b) => b - a);
+
+  const allBtn = document.createElement('button');
+  allBtn.className = 'fb act';
+  allBtn.textContent = 'ALL';
+  allBtn.onclick = () => { activeFloor = null; applyFloorFilter(); bar.querySelectorAll('.fb').forEach(b => b.classList.remove('act')); allBtn.classList.add('act'); };
+  bar.appendChild(allBtn);
+
+  levels.forEach(lv => {
+    const btn = document.createElement('button');
+    btn.className = 'fb';
+    btn.textContent = lv < 0 ? `B${-lv}` : `L${lv}`;
+    btn.onclick = () => { activeFloor = lv; applyFloorFilter(); bar.querySelectorAll('.fb').forEach(b => b.classList.remove('act')); btn.classList.add('act'); };
+    bar.appendChild(btn);
+  });
+}
+
+function applyFloorFilter() {
+  meshes.forEach(m => {
+    if (activeFloor === null) {
+      m.mesh.visible = true;
+      m.mesh.material.opacity = selectedIdx >= 0 ? (m.idx === selectedIdx ? 1.0 : 0.25) : 0.88;
+    } else {
+      if (m.entry.level === activeFloor) {
+        m.mesh.visible = true;
+        m.mesh.material.opacity = 0.92;
+      } else {
+        m.mesh.visible = true;
+        m.mesh.material.opacity = 0.06;
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+//  COLOR MODE
+// ══════════════════════════════════════════════════════════
+function setColorMode(mode) {
+  colorMode = mode;
+  document.getElementById('cm-struct').classList.toggle('active', mode === 'struct');
+  document.getElementById('cm-type').classList.toggle('active', mode === 'type');
+
+  meshes.forEach(m => {
+    const color = mode === 'struct'
+      ? getStructColor(m.result._struct)
+      : new THREE.Color(getTypeColorHex(m.entry.type)).getHex();
+    m.mesh.material.color.setHex(color);
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+//  OUTPUT PANEL
+// ══════════════════════════════════════════════════════════
+function toggleOutput() {
+  const p = document.getElementById('output-panel');
+  const show = !p.classList.contains('show');
+  p.classList.toggle('show', show);
+  document.getElementById('btn-output').classList.toggle('active', show);
+
+  if (show) {
+    const lateral = select_lateral(building);
+    const transfers = find_transfer_floors(classified, building);
+    let lines = [];
+    lines.push(`## LATERAL: ${lateral}`);
+    lines.push(`## TRANSFER_FLOORS: ${transfers.join(',') || 'none'}`);
+    lines.push(`## OUTRIGGER_FLOORS: ${building.mepFloors.join(',')}`);
+    lines.push('');
+    classified.forEach(r => {
+      const e = r.entry;
+      lines.push(`{${e.type}}/{${e.area}}/{${e.level}}/{${e.category}}/{${e.w},${e.d}}/${r._struct}`);
+    });
+    p.textContent = lines.join('\n');
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+//  TOGGLE / MODAL
+// ══════════════════════════════════════════════════════════
+function toggleG(key) {
+  if (key === 'taper') { building.taper = !building.taper; document.getElementById('tog-taper').classList.toggle('on', building.taper); }
+  else if (key === 'lowrise') { building.lowRiseSpan = !building.lowRiseSpan; document.getElementById('tog-lowrise').classList.toggle('on', building.lowRiseSpan); }
+}
+
+function openModal() { document.getElementById('modal-overlay').classList.add('show'); }
+function closeModal() { document.getElementById('modal-overlay').classList.remove('show'); }
+
+function addZone() {
+  zones.push({
+    type: document.getElementById('m-type').value || 'offices',
+    area: parseFloat(document.getElementById('m-area').value) || 500,
+    level: parseInt(document.getElementById('m-level').value) || 1,
+    w: parseFloat(document.getElementById('m-w').value) || 20,
+    d: parseFloat(document.getElementById('m-d').value) || 25,
+    category: document.getElementById('m-cat').value || 'public',
+    perimeter: document.getElementById('m-perim').value === 'true',
+  });
+  closeModal();
+  runClassifier();
+}
+
+// ══════════════════════════════════════════════════════════
+//  PRESETS
+// ══════════════════════════════════════════════════════════
+function loadPreset(name) {
+  document.querySelectorAll('#p-tpac,#p-53w53,#p-tama').forEach(b => b.classList.remove('active'));
+  document.getElementById('p-' + name).classList.add('active');
+  selectedIdx = -1;
+  document.getElementById('info-card').classList.remove('show');
+
+  if (name === 'tpac') {
+    setGlobals(14, 60, 3, '7', 80, 110, false, false);
+    zones = [
+      { type: 'lobby',                        area: 800,  level: 0, category: 'public',      w: 20, d: 40, perimeter: false },
+      { type: 'box office',                   area: 120,  level: 0, category: 'public',      w: 8,  d: 15, perimeter: false },
+      { type: 'fire stair and elevator 1',    area: 150,  level: 0, category: 'circulation', w: 10, d: 15, perimeter: false },
+      { type: 'fire stair and elevator 2',    area: 150,  level: 0, category: 'circulation', w: 10, d: 15, perimeter: false },
+      { type: 'circulation',                  area: 400,  level: 0, category: 'public',      w: 6,  d: 67, perimeter: false },
+      { type: 'restroom',                     area: 168,  level: 0, category: 'public',      w: 12, d: 14, perimeter: false },
+      { type: 'mechanical',                   area: 300,  level: 1, category: 'private',     w: 15, d: 20, perimeter: false },
+      { type: 'loading',                      area: 250,  level: 1, category: 'private',     w: 10, d: 25, perimeter: false },
+      { type: 'storage',                      area: 200,  level: 1, category: 'private',     w: 10, d: 20, perimeter: false },
+      { type: 'fire stair and elevator 1',    area: 150,  level: 1, category: 'circulation', w: 10, d: 15, perimeter: false },
+      { type: 'fire stair and freight elevator', area: 200, level: 1, category: 'circulation', w: 10, d: 20, perimeter: false },
+      { type: 'event hall',                   area: 1800, level: 4, category: 'public',      w: 30, d: 60, perimeter: false },
+      { type: 'event hall',                   area: 900,  level: 4, category: 'public',      w: 25, d: 36, perimeter: false },
+      { type: 'event hall',                   area: 600,  level: 4, category: 'public',      w: 20, d: 30, perimeter: false },
+      { type: 'lobby',                        area: 500,  level: 4, category: 'public',      w: 12, d: 40, perimeter: false },
+      { type: 'backstage',                    area: 400,  level: 4, category: 'private',     w: 10, d: 40, perimeter: false },
+      { type: 'fire stair and elevator 1',    area: 150,  level: 4, category: 'circulation', w: 10, d: 15, perimeter: false },
+      { type: 'fire stair and elevator 2',    area: 150,  level: 4, category: 'circulation', w: 10, d: 15, perimeter: false },
+      { type: 'event hall',                   area: 1200, level: 5, category: 'public',      w: 25, d: 48, perimeter: false },
+      { type: 'event hall',                   area: 800,  level: 5, category: 'public',      w: 22, d: 36, perimeter: false },
+      { type: 'backstage',                    area: 300,  level: 5, category: 'private',     w: 10, d: 30, perimeter: false },
+      { type: 'fire stair and elevator 1',    area: 150,  level: 5, category: 'circulation', w: 10, d: 15, perimeter: false },
+      { type: 'fly tower',                    area: 900,  level: 7, category: 'private',     w: 25, d: 36, perimeter: false },
+      { type: 'backstage',                    area: 400,  level: 7, category: 'private',     w: 10, d: 40, perimeter: false },
+      { type: 'rehearsal room',               area: 500,  level: 7, category: 'private',     w: 20, d: 25, perimeter: false },
+      { type: 'mechanical',                   area: 300,  level: 7, category: 'private',     w: 15, d: 20, perimeter: false },
+      { type: 'fire stair and elevator 1',    area: 150,  level: 7, category: 'circulation', w: 10, d: 15, perimeter: false },
+      { type: 'staff',                        area: 1200, level: 10, category: 'private',    w: 30, d: 40, perimeter: false },
+      { type: 'rehearsal room',               area: 400,  level: 10, category: 'private',    w: 20, d: 20, perimeter: false },
+      { type: 'mechanical',                   area: 300,  level: 10, category: 'private',    w: 15, d: 20, perimeter: false },
+      { type: 'fire stair and elevator 1',    area: 150,  level: 10, category: 'circulation', w: 10, d: 15, perimeter: false },
+      { type: 'viewing platform',             area: 600,  level: 13, category: 'public',     w: 10, d: 60, perimeter: false },
+      { type: 'roof terrace',                 area: 800,  level: 13, category: 'public',     w: 20, d: 40, perimeter: true  },
+      { type: 'fire stair and elevator 1',    area: 150,  level: 13, category: 'circulation', w: 10, d: 15, perimeter: false },
+    ];
+  } else if (name === '53w53') {
+    setGlobals(75, 320, 4, '16,32,48', 32, 42, true, false);
+    zones = [
+      { type: 'lobby',                        area: 1200, level: 0,  category: 'public',      w: 28, d: 40, perimeter: false },
+      { type: 'gallery',                      area: 600,  level: 1,  category: 'public',      w: 20, d: 30, perimeter: false },
+      { type: 'retail',                       area: 400,  level: 2,  category: 'public',      w: 16, d: 25, perimeter: false },
+      { type: 'restaurant',                   area: 300,  level: 3,  category: 'public',      w: 15, d: 20, perimeter: false },
+      { type: 'fire stair and elevator 1',    area: 200,  level: 0,  category: 'circulation', w: 12, d: 16, perimeter: false },
+      { type: 'fire stair and elevator 2',    area: 180,  level: 0,  category: 'circulation', w: 12, d: 15, perimeter: false },
+      { type: 'offices',                      area: 1500, level: 8,  category: 'public',      w: 28, d: 38, perimeter: true },
+      { type: 'offices',                      area: 1200, level: 12, category: 'public',      w: 26, d: 36, perimeter: true },
+      { type: 'mechanical',                   area: 600,  level: 16, category: 'private',     w: 20, d: 30, perimeter: false },
+      { type: 'fire stair and elevator 1',    area: 160,  level: 16, category: 'circulation', w: 10, d: 16, perimeter: false },
+      { type: 'apartments',                   area: 500,  level: 20, category: 'private',     w: 18, d: 28, perimeter: true },
+      { type: 'apartments',                   area: 400,  level: 30, category: 'private',     w: 16, d: 25, perimeter: true },
+      { type: 'sky lobby',                    area: 800,  level: 32, category: 'public',      w: 20, d: 30, perimeter: false },
+      { type: 'fire stair and elevator 1',    area: 140,  level: 32, category: 'circulation', w: 10, d: 14, perimeter: false },
+      { type: 'apartments',                   area: 300,  level: 40, category: 'private',     w: 14, d: 22, perimeter: true },
+      { type: 'apartments',                   area: 250,  level: 50, category: 'private',     w: 12, d: 20, perimeter: true },
+      { type: 'mechanical',                   area: 400,  level: 48, category: 'private',     w: 14, d: 28, perimeter: false },
+      { type: 'apartments',                   area: 200,  level: 60, category: 'private',     w: 10, d: 18, perimeter: true },
+      { type: 'apartments',                   area: 150,  level: 70, category: 'private',     w: 8,  d: 15, perimeter: true },
+      { type: 'fire stair and elevator 1',    area: 100,  level: 70, category: 'circulation', w: 8,  d: 12, perimeter: false },
+    ];
+  } else if (name === 'tama') {
+    setGlobals(4, 18, 0, '', 60, 80, false, true);
+    zones = [
+      { type: 'lobby',                        area: 400,  level: 0, category: 'public',      w: 8,  d: 10, perimeter: false },
+      { type: 'reading hall',                 area: 300,  level: 0, category: 'public',      w: 10, d: 10, perimeter: false },
+      { type: 'gallery',                      area: 250,  level: 0, category: 'public',      w: 10, d: 10, perimeter: false },
+      { type: 'fire stair and elevator 1',    area: 80,   level: 0, category: 'circulation', w: 6,  d: 8,  perimeter: false },
+      { type: 'stacks',                       area: 500,  level: 1, category: 'private',     w: 10, d: 12, perimeter: false },
+      { type: 'study zone',                   area: 200,  level: 1, category: 'public',      w: 10, d: 10, perimeter: false },
+      { type: 'offices',                      area: 300,  level: 1, category: 'public',      w: 15, d: 20, perimeter: false },
+      { type: 'fire stair and elevator 1',    area: 80,   level: 1, category: 'circulation', w: 6,  d: 8,  perimeter: false },
+      { type: 'mechanical',                   area: 150,  level: 2, category: 'private',     w: 10, d: 15, perimeter: false },
+      { type: 'storage',                      area: 200,  level: 2, category: 'private',     w: 10, d: 20, perimeter: false },
+      { type: 'fire stair and elevator 1',    area: 80,   level: 2, category: 'circulation', w: 6,  d: 8,  perimeter: false },
+      { type: 'reading hall',                 area: 300,  level: 3, category: 'public',      w: 10, d: 10, perimeter: false },
+      { type: 'event space',                  area: 200,  level: 3, category: 'public',      w: 10, d: 10, perimeter: false },
+      { type: 'roof terrace',                 area: 400,  level: 3, category: 'public',      w: 10, d: 10, perimeter: true  },
+      { type: 'fire stair and elevator 1',    area: 80,   level: 3, category: 'circulation', w: 6,  d: 8,  perimeter: false },
+    ];
+  }
+
+  runClassifier();
+}
+
+function setGlobals(hf, h, pt, mep, sw, sd, taper, lowrise) {
+  document.getElementById('g-hfloors').value = hf;
+  document.getElementById('g-height').value = h;
+  document.getElementById('g-podium-top').value = pt;
+  document.getElementById('g-mep').value = mep;
+  document.getElementById('g-siteW').value = sw;
+  document.getElementById('g-siteD').value = sd;
+  building.taper = taper;
+  building.lowRiseSpan = lowrise;
+  document.getElementById('tog-taper').classList.toggle('on', taper);
+  document.getElementById('tog-lowrise').classList.toggle('on', lowrise);
+}
+
+// ══════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════
+loadPreset('tpac');
+renderLegend();
+</script>
+</body>
+</html>

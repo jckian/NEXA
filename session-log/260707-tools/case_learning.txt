@@ -1,0 +1,96 @@
+# Level -2
+{parking bay group}/{322}/{-2}/{private}/{18,18}
+{parking bay group}/{322}/{-2}/{private}/{18,18}
+{parking bay group}/{322}/{-2}/{private}/{18,18}
+{mechanical room}/{161}/{-2}/{private}/{13,12}
+{storage}/{123}/{-2}/{private}/{11,11}
+{electrical room}/{54}/{-2}/{private}/{7,8}
+{fire stair & freight elevator core}/{40}/{-2}/{circulation}/{6,7}
+{fire stair & passenger elevator core a}/{40}/{-2}/{circulation}/{6,7}
+{fire stair & passenger elevator core b}/{40}/{-2}/{circulation}/{6,7}
+{circulation}/{107}/{-2}/{circulation}/{10,11}
+# Level -1
+{loading dock}/{161}/{-1}/{private}/{13,12}
+{storage}/{123}/{-1}/{private}/{11,11}
+{storage}/{123}/{-1}/{private}/{11,11}
+{mechanical room}/{161}/{-1}/{private}/{13,12}
+{electrical room}/{54}/{-1}/{private}/{7,8}
+{staff area}/{92}/{-1}/{private}/{10,9}
+{it support}/{62}/{-1}/{private}/{8,8}
+{fire stair & freight elevator core}/{40}/{-1}/{circulation}/{6,7}
+{fire stair & passenger elevator core a}/{40}/{-1}/{circulation}/{6,7}
+{fire stair & passenger elevator core b}/{40}/{-1}/{circulation}/{6,7}
+{circulation}/{107}/{-1}/{circulation}/{10,11}
+# Level 0
+{lobby}/{207}/{0}/{public}/{14,15}
+{sales and display}/{253}/{0}/{public}/{16,16}
+{toilets}/{80}/{0}/{public}/{9,9}
+{fire stair & freight elevator core}/{40}/{0}/{circulation}/{6,7}
+{fire stair & passenger elevator core a}/{40}/{0}/{circulation}/{6,7}
+{fire stair & passenger elevator core b}/{40}/{0}/{circulation}/{6,7}
+{circulation}/{107}/{0}/{circulation}/{10,11}
+# Level 1
+{classroom}/{123}/{1}/{public}/{11,11}
+{classroom}/{123}/{1}/{public}/{11,11}
+{seminar room}/{123}/{1}/{public}/{11,11}
+{toilets}/{80}/{1}/{public}/{9,9}
+{fire stair & freight elevator core}/{40}/{1}/{circulation}/{6,7}
+{fire stair & passenger elevator core a}/{40}/{1}/{circulation}/{6,7}
+{fire stair & passenger elevator core b}/{40}/{1}/{circulation}/{6,7}
+{circulation}/{107}/{1}/{circulation}/{10,11}
+{office}/{78}/{1}/{private}/{9,9}
+# Level 2
+{computer lab}/{123}/{2}/{public}/{11,11}
+{project review room}/{123}/{2}/{public}/{11,11}
+{toilets}/{80}/{2}/{public}/{9,9}
+{fire stair & freight elevator core}/{40}/{2}/{circulation}/{6,7}
+{fire stair & passenger elevator core a}/{40}/{2}/{circulation}/{6,7}
+{fire stair & passenger elevator core b}/{40}/{2}/{circulation}/{6,7}
+{circulation}/{107}/{2}/{circulation}/{10,11}
+{2b2b apartment}/{134}/{2}/{private}/{12,11}
+# Level 3
+{office}/{1237}/{3}/{private}/{35,35}
+{fire stair & freight elevator core}/{40}/{3}/{circulation}/{6,7}
+{fire stair & passenger elevator core a}/{40}/{3}/{circulation}/{6,7}
+{fire stair & passenger elevator core b}/{40}/{3}/{circulation}/{6,7}
+{circulation}/{107}/{3}/{circulation}/{10,11}
+# Level 4
+{fire stair & freight elevator core}/{40}/{4}/{circulation}/{6,7}
+{fire stair & passenger elevator core a}/{40}/{4}/{circulation}/{6,7}
+{fire stair & passenger elevator core b}/{40}/{4}/{circulation}/{6,7}
+{circulation}/{107}/{4}/{circulation}/{10,11}
+{2b2b apartment}/{134}/{4}/{private}/{12,11}
+{2b2b apartment}/{134}/{4}/{private}/{12,11}
+{2b2b apartment}/{134}/{4}/{private}/{12,11}
+{2b2b apartment}/{134}/{4}/{private}/{12,11}
+{2b2b apartment}/{134}/{4}/{private}/{12,11}
+{2b2b apartment}/{134}/{4}/{private}/{12,11}
+{2b2b apartment}/{134}/{4}/{private}/{12,11}
+{2b2b apartment}/{134}/{4}/{private}/{12,11}
+{2b2b apartment}/{134}/{4}/{private}/{12,11}
+# Level 5
+{office}/{1237}/{5}/{private}/{35,35}
+{fire stair & freight elevator core}/{40}/{5}/{circulation}/{6,7}
+{fire stair & passenger elevator core a}/{40}/{5}/{circulation}/{6,7}
+{fire stair & passenger elevator core b}/{40}/{5}/{circulation}/{6,7}
+{circulation}/{107}/{5}/{circulation}/{10,11}
+# Level 6
+{fire stair & freight elevator core}/{40}/{6}/{circulation}/{6,7}
+{fire stair & passenger elevator core a}/{40}/{6}/{circulation}/{6,7}
+{fire stair & passenger elevator core b}/{40}/{6}/{circulation}/{6,7}
+{circulation}/{107}/{6}/{circulation}/{10,11}
+{2b2b apartment}/{134}/{6}/{private}/{12,11}
+{2b2b apartment}/{134}/{6}/{private}/{12,11}
+{2b2b apartment}/{134}/{6}/{private}/{12,11}
+{2b2b apartment}/{134}/{6}/{private}/{12,11}
+{2b2b apartment}/{134}/{6}/{private}/{12,11}
+{2b2b apartment}/{134}/{6}/{private}/{12,11}
+{2b2b apartment}/{134}/{6}/{private}/{12,11}
+{2b2b apartment}/{134}/{6}/{private}/{12,11}
+{2b2b apartment}/{134}/{6}/{private}/{12,11}
+# Level 7
+{office}/{1237}/{7}/{private}/{35,35}
+{fire stair & freight elevator core}/{40}/{7}/{circulation}/{6,7}
+{fire stair & passenger elevator core a}/{40}/{7}/{circulation}/{6,7}
+{fire stair & passenger elevator core b}/{40}/{7}/{circulation}/{6,7}
+{circulation}/{107}/{7}/{circulation}/{10,11}

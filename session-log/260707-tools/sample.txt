@@ -1,0 +1,111 @@
+# MIX_6fl_program — 6F + 2B module-based program (40m×40m footprint)
+# Levels: B2=-2 B1=-1 L1=0 L2=1 L3=2 L4=3 L5=4 L6=5
+# B2 — Parking + Mechanical
+{parking bay group}/{322}/{-2}/{private}/{16,20}
+{parking bay group}/{322}/{-2}/{private}/{16,20}
+{parking bay group}/{322}/{-2}/{private}/{16,20}
+{mechanical room}/{161}/{-2}/{private}/{10,16}
+{storage}/{107}/{-2}/{private}/{8,13}
+{electrical room}/{54}/{-2}/{private}/{7,8}
+{fire stair & freight elevator core}/{201}/{-2}/{circulation}/{10,20}
+{fire stair & passenger elevator core a}/{161}/{-2}/{circulation}/{10,16}
+{circulation}/{107}/{-2}/{circulation}/{8,13}
+# B1 — Service + Loading
+{parking bay group}/{322}/{-1}/{private}/{16,20}
+{loading dock}/{161}/{-1}/{private}/{10,16}
+{storage}/{107}/{-1}/{private}/{8,13}
+{storage}/{107}/{-1}/{private}/{8,13}
+{mechanical room}/{161}/{-1}/{private}/{10,16}
+{electrical room}/{54}/{-1}/{private}/{7,8}
+{staff area}/{80}/{-1}/{private}/{8,10}
+{it support}/{54}/{-1}/{private}/{7,8}
+{fire stair & freight elevator core}/{201}/{-1}/{circulation}/{10,20}
+{fire stair & passenger elevator core a}/{161}/{-1}/{circulation}/{10,16}
+{circulation}/{134}/{-1}/{circulation}/{10,13}
+# L1 — Urban Interface
+{coffee shop}/{161}/{0}/{public}/{10,16}
+{brand showroom}/{214}/{0}/{public}/{14,15}
+{pop-up retail}/{107}/{0}/{public}/{8,13}
+{exhibition gallery}/{268}/{0}/{public}/{16,17}
+{event hall}/{241}/{0}/{public}/{16,15}
+{foyer}/{161}/{0}/{public}/{10,16}
+{toilets}/{80}/{0}/{public}/{8,10}
+{storage}/{107}/{0}/{private}/{8,13}
+{fire stair & freight elevator core}/{201}/{0}/{circulation}/{10,20}
+{fire stair & passenger elevator core a}/{161}/{0}/{circulation}/{10,16}
+{circulation}/{107}/{0}/{circulation}/{8,13}
+# L2 — Knowledge + Work + Wellness
+{office loft}/{322}/{1}/{private}/{16,20}
+{startup office suite}/{161}/{1}/{private}/{10,16}
+{ai training classroom}/{201}/{1}/{public}/{10,20}
+{seminar room}/{161}/{1}/{public}/{10,16}
+{computer lab}/{201}/{1}/{public}/{10,20}
+{startup demo space}/{161}/{1}/{public}/{10,16}
+{yoga studio}/{161}/{1}/{public}/{10,16}
+{pilates studio}/{134}/{1}/{public}/{10,13}
+{fire stair & freight elevator core}/{201}/{1}/{circulation}/{10,20}
+{fire stair & passenger elevator core a}/{161}/{1}/{circulation}/{10,16}
+{circulation}/{107}/{1}/{circulation}/{8,13}
+# L3 — Work + Wellness
+{office loft}/{322}/{2}/{private}/{16,20}
+{shared amenity}/{161}/{2}/{public}/{10,16}
+{group fitness studio}/{241}/{2}/{public}/{16,15}
+{recovery lounge}/{134}/{2}/{public}/{10,13}
+{physical therapy suite}/{107}/{2}/{private}/{8,13}
+{meditation room}/{80}/{2}/{public}/{8,10}
+{health coaching room}/{54}/{2}/{private}/{7,8}
+{fire stair & freight elevator core}/{201}/{2}/{circulation}/{10,20}
+{fire stair & passenger elevator core a}/{161}/{2}/{circulation}/{10,16}
+{circulation}/{134}/{2}/{circulation}/{10,13}
+# L4 — Residential (4× studio, 4× 1B1B, 3× 2B2B)
+{studio apartment}/{67}/{3}/{private}/{8,8}
+{studio apartment}/{67}/{3}/{private}/{8,8}
+{studio apartment}/{67}/{3}/{private}/{8,8}
+{studio apartment}/{67}/{3}/{private}/{8,8}
+{1b1b apartment}/{107}/{3}/{private}/{8,13}
+{1b1b apartment}/{107}/{3}/{private}/{8,13}
+{1b1b apartment}/{107}/{3}/{private}/{8,13}
+{1b1b apartment}/{107}/{3}/{private}/{8,13}
+{2b2b apartment}/{134}/{3}/{private}/{10,13}
+{2b2b apartment}/{134}/{3}/{private}/{10,13}
+{2b2b apartment}/{134}/{3}/{private}/{10,13}
+{residential lounge}/{134}/{3}/{public}/{10,13}
+{community kitchen}/{107}/{3}/{public}/{8,13}
+{laundry room}/{54}/{3}/{private}/{7,8}
+{fire stair & freight elevator core}/{201}/{3}/{circulation}/{10,20}
+{fire stair & passenger elevator core a}/{161}/{3}/{circulation}/{10,16}
+{circulation}/{134}/{3}/{circulation}/{10,13}
+# L5 — Residential (4× studio, 5× 1B1B, 3× 2B2B)
+{studio apartment}/{67}/{4}/{private}/{8,8}
+{studio apartment}/{67}/{4}/{private}/{8,8}
+{studio apartment}/{67}/{4}/{private}/{8,8}
+{studio apartment}/{67}/{4}/{private}/{8,8}
+{1b1b apartment}/{107}/{4}/{private}/{8,13}
+{1b1b apartment}/{107}/{4}/{private}/{8,13}
+{1b1b apartment}/{107}/{4}/{private}/{8,13}
+{1b1b apartment}/{107}/{4}/{private}/{8,13}
+{1b1b apartment}/{107}/{4}/{private}/{8,13}
+{2b2b apartment}/{134}/{4}/{private}/{10,13}
+{2b2b apartment}/{134}/{4}/{private}/{10,13}
+{2b2b apartment}/{134}/{4}/{private}/{10,13}
+{residential lounge}/{134}/{4}/{public}/{10,13}
+{package room}/{40}/{4}/{private}/{6,7}
+{fire stair & freight elevator core}/{201}/{4}/{circulation}/{10,20}
+{fire stair & passenger elevator core a}/{161}/{4}/{circulation}/{10,16}
+{circulation}/{107}/{4}/{circulation}/{8,13}
+# L6 — Residential + Transition (2× studio, 4× 1B1B, 4× 2B2B)
+{studio apartment}/{67}/{5}/{private}/{8,8}
+{studio apartment}/{67}/{5}/{private}/{8,8}
+{1b1b apartment}/{107}/{5}/{private}/{8,13}
+{1b1b apartment}/{107}/{5}/{private}/{8,13}
+{1b1b apartment}/{107}/{5}/{private}/{8,13}
+{1b1b apartment}/{107}/{5}/{private}/{8,13}
+{2b2b apartment}/{134}/{5}/{private}/{10,13}
+{2b2b apartment}/{134}/{5}/{private}/{10,13}
+{2b2b apartment}/{134}/{5}/{private}/{10,13}
+{2b2b apartment}/{134}/{5}/{private}/{10,13}
+{shared amenity}/{161}/{5}/{public}/{10,16}
+{lounge bar}/{134}/{5}/{public}/{10,13}
+{fire stair & freight elevator core}/{201}/{5}/{circulation}/{10,20}
+{fire stair & passenger elevator core a}/{161}/{5}/{circulation}/{10,16}
+{circulation}/{107}/{5}/{circulation}/{8,13}

@@ -1,0 +1,471 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXA — Site Scout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #172FC7; --surface: #FFFFFF;
+    --border: rgba(20,24,32,0.09); --border-hi: rgba(20,24,32,0.15);
+    --text-hi: #141820; --text-mid: #5A6478; --text-lo: #9BA5B5;
+    --accent: #172FC7; --accent-dim: rgba(23,47,199,0.08);
+    --font: 'DM Sans', system-ui, sans-serif; --mono: 'JetBrains Mono', monospace;
+    --short: #E67033; --yellow: #EEC341; --err: #d1373f;
+    --ink: #FFFFFF; --ink-mid: rgba(255,255,255,0.72); --ink-lo: rgba(255,255,255,0.46);
+    --ink-border: rgba(255,255,255,0.24); --ink-border-hi: rgba(255,255,255,0.4);
+  }
+  html { background: var(--bg); }
+  html, body { width: 100%; min-height: 100%; font-family: var(--font); -webkit-font-smoothing: antialiased; color: var(--ink); }
+
+  #brand { position: fixed; top: 32px; left: 40px; display: flex; align-items: center; gap: 10px; z-index: 1200; }
+  #brand-mark { width: 28px; height: 28px; background-color: var(--ink);
+    -webkit-mask: url(../NEXA-logo-mask.png) center / contain no-repeat; mask: url(../NEXA-logo-mask.png) center / contain no-repeat; }
+  #brand-name { font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-mid); }
+
+  #wrap { padding: 96px 40px 60px; max-width: 1480px; margin: 0 auto; }
+  h1 { font-size: clamp(26px, 3vw, 36px); font-weight: 300; letter-spacing: -0.02em; margin-bottom: 6px; }
+  #sub { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-lo); margin-bottom: 26px; }
+
+  /* address row: mirrors the wizard's input-row */
+  #addr-row { display: flex; align-items: center; gap: 10px; background: var(--surface);
+    border: 1px solid var(--border-hi); padding: 6px 6px 6px 18px; max-width: 640px; margin-bottom: 10px; }
+  #addr-row input { flex: 1; border: none; outline: none; background: none; font-family: var(--font); font-size: 13px; color: var(--text-hi); }
+  #addr-row input::placeholder { color: var(--text-lo); }
+  #btn-go { width: 34px; height: 34px; flex-shrink: 0; border-radius: 3px; background: var(--accent); border: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  #btn-go svg { width: 14px; height: 14px; stroke: #F5F5F5; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  #btn-go:disabled { background: var(--text-lo); opacity: 0.5; cursor: default; }
+  #status { font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; color: var(--ink-mid); min-height: 16px; margin-bottom: 20px; }
+  #status.err { color: #FFB4B8; }
+
+  #grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 12px; align-items: start; }
+  @media (max-width: 1000px) { #grid { grid-template-columns: minmax(0, 1fr); } }
+  #map { width: 100%; height: 620px; border: 1px solid var(--ink-border); background: #dfe6ef; }
+
+  .panel { background: var(--surface); border: 1px solid var(--border-hi); padding: 16px 18px; margin-bottom: 12px; color: var(--text-hi); }
+  .panel h2 { font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-lo); margin-bottom: 10px; font-weight: 500; }
+  .kv { display: flex; gap: 10px; font-size: 12px; padding: 3px 0; }
+  .kv .k { font-family: var(--mono); font-size: 10px; color: var(--text-lo); width: 118px; flex-shrink: 0; padding-top: 1px; }
+  .kv .v { color: var(--text-hi); min-width: 0; }
+  .kv .v em { font-style: normal; color: var(--text-mid); font-size: 11px; }
+  .src { font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.04em; color: var(--text-lo); margin-top: 8px; line-height: 1.6; }
+  .pending { font-size: 11.5px; color: var(--text-lo); }
+  .unavail { font-size: 11.5px; color: var(--err); }
+
+  .cand { display: block; width: 100%; text-align: left; background: none; border: 1px solid var(--border-hi);
+    padding: 7px 10px; margin-bottom: 5px; cursor: pointer; font-family: var(--mono); font-size: 10.5px; color: var(--text-mid); }
+  .cand:hover { border-color: rgba(23,47,199,0.35); color: var(--accent); }
+  .cand.sel { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+  .metric { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; font-size: 12px; border-bottom: 1px dashed var(--border); }
+  .metric:last-of-type { border-bottom: none; }
+  .metric .mk { color: var(--text-mid); }
+  .metric .mv { font-family: var(--mono); font-size: 11px; color: var(--text-hi); text-align: right; }
+
+  #mixbar { display: flex; height: 10px; width: 100%; overflow: hidden; margin: 8px 0 6px; }
+  #mixbar span { height: 100%; }
+  #mixlegend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-family: var(--mono); font-size: 9px; color: var(--text-mid); }
+
+  #btn-export { background: var(--accent); color: #fff; border: none; font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.08em; padding: 9px 16px; cursor: pointer; }
+  #btn-export:hover { opacity: 0.85; }
+  #btn-export:disabled { background: var(--text-lo); opacity: 0.6; cursor: default; }
+  #export-note { font-size: 11px; color: var(--text-mid); line-height: 1.55; margin-top: 10px; }
+  #export-note code { font-family: var(--mono); font-size: 10px; background: var(--accent-dim); padding: 1px 4px; }
+
+  #foot { margin-top: 26px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.05em; color: var(--ink-lo); line-height: 1.9; max-width: 900px; }
+</style>
+</head>
+<body>
+
+<div id="brand"><div id="brand-mark" role="img" aria-label="NEXA"></div><span id="brand-name">NEXA</span></div>
+
+<div id="wrap">
+  <h1>Site <em>Scout</em></h1>
+  <div id="sub">address → parcel · zoning · surroundings snapshot &nbsp;·&nbsp; machine-fetched, reported-tier evidence</div>
+
+  <div id="addr-row">
+    <input id="addr" type="text" autocomplete="off" placeholder="e.g. 130 W College St, Los Angeles, CA 90012">
+    <button id="btn-go" title="Scout this address"><svg viewBox="0 0 18 18"><path d="M4 9h10M10 5l4 4-4 4"></path></svg></button>
+  </div>
+  <div id="status"></div>
+
+  <div id="grid">
+    <div id="map"></div>
+    <div id="panels">
+      <div class="panel" id="p-parcel"><h2>Parcel</h2><div class="pending">Enter an address to begin.</div></div>
+      <div class="panel" id="p-reg"><h2>Regulation · LA City</h2><div class="pending">—</div></div>
+      <div class="panel" id="p-sur"><h2>Surroundings · 400 / 800 m</h2><div class="pending">—</div></div>
+      <div class="panel" id="p-exp"><h2>Export</h2>
+        <button id="btn-export" disabled>download site snapshot (.js)</button>
+        <div id="export-note">Produces a <code>site-&lt;slug&gt;.js</code> dossier skeleton in the NEXA Intel schema —
+          every machine-fetched field tagged <code>reported</code> with its source and access date; the timeline stays
+          empty (historical succession needs N1 research, not a live query). To load it into the platform: save the file
+          to <code>NEXA/intel/data/</code> and add a <code>&lt;script src&gt;</code> tag for it in <code>program-input.html</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="foot">
+    sources: US Census Geocoder · Nominatim/OSM · LA County Assessor parcels (public.gis.lacounty.gov) ·
+    LA City Planning zoning (GeoHub hosted layer) · LA City Planning overlays (maps.lacity.org) · Overpass API (OSM).
+    coverage: any US address geocodes + OSM surroundings; parcel/zoning/overlay panels are LA-only.
+    all fetched values are REPORTED tier — verify against ZIMAS before citing. POI metrics are based on OSM, not a census.
+    note: the LA county/city layers require an http origin — open this page via the local server, not file://, for full data.
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const statusEl = $('status');
+  const setStatus = (t, err) => { statusEl.textContent = t || ''; statusEl.className = err ? 'err' : ''; };
+  const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const today = (() => { const d = new Date(); return String(d.getFullYear() % 100).padStart(2, '0') + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0'); })();
+
+  // ── endpoints (probed working 260713 — see session log) ──
+  const EP = {
+    census: 'https://geocoding.geo.census.gov/geocoder/locations/onelineaddress',
+    nominatim: 'https://nominatim.openstreetmap.org/search',
+    parcels: 'https://public.gis.lacounty.gov/public/rest/services/LACounty_Cache/LACounty_Parcel/MapServer/0',
+    zoning: 'https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Zoning/FeatureServer/15',
+    cityPlanning: 'https://maps.lacity.org/lahub/rest/services/City_Planning_Department/MapServer',
+    overpass: 'https://overpass-api.de/api/interpreter'
+  };
+  const CITY_OVERLAYS = [ // [label, layer id] on the City_Planning_Department MapServer
+    ['HPOZ', 10], ['Specific Plan', 19], ['Adaptive Reuse Area', 6]
+  ];
+
+  // ── map ──
+  const map = L.map('map', { zoomControl: true }).setView([34.05, -118.25], 11);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+  let marker = null, parcelLayer = null, rings = [];
+  const clearRings = () => { rings.forEach(r => map.removeLayer(r)); rings = []; };
+
+  // ── state gathered per run (feeds the export) ──
+  let S = null;
+  const resetState = addr => { S = { input: addr, accessed: today, geocode: null, parcel: null, zoning: null, overlays: {}, osm: null }; };
+
+  const havM = (a, b) => { // metres between [lat,lng]
+    const R = 6371000, dLa = (b[0] - a[0]) * Math.PI / 180, dLo = (b[1] - a[1]) * Math.PI / 180;
+    const x = Math.sin(dLa / 2) ** 2 + Math.cos(a[0] * Math.PI / 180) * Math.cos(b[0] * Math.PI / 180) * Math.sin(dLo / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(x));
+  };
+
+  // ── geocode: Census (US) → Nominatim fallback ──
+  async function geocode(addr) {
+    try {
+      const u = `${EP.census}?address=${encodeURIComponent(addr)}&benchmark=Public_AR_Current&format=json`;
+      const j = await (await fetch(u)).json();
+      const m = j.result && j.result.addressMatches && j.result.addressMatches[0];
+      if (m) return { lat: m.coordinates.y, lng: m.coordinates.x, label: m.matchedAddress, source: 'US Census Geocoder', url: u };
+    } catch (e) {}
+    const u2 = `${EP.nominatim}?q=${encodeURIComponent(addr)}&format=json&limit=1`;
+    const j2 = await (await fetch(u2)).json();
+    if (j2 && j2[0]) return { lat: +j2[0].lat, lng: +j2[0].lon, label: j2[0].display_name, source: 'Nominatim / OSM', url: u2 };
+    throw new Error('address not found by either geocoder');
+  }
+
+  // ── ArcGIS point query helper ──
+  const agsQuery = (base, pt, extra) =>
+    fetch(`${base}/query?f=json&geometry=${pt.lng},${pt.lat}&geometryType=esriGeometryPoint&inSR=4326` +
+      `&spatialRel=esriSpatialRelIntersects&outFields=*&outSR=4326${extra || ''}`).then(r => r.json());
+
+  // ── parcels: candidates near the geocoded point; user confirms on ambiguity ──
+  async function loadParcels(pt) {
+    const el = $('p-parcel');
+    try {
+      const j = await agsQuery(EP.parcels, pt, '&distance=45&units=esriSRUnit_Meter&returnGeometry=true');
+      if (j.error) throw new Error(j.error.message || 'layer error');
+      const feats = (j.features || []).slice(0, 8);
+      if (!feats.length) { el.innerHTML = '<h2>Parcel</h2><div class="pending">No LA County parcel within 45 m — outside LA County, or an unparcelled area. OSM analysis still runs.</div>'; return; }
+      // auto-pick: house number beats street name beats proximity order. Matching the
+      // street matters — the geocoded point sits on the centerline, so the *nearest*
+      // parcel is often across the street on a different street entirely.
+      const houseNo = (S.input.match(/^\s*(\d+)/) || [])[1];
+      const streetTok = (S.input.replace(/^\s*\d+\s*/, '').split(',')[0] || '')
+        .toUpperCase().replace(/[^A-Z ]/g, ' ').split(/\s+/)
+        .filter(w => w.length > 2 && !/^(THE|AND)$/.test(w))
+        .sort((a, b) => b.length - a.length)[0]; // longest word ≈ the street's proper name
+      const score = a =>
+        (houseNo && String(a.SitusHouseNo).trim() === houseNo ? 0 : 2) +
+        (streetTok && String(a.SitusFullAddress || '').toUpperCase().includes(streetTok) ? 0 : 1);
+      feats.sort((a, b) => score(a.attributes) - score(b.attributes));
+      el.innerHTML = '<h2>Parcel · click to select</h2>' + feats.map((f, i) =>
+        `<button class="cand" data-i="${i}">${esc(f.attributes.APN)} · ${esc(f.attributes.SitusFullAddress || '(no situs)')}</button>`
+      ).join('') + `<div class="src">LA County Assessor parcels · public.gis.lacounty.gov · accessed ${today} · reported tier</div>`;
+      el.querySelectorAll('.cand').forEach(b => b.addEventListener('click', () => selectParcel(feats[+b.dataset.i], b)));
+      selectParcel(feats[0], el.querySelector('.cand')); // preselect the best guess
+    } catch (e) {
+      el.innerHTML = '<h2>Parcel</h2><div class="unavail">county parcel layer unavailable from this origin — open via the local server (see note below)</div>';
+    }
+  }
+
+  function selectParcel(f, btn) {
+    document.querySelectorAll('.cand').forEach(x => x.classList.remove('sel'));
+    if (btn) btn.classList.add('sel');
+    const a = f.attributes;
+    S.parcel = { apn: a.APN, ain: a.AIN, situs: a.SitusFullAddress, useType: a.UseType || null, useDesc: a.UseDescription || a.UseCode || null,
+      yearBuilt: a.YearBuilt1 || a.EffectiveYearBuilt1 || null, sqftMain: a.SQFTmain1 || a.SQFTmain || null, geometry: f.geometry };
+    if (parcelLayer) map.removeLayer(parcelLayer);
+    if (f.geometry && f.geometry.rings) {
+      parcelLayer = L.polygon(f.geometry.rings.map(rg => rg.map(p => [p[1], p[0]])),
+        { color: '#E67033', weight: 2, fillOpacity: 0.12 }).addTo(map);
+      map.fitBounds(parcelLayer.getBounds().pad(1.8));
+      // re-run regulation queries at the parcel centroid — the street-centerline point misses polygons
+      const c = parcelLayer.getBounds().getCenter();
+      loadRegulation({ lat: c.lat, lng: c.lng });
+    }
+  }
+
+  // ── zone-string interpretation: use district, FAR, height, lot coverage ──
+  // LEGACY codes (e.g. M2-2D): derived from the LAMC 12.21.1 height-district table —
+  // ESTIMATED tier ("D" limitations, specific plans and overlays override; verify in ZIMAS).
+  // DTLA 2040 NEW-FORMAT codes (e.g. [DM2-G1-5][CX2-FA][CPIO]): the new code's standards
+  // tables are NOT encoded here — the parts are named, numbers are refused, not guessed.
+  const USE_ZONES = { R1: 'single-family residential', R2: 'two-family residential', RD: 'restricted-density multiple residential', R3: 'multiple dwelling · medium density', R4: 'multiple dwelling · high density', R5: 'multiple dwelling · highest density', RAS3: 'residential/accessory services', RAS4: 'residential/accessory services', C1: 'limited commercial', C2: 'commercial (broad retail/office; R4 residential uses allowed)', C4: 'commercial', C5: 'commercial (central area)', CM: 'commercial manufacturing', M1: 'limited industrial', M2: 'light industrial', M3: 'heavy industrial', P: 'automobile parking', PF: 'public facilities', OS: 'open space', A1: 'agricultural', A2: 'agricultural' };
+  const HEIGHT_DISTRICTS = { '1': { far: '3:1', h: 'no fixed height cap (zone/overlay rules govern)' }, '1L': { far: '3:1', h: '75 ft / 6 stories' }, '1VL': { far: '3:1', h: '45 ft / 3 stories' }, '1XL': { far: '3:1', h: '30 ft / 2 stories' }, '2': { far: '6:1', h: 'no fixed height cap' }, '3': { far: '10:1', h: 'no fixed height cap' }, '4': { far: '13:1', h: 'no fixed height cap' } };
+  function interpretZone(z) {
+    if (!z) return null;
+    if (z.trim().startsWith('[')) {
+      const parts = (z.match(/\[([^\]]+)\]/g) || []).map(s => s.slice(1, -1));
+      return { format: 'dtla2040', parts,
+        note: 'DTLA 2040 new-format code — form district · use district · overlay. The new code’s FAR/height/coverage tables are not encoded in this tool; read the form-district standards (planning.lacity.gov) before using numbers.' };
+    }
+    const seg = z.replace(/[()\s]/g, '').split('-');
+    const use = seg[0], hdRaw = seg[1] || '';
+    const hdKey = (hdRaw.match(/^(1XL|1VL|1L|[1-4])/) || [])[1] || null;
+    const hd = hdKey && HEIGHT_DISTRICTS[hdKey];
+    return { format: 'legacy', useCode: use, use: USE_ZONES[use] || null, hdKey,
+      far: hd ? hd.far : null, height: hd ? hd.h : null, dLimit: /D/.test(hdRaw),
+      note: 'FAR/height derived from the LAMC 12.21.1 height-district table — ESTIMATED; a “D” limitation, specific plan or CPIO can override. Verify in ZIMAS.' };
+  }
+
+  // ── regulation: hosted zoning (CORS *) + city overlays (http origin only) ──
+  async function loadRegulation(pt) {
+    const el = $('p-reg');
+    el.innerHTML = '<h2>Regulation · LA City</h2><div class="pending">querying…</div>';
+    const rows = [];
+    try {
+      const z = await agsQuery(EP.zoning, pt, '&returnGeometry=false');
+      const zf = (z.features || [])[0];
+      if (zf) {
+        S.zoning = { code: zf.attributes.Zoning, category: zf.attributes.CATEGORY };
+        S.zoneInfo = interpretZone(zf.attributes.Zoning);
+        rows.push(`<div class="kv"><span class="k">zoning</span><span class="v"><b>${esc(zf.attributes.Zoning)}</b><br><em>${esc(zf.attributes.CATEGORY)}</em></span></div>`);
+        const zi = S.zoneInfo;
+        if (zi && zi.format === 'legacy') {
+          rows.push(`<div class="kv"><span class="k">use district</span><span class="v">${zi.use ? esc(zi.useCode) + ' — ' + esc(zi.use) : esc(zi.useCode) + ' <em>(not in table)</em>'}</span></div>`);
+          rows.push(`<div class="kv"><span class="k">FAR</span><span class="v">${zi.far ? esc(zi.far) + (zi.dLimit ? ' <em>— “D” limitation present: a lower site-specific FAR/height governs</em>' : '') : '<em>height district not recognized</em>'}</span></div>`);
+          rows.push(`<div class="kv"><span class="k">height limit</span><span class="v">${zi.height ? esc(zi.height) : '<em>—</em>'}</span></div>`);
+          rows.push(`<div class="kv"><span class="k">lot coverage</span><span class="v"><em>LA regulates FAR + setbacks citywide; lot-coverage caps apply only in certain residential zones — not encoded</em></span></div>`);
+          rows.push(`<div class="src">${esc(zi.note)}</div>`);
+        } else if (zi && zi.format === 'dtla2040') {
+          rows.push(`<div class="kv"><span class="k">code parts</span><span class="v">${zi.parts.map(p => '<b>' + esc(p) + '</b>').join(' · ')}<br><em>form district · use district · overlay</em></span></div>`);
+          rows.push(`<div class="kv"><span class="k">FAR / height / coverage</span><span class="v"><em>refused, not guessed — see note</em></span></div>`);
+          rows.push(`<div class="src">${esc(zi.note)}</div>`);
+        }
+      } else rows.push('<div class="kv"><span class="k">zoning</span><span class="v"><em>no polygon at this point</em></span></div>');
+    } catch (e) { rows.push('<div class="kv"><span class="k">zoning</span><span class="v unavail">layer unreachable</span></div>'); }
+
+    for (const [label, lyr] of CITY_OVERLAYS) {
+      try {
+        const j = await agsQuery(`${EP.cityPlanning}/${lyr}`, pt, '&returnGeometry=false&distance=10&units=esriSRUnit_Meter');
+        const f = (j.features || [])[0];
+        S.overlays[label] = f ? (f.attributes.NAME || f.attributes.TOOLTIP || 'yes') : null;
+        rows.push(`<div class="kv"><span class="k">${esc(label.toLowerCase())}</span><span class="v">${f ? '<b>' + esc(S.overlays[label]) + '</b>' : '<em>none at this point</em>'}</span></div>`);
+      } catch (e) {
+        S.overlays[label] = undefined;
+        rows.push(`<div class="kv"><span class="k">${esc(label.toLowerCase())}</span><span class="v unavail">unavailable from this origin</span></div>`);
+      }
+    }
+    rows.push(`<div class="src">LADCP Zoning (GeoHub hosted) + City Planning MapServer overlays · accessed ${today} · reported tier — verify against ZIMAS before citing</div>`);
+    el.innerHTML = '<h2>Regulation · LA City</h2>' + rows.join('');
+    $('btn-export').disabled = false;
+  }
+
+  // ── surroundings: Overpass 800 m ──
+  async function loadSurroundings(pt) {
+    const el = $('p-sur');
+    el.innerHTML = '<h2>Surroundings · 400 / 800 m</h2><div class="pending">querying OSM…</div>';
+    const q = `[out:json][timeout:25];(node(around:800,${pt.lat},${pt.lng})[highway=bus_stop];` +
+      `node(around:800,${pt.lat},${pt.lng})[railway~"station|stop"];way(around:800,${pt.lat},${pt.lng})[leisure=park];` +
+      `node(around:800,${pt.lat},${pt.lng})[amenity~"restaurant|cafe|bar|fast_food"];` +
+      `node(around:800,${pt.lat},${pt.lng})[amenity~"school|university|college"];node(around:800,${pt.lat},${pt.lng})[shop];);out tags center 400;`;
+    let els;
+    try {
+      const r = await fetch(EP.overpass, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'data=' + encodeURIComponent(q) });
+      els = (await r.json()).elements || [];
+    } catch (e) {
+      el.innerHTML = '<h2>Surroundings · 400 / 800 m</h2><div class="unavail">Overpass unreachable (rate limit?) — retry in a minute</div>';
+      return;
+    }
+    const at = e => e.center ? [e.center.lat, e.center.lon] : [e.lat, e.lon];
+    const cat = e => { const t = e.tags || {}; return t.highway === 'bus_stop' ? 'bus' : t.railway ? 'rail' : t.leisure === 'park' ? 'park'
+      : /school|university|college/.test(t.amenity || '') ? 'school' : t.shop ? 'retail' : 'food'; };
+    const with_d = els.map(e => ({ e, c: cat(e), d: havM([pt.lat, pt.lng], at(e)) }));
+    const in400 = c => with_d.filter(x => x.c === c && x.d <= 400).length;
+    const in800 = c => with_d.filter(x => x.c === c && x.d <= 800).length;
+    const stations = with_d.filter(x => x.c === 'rail' && (x.e.tags.railway === 'station'));
+    stations.sort((a, b) => a.d - b.d);
+    const nearestStation = stations[0];
+    const parks = with_d.filter(x => x.c === 'park'); parks.sort((a, b) => a.d - b.d);
+
+    S.osm = {
+      nearestRail: nearestStation ? { name: nearestStation.e.tags.name || 'station', dist: Math.round(nearestStation.d) } : null,
+      bus400: in400('bus'), food400: in400('food'), retail400: in400('retail'),
+      food800: in800('food'), retail800: in800('retail'), school800: in800('school'),
+      park: parks[0] ? { name: parks[0].e.tags.name || 'park', dist: Math.round(parks[0].d) } : null,
+      poiTotal800: with_d.filter(x => x.d <= 800).length
+    };
+
+    const M = S.osm;
+    const mix = ['food', 'retail', 'bus', 'rail', 'school', 'park'].map(c => [c, with_d.filter(x => x.c === c && x.d <= 800).length]);
+    const tot = Math.max(1, mix.reduce((s, m2) => s + m2[1], 0));
+    const COLORS = { food: '#E67033', retail: '#EEC341', bus: '#5A6478', rail: '#172FC7', school: '#9BA5B5', park: '#3E8E5A' };
+    el.innerHTML = '<h2>Surroundings · 400 / 800 m</h2>' +
+      `<div class="metric"><span class="mk">nearest rail station</span><span class="mv">${M.nearestRail ? esc(M.nearestRail.name) + ' · ' + M.nearestRail.dist + ' m' : 'none ≤800 m'}</span></div>` +
+      `<div class="metric"><span class="mk">bus stops ≤400 m</span><span class="mv">${M.bus400}</span></div>` +
+      `<div class="metric"><span class="mk">food &amp; drink ≤400 / ≤800 m</span><span class="mv">${M.food400} / ${M.food800}</span></div>` +
+      `<div class="metric"><span class="mk">retail ≤400 / ≤800 m</span><span class="mv">${M.retail400} / ${M.retail800}</span></div>` +
+      `<div class="metric"><span class="mk">schools ≤800 m</span><span class="mv">${M.school800}</span></div>` +
+      `<div class="metric"><span class="mk">nearest park</span><span class="mv">${M.park ? esc(M.park.name) + ' · ' + M.park.dist + ' m' : 'none ≤800 m'}</span></div>` +
+      '<div id="mixbar">' + mix.map(([c, n]) => `<span style="width:${(n / tot * 100).toFixed(1)}%;background:${COLORS[c]}"></span>`).join('') + '</div>' +
+      '<div id="mixlegend">' + mix.map(([c, n]) => `<span><i style="display:inline-block;width:7px;height:7px;background:${COLORS[c]};margin-right:4px;"></i>${c} ${n}</span>`).join('') + '</div>' +
+      `<div class="src">OSM via Overpass · ${M.poiTotal800} mapped POIs ≤800 m · accessed ${today} · OSM completeness varies — counts are a floor, not a census</div>`;
+  }
+
+  // ── run ──
+  async function run() {
+    const addr = $('addr').value.trim();
+    if (!addr) return;
+    $('btn-go').disabled = true;
+    resetState(addr);
+    ['p-parcel', 'p-reg', 'p-sur'].forEach(id => { $(id).innerHTML = $(id).innerHTML.replace(/<div class="(pending|unavail)">[\s\S]*$/, '<div class="pending">…</div>'); });
+    try {
+      setStatus('geocoding…');
+      const g = await geocode(addr);
+      S.geocode = g;
+      setStatus(`located: ${g.label}  (${g.lat.toFixed(5)}, ${g.lng.toFixed(5)})  ·  ${g.source}`);
+      const pt = { lat: g.lat, lng: g.lng };
+      if (marker) map.removeLayer(marker);
+      if (parcelLayer) { map.removeLayer(parcelLayer); parcelLayer = null; }
+      clearRings();
+      marker = L.marker([pt.lat, pt.lng]).addTo(map);
+      rings.push(L.circle([pt.lat, pt.lng], { radius: 400, color: '#ffffff', weight: 1, dashArray: '4 4', fillOpacity: 0.03 }).addTo(map));
+      rings.push(L.circle([pt.lat, pt.lng], { radius: 800, color: '#ffffff', weight: 1, dashArray: '2 6', fillOpacity: 0.02 }).addTo(map));
+      map.setView([pt.lat, pt.lng], 16);
+      await Promise.allSettled([loadParcels(pt), loadRegulation(pt), loadSurroundings(pt)]);
+      $('btn-export').disabled = false;
+    } catch (e) {
+      setStatus(String(e.message || e), true);
+    } finally {
+      $('btn-go').disabled = false;
+    }
+  }
+  $('btn-go').addEventListener('click', run);
+  $('addr').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
+
+  // ── export: dossier skeleton in the NEXA Intel schema (INTEL-DATA.md §0–§3) ──
+  function fact(value, source, url) {
+    return { value: value == null ? null : value, source, url: url || null, accessed: today, confidence: value == null ? 'unknown' : 'reported' };
+  }
+  function buildSnapshot() {
+    const slug = S.input.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'site';
+    const g = S.geocode, p = S.parcel, z = S.zoning, o = S.osm;
+    const site = {
+      dossier: {
+        meta: {
+          name: fact(S.input, g ? g.source : 'user input', g && g.url),
+          address: fact(g ? g.label : S.input, g ? g.source : 'user input', g && g.url),
+          apn: fact(p ? p.apn : null, p && 'LA County Assessor parcels'),
+          areaSqm: fact(null),
+          accessedRange: fact('site-scout snapshot ' + today, 'NEXA site-scout (machine-fetched)')
+        },
+        physical: {
+          parcelGeometry: fact(p && p.geometry ? p.geometry : null, p && 'LA County Assessor parcels (rings, EPSG:4326)'),
+          siteArea: fact(null),
+          existingFootprint: fact(p && p.sqftMain ? p.sqftMain + ' sf (assessor main sqft)' : null, p && 'LA County Assessor parcels'),
+          existingGFA: fact(null),
+          far: fact(null), heightLimit: fact(null), easements: fact(null),
+          existingUse: fact(p ? [p.useType, p.useDesc].filter(Boolean).join(' / ') || null : null, p && 'LA County Assessor parcels'),
+          yearBuilt: fact(p ? p.yearBuilt : null, p && 'LA County Assessor parcels')
+        },
+        urban: {
+          streetHierarchy: fact(null),
+          transitStops: [
+            o && o.nearestRail ? fact('Nearest rail: ' + o.nearestRail.name + ', ~' + o.nearestRail.dist + ' m', 'OSM via Overpass') : fact(null),
+            o ? fact(o.bus400 + ' bus stops ≤400 m', 'OSM via Overpass') : fact(null)
+          ],
+          walkability: fact(o ? (o.food400 + o.retail400) + ' food/retail POIs ≤400 m (OSM floor, not a census)' : null, o && 'OSM via Overpass'),
+          bikeNetwork: fact(null), parkingSupply: fact(null)
+        },
+        environmental: { solarOrientation: fact(null), windNotes: fact(null), noiseSources: fact(null), topography: fact(null), floodRisk: fact(null), heatIsland: fact(null) },
+        context: {
+          adjacentUses: [fact(null)],
+          publicSpace: [o && o.park ? fact('Nearest park: ' + o.park.name + ', ~' + o.park.dist + ' m', 'OSM via Overpass') : fact(null)],
+          culturalDistricts: [fact(null)], institutions: fact(o ? o.school800 + ' schools/colleges ≤800 m (OSM)' : null, o && 'OSM via Overpass')
+        },
+        regulation: {
+          zoning: fact(z ? z.code + ' (' + z.category + ')' : null, z && 'LA City Planning Zoning layer (GeoHub hosted FeatureServer)', z && EP.zoning),
+          communityPlan: fact(null), overlayZones: fact(null),
+          hpoz: fact(S.overlays['HPOZ'] !== undefined ? S.overlays['HPOZ'] : null, 'LA City Planning MapServer/10'),
+          specificPlan: fact(S.overlays['Specific Plan'] !== undefined ? S.overlays['Specific Plan'] : null, 'LA City Planning MapServer/19'),
+          adaptiveReuseArea: fact(S.overlays['Adaptive Reuse Area'] !== undefined ? S.overlays['Adaptive Reuse Area'] : null, 'LA City Planning MapServer/6'),
+          useDistrict: (S.zoneInfo && S.zoneInfo.format === 'legacy' && S.zoneInfo.use)
+            ? { value: S.zoneInfo.useCode + ' — ' + S.zoneInfo.use, source: 'LAMC use-zone table (derived from the mapped zone string)', url: null, accessed: today, confidence: 'estimated' }
+            : fact(S.zoneInfo && S.zoneInfo.format === 'dtla2040' ? 'DTLA 2040 new-format parts: ' + S.zoneInfo.parts.join(' · ') + ' — standards not interpreted' : null, S.zoneInfo && 'mapped zone string'),
+          far: (S.zoneInfo && S.zoneInfo.far)
+            ? { value: S.zoneInfo.far + (S.zoneInfo.dLimit ? ' — “D” limitation present, a lower site-specific cap governs' : ''), source: 'LAMC 12.21.1 height-district table (derived, NOT parcel-verified)', url: null, accessed: today, confidence: 'estimated' }
+            : fact(null),
+          height: (S.zoneInfo && S.zoneInfo.height)
+            ? { value: S.zoneInfo.height, source: 'LAMC 12.21.1 height-district table (derived, NOT parcel-verified)', url: null, accessed: today, confidence: 'estimated' }
+            : fact(null),
+          lotCoverage: fact(null),
+          setbacks: fact(null), parkingReq: fact(null),
+          historicStatus: fact(null), affordableHousingBonuses: fact(null), pendingRezoning: fact(null)
+        },
+        market: { population: fact(null), income: fact(null), age: fact(null), employmentBase: fact(null), housingDemand: fact(null), officeVacancy: fact(null), retailDemand: fact(null), tourism: fact(null), creativeIndustry: fact(null) },
+        climate: { heatProjection: fact(null), floodProjection: fact(null), waterEnergyNotes: fact(null), transitInvestment: fact(null), resilienceOpportunities: fact(null) }
+      },
+      timeline: { nodes: [], edges: [] } // historical succession REQUIRES N1 research — a live query cannot see 1909
+    };
+    const key = slug;
+    return { key, text:
+`// NEXA/intel/data/site-${slug}.js
+// MACHINE-FETCHED SNAPSHOT — generated by NEXA Site Scout, ${today}.
+// Every filled field is REPORTED tier (live query of the named source, not a read document).
+// Verify zoning/overlays against ZIMAS before citing. Timeline is EMPTY pending N1 research.
+window.NEXA_INTEL = window.NEXA_INTEL || {};
+window.NEXA_INTEL.sites = window.NEXA_INTEL.sites || {};
+window.NEXA_INTEL.sites[${JSON.stringify(key)}] = ${JSON.stringify(site, null, 2)};
+` };
+  }
+  $('btn-export').addEventListener('click', () => {
+    if (!S || !S.geocode) return;
+    const { key, text } = buildSnapshot();
+    const blob = new Blob([text], { type: 'text/javascript' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'site-' + key + '.js';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  // test hook (headless verification pipeline)
+  window.__scout = { state: () => S, run, buildSnapshot };
+
+  // ?addr= URL hook for demos + verification
+  const qa = new URLSearchParams(location.search).get('addr');
+  if (qa) { $('addr').value = qa; run(); }
+})();
+</script>
+</body></html>

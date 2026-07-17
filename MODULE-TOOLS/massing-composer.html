@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Massing Composer — 8'-6" / 1:2 Module Assemblies</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #F5F5F5; --blue: #172FC7; --orange: #E67033; --yellow: #EEC341;
+      --grad: linear-gradient(135deg, #172FC7, #E67033);
+      --panel-bg: rgba(255, 255, 255, 0.90);
+      --border: rgba(23, 47, 199, 0.28);
+      --border-dim: rgba(23, 47, 199, 0.12);
+      --text-hi: #172FC7; --text-mid: rgba(23, 47, 199, 0.66); --text-lo: rgba(23, 47, 199, 0.42);
+      --radius-lg: 12px; --radius-md: 8px; --radius-sm: 5px;
+      --shadow: 0 8px 28px rgba(23, 47, 199, 0.12), 0 2px 8px rgba(23, 47, 199, 0.08);
+    }
+    body { background: var(--bg); font-family: 'Montserrat', Helvetica, Arial, sans-serif; overflow: hidden; color: var(--text-hi); }
+    #canvas-container { position: fixed; inset: 0; }
+    #title-block { position: fixed; top: 20px; left: 20px; z-index: 10; }
+    #title-block h1 { font-size: 14px; font-weight: 600; letter-spacing: 0.06em; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    #title-block p { font-size: 9px; letter-spacing: 0.18em; color: var(--text-lo); text-transform: uppercase; margin-top: 5px; }
+    #title-block a { color: var(--orange); text-decoration: none; border-bottom: 1px dotted var(--border); }
+    .panel { position: fixed; background: var(--panel-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); z-index: 10; backdrop-filter: blur(16px); box-shadow: var(--shadow); }
+    #left-panel { top: 70px; left: 20px; width: 244px; }
+    #right-panel { top: 70px; right: 20px; width: 250px; max-height: calc(100vh - 110px); overflow-y: auto; }
+    .panel h2 { font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-lo); padding: 14px 16px 10px; font-weight: 600; }
+    .panel-section { border-top: 1px solid var(--border-dim); }
+    .ctrl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; padding: 4px 16px 12px; }
+    .ctrl-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .ctrl-field.full { grid-column: 1 / -1; }
+    .ctrl-field label { font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-lo); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ctrl-field input, .ctrl-field select { width: 100%; min-width: 0; background: rgba(23,47,199,0.05); border: 1px solid var(--border-dim); border-radius: var(--radius-sm); color: var(--text-hi); padding: 6px 8px; font-family: inherit; font-size: 11px; outline: none; }
+    .ctrl-field input:focus { border-color: var(--border); }
+    .btn { display: block; width: calc(100% - 32px); margin: 0 16px 14px; padding: 10px; border: none; border-radius: var(--radius-md); background: var(--grad); color: #fff; font-family: inherit; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
+    .btn:hover { opacity: 0.88; }
+    #snap-note { font-size: 10px; color: var(--text-mid); padding: 0 16px 14px; line-height: 1.5; }
+    #snap-note b { color: var(--text-hi); }
+    #opts { padding: 4px 16px 14px; }
+    .opt-row { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; cursor: pointer; }
+    .opt-row:hover .opt-name { color: var(--text-hi); }
+    .opt-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; border: 1px solid rgba(23,47,199,0.2); }
+    .opt-name { font-size: 11px; color: var(--text-mid); }
+    .opt-meta { font-size: 9px; color: var(--text-lo); }
+    #hint { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--panel-bg); border: 1px solid var(--border); border-radius: 999px; padding: 8px 18px; z-index: 10; backdrop-filter: blur(16px); box-shadow: var(--shadow); font-size: 10px; color: var(--text-mid); letter-spacing: 0.04em; }
+    #hint b { color: var(--text-hi); }
+  </style>
+</head>
+
+<body>
+  <div id="canvas-container"></div>
+  <div id="title-block">
+    <h1>MASSING COMPOSER</h1>
+    <p>8'-6" MODULE &middot; 1:2 FILL &middot; <a href="program-tile-editor.html">→ tile editor</a></p>
+  </div>
+
+  <div id="left-panel" class="panel">
+    <h2>Total Massing</h2>
+    <div class="ctrl-grid">
+      <div class="ctrl-field full"><label>Mode</label>
+        <select id="in-mode">
+          <option value="solid" selected>Solid · min same-axis</option>
+          <option value="porous">Porous · true 3D interlock</option>
+        </select>
+      </div>
+      <div class="ctrl-field"><label>Length X (m)</label><input type="number" id="in-l" value="32" step="0.5" /></div>
+      <div class="ctrl-field"><label>Width Z (m)</label><input type="number" id="in-w" value="21" step="0.5" /></div>
+      <div class="ctrl-field"><label>Height Y (m)</label><input type="number" id="in-h" value="40" step="0.5" /></div>
+      <div class="ctrl-field"><label>Module Ht (fixed)</label><input type="text" id="in-fh" value="2.59 m · 8'-6&quot;" disabled style="opacity:0.6" /></div>
+    </div>
+    <div class="ctrl-field full" style="padding:4px 16px 8px;">
+      <label>Opacity · <span id="op-val">90%</span></label>
+      <input type="range" id="in-opacity" min="0.1" max="1" step="0.05" value="0.9" style="width:100%;accent-color:#172FC7;" />
+    </div>
+    <div class="ctrl-field full" style="padding:4px 16px 8px;">
+      <label>Density · <span id="dn-val">100%</span></label>
+      <input type="range" id="in-density" min="0.2" max="1" step="0.05" value="1" style="width:100%;accent-color:#EEC341;" />
+    </div>
+    <div class="ctrl-field full" style="padding:4px 16px 12px;">
+      <label>Protrude · <span id="pr-val">0%</span> <span style="color:var(--text-lo)">(½ or ⅔ out)</span></label>
+      <input type="range" id="in-protrude" min="0" max="0.6" step="0.05" value="0" style="width:100%;accent-color:#E67033;" />
+    </div>
+    <button class="btn" id="gen-btn">Generate Assemblies</button>
+    <div class="panel-section">
+      <h2>Snapped to module grid</h2>
+      <div id="snap-note"></div>
+    </div>
+  </div>
+
+  <div id="right-panel" class="panel">
+    <h2>Assembly Options</h2>
+    <div id="opts"></div>
+    <div class="panel-section" style="padding-top:8px;">
+      <h2>Export focused option (.obj)</h2>
+      <button class="btn" id="exp-v" style="background:#E67033;">Export Vertical Modules</button>
+      <button class="btn" id="exp-h" style="background:#172FC7;">Export Horizontal Modules</button>
+    </div>
+  </div>
+
+  <div id="hint"><b>Drag</b> to orbit &middot; <b>scroll</b> zoom &middot; click an option to <b>isolate</b> / show all</div>
+
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+  } }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const FT = 0.3048, MODULE = 8.5 * FT;     // 2.5908 m
+    const FLOOR_H = MODULE;                     // vertical module height is also fixed at 8'-6"
+    const H_COLOR = '#8A97E5';                  // horizontal bricks — soft blue (from #172FC7)
+    const V_COLOR = '#F1A57A';                  // vertical bricks — soft orange (from #E67033)
+    const EDGE_COLOR = '#F0D070';               // brick edges — soft yellow
+    const evenUp = n => (n % 2 ? n + 1 : n);
+    const evenDown = n => (n % 2 ? n - 1 : n);
+
+    function hslToHex(h, s, l) {
+      s /= 100; l /= 100;
+      const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l);
+      const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+      const to = x => Math.round(255 * x).toString(16).padStart(2, '0');
+      return '#' + to(f(0)) + to(f(8)) + to(f(4));
+    }
+
+    // ── CROSS-WEAVE 3D packings ──
+    // brick = [i, j, k, axis]   axis 0 = X(i,i+1)  1 = Z(j,j+1)  2 = vertical Y(k,k+1)
+    // (vertical brick = plan 1×1, height 2 → 長1:寬1:高2)
+    // ENFORCED ALTERNATION: going up every column strictly alternates a flat
+    // course and a vertical layer (H, V, H, V…) — never two flat or two
+    // vertical layers in a row. (Adjacency-free in all 3 axes is geometrically
+    // impossible with 1×2 bricks, so the constraint is enforced in the build
+    // direction, which is what removes the solid runs.)
+    // EVENLY-MIXED solid fill: every 2×2×2 block holds 2 vertical + 2 horizontal
+    // bricks, and which row/column is vertical flips by block parity (incl. height)
+    // so vertical & horizontal spread as a 3D checker — no bands / zoning.
+    function evenVol(W, D, F, phase) {  // vertical bricks sit in a j-row, horizontals run X
+      const b = [], Fe = F - (F % 2);
+      for (let k = 0; k < Fe; k += 2) for (let bi = 0; bi < W; bi += 2) for (let bj = 0; bj < D; bj += 2) {
+        const par = ((bi / 2 + bj / 2 + k / 2 + phase) % 2 + 2) % 2, vC = par ? bj + 1 : bj, hC = par ? bj : bj + 1;
+        b.push([bi, vC, k, 2]); b.push([bi + 1, vC, k, 2]);
+        b.push([bi, hC, k, 0]); b.push([bi, hC, k + 1, 0]);
+      }
+      if (F % 2) { const k = F - 1; for (let j = 0; j < D; j++) for (let i = 0; i < W; i += 2) b.push([i, j, k, 0]); }
+      return b;
+    }
+    function evenVolB(W, D, F, phase) { // transpose: vertical bricks in an i-column, horizontals run Z
+      const b = [], Fe = F - (F % 2);
+      for (let k = 0; k < Fe; k += 2) for (let bi = 0; bi < W; bi += 2) for (let bj = 0; bj < D; bj += 2) {
+        const par = ((bi / 2 + bj / 2 + k / 2 + phase) % 2 + 2) % 2, vR = par ? bi + 1 : bi, hR = par ? bi : bi + 1;
+        b.push([vR, bj, k, 2]); b.push([vR, bj + 1, k, 2]);
+        b.push([hR, bj, k, 1]); b.push([hR, bj, k + 1, 1]);
+      }
+      if (F % 2) { const k = F - 1; for (let i = 0; i < W; i++) for (let j = 0; j < D; j += 2) b.push([i, j, k, 1]); }
+      return b;
+    }
+
+    // ── POROUS interlock: TRUE 3D alternation (no two face-adjacent bricks share
+    // an axis → X∤X, Z∤Z, vertical∤vertical). Full solid fill is provably
+    // impossible, so this leaves woven voids (~70% dense). Greedy; the position
+    // seed rotates orientation preference to vary the weave.
+    function porousVol(W, D, F, seed) {
+      const id = (x, y, z) => (z * D + y) * W + x;
+      const ax = new Int8Array(W * D * F).fill(-1), bid = new Int32Array(W * D * F).fill(-1);
+      let nb = 0; const out = [];
+      const nb6 = (x, y, z) => { const r = []; if (x + 1 < W) r.push([x + 1, y, z]); if (x - 1 >= 0) r.push([x - 1, y, z]); if (y + 1 < D) r.push([x, y + 1, z]); if (y - 1 >= 0) r.push([x, y - 1, z]); if (z + 1 < F) r.push([x, y, z + 1]); if (z - 1 >= 0) r.push([x, y, z - 1]); return r; };
+      const forb = (cells) => { const s = new Set(); for (const [x, y, z] of cells) for (const [p, q, r] of nb6(x, y, z)) { const t = id(p, q, r); if (ax[t] >= 0 && !cells.some(c => c[0] === p && c[1] === q && c[2] === r)) s.add(ax[t]); } return s; };
+      for (let z = 0; z < F; z++) for (let y = 0; y < D; y++) for (let x = 0; x < W; x++) {
+        const c = id(x, y, z); if (ax[c] >= 0) continue;
+        const cand = [];
+        if (x + 1 < W && ax[id(x + 1, y, z)] < 0) cand.push([[[x, y, z], [x + 1, y, z]], 0]);
+        if (z + 1 < F && ax[id(x, y, z + 1)] < 0) cand.push([[[x, y, z], [x, y, z + 1]], 1]);
+        if (y + 1 < D && ax[id(x, y + 1, z)] < 0) cand.push([[[x, y, z], [x, y + 1, z]], 2]);
+        const pref = (x + y + z + seed) % 3;
+        cand.sort((a, b) => (((a[1] - pref) + 3) % 3) - (((b[1] - pref) + 3) % 3));
+        const banned = (cells) => forb(cells);
+        for (const [cells, a] of cand) { if (!banned(cells).has(a)) { for (const [p, q, r] of cells) { ax[id(p, q, r)] = a; bid[id(p, q, r)] = nb; } nb++; out.push([x, y, z, a]); break; } }
+      }
+      return out;
+    }
+
+    // Safety net: never place a brick that overlaps another or leaves the grid —
+    // if it does not fit cleanly, drop it (leave the cell empty). Guarantees zero
+    // overlap in every mode / setting.
+    function dedupe(bricks, Wm, Dm, F) {
+      const occ = new Uint8Array(Wm * Dm * F), id = (x, y, z) => (z * Dm + y) * Wm + x, out = [];
+      for (const [i, j, k, a] of bricks) {
+        const x2 = a === 0 ? i + 1 : i, y2 = a === 1 ? j + 1 : j, z2 = a === 2 ? k + 1 : k;
+        if (i < 0 || j < 0 || k < 0 || x2 >= Wm || y2 >= Dm || z2 >= F) continue;  // out of bounds → skip
+        const A = id(i, j, k), B = id(x2, y2, z2);
+        if (occ[A] || occ[B]) continue;                                            // would overlap → leave empty
+        occ[A] = occ[B] = 1; out.push([i, j, k, a]);
+      }
+      return out;
+    }
+
+    // Two delivered versions, switched by Mode.
+    function buildOptions(mode) {
+      if (mode === 'porous') return [
+        { name: 'Interlock — A', desc: '3D weave · voids', hue: 210, gen: (W, D, F) => porousVol(W, D, F, 0) },
+        { name: 'Interlock — B', desc: '3D weave · voids', hue: 150, gen: (W, D, F) => porousVol(W, D, F, 1) },
+        { name: 'Interlock — C', desc: '3D weave · voids', hue: 28, gen: (W, D, F) => porousVol(W, D, F, 2) },
+      ];
+      return [
+        { name: 'Even Mix — A', desc: 'solid · 3D checker', hue: 210, gen: (W, D, F) => evenVol(W, D, F, 0) },
+        { name: 'Even Mix — B', desc: 'solid · shifted checker', hue: 150, gen: (W, D, F) => evenVol(W, D, F, 1) },
+        { name: 'Even Mix — C', desc: 'solid · transposed', hue: 28, gen: (W, D, F) => evenVolB(W, D, F, 0) },
+        { name: 'Even Mix — D', desc: 'solid · transposed shift', hue: 280, gen: (W, D, F) => evenVolB(W, D, F, 1) },
+      ];
+    }
+
+    // ── THREE setup ──
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color('#F5F5F5');
+    let camera;
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+    let controls;
+    scene.add(new THREE.AmbientLight(0xffffff, 0.92));
+    const dl = new THREE.DirectionalLight(0xffffff, 0.65); dl.position.set(30, 60, 20); scene.add(dl);
+    const dl2 = new THREE.DirectionalLight(0xffffff, 0.25); dl2.position.set(-30, 20, -30); scene.add(dl2);
+
+    const root = new THREE.Group(); scene.add(root);
+    let optionGroups = [];   // for isolate toggle
+    let brickMats = [];      // {mat, vert} for live opacity control
+    let edgeMats = [];       // edge materials, brightness follows the slider
+    let optionData = [];     // per-option brick records for OBJ export
+    let lastM = MODULE, lastSeam = 0;
+    let opacityVal = 0.9;
+    let densityVal = 1;      // fraction of bricks kept (carves even voids)
+    let protrudeVal = 0;     // fraction of surface bricks that pop out 1/2 or 2/3 module
+    const hash3 = (x, y, z) => { const s = Math.sin(x * 127.1 + y * 311.7 + z * 74.7) * 43758.5453; return s - Math.floor(s); };
+
+    // If a brick sits on the box surface, maybe pop it outward 1/2 or 2/3 module
+    // along the touched face normal (not downward). Returns [dx,dy,dz] metres or null.
+    function protrudeOffset(i, j, k, axis, Wm, Dm, F) {
+      if (protrudeVal <= 0) return null;
+      if (hash3(i + 0.5, j + 1.5, k + 2.5) >= protrudeVal) return null;
+      const iMax = axis === 0 ? i + 1 : i, jMax = axis === 1 ? j + 1 : j, kMax = axis === 2 ? k + 1 : k;
+      const dirs = [];
+      if (i === 0) dirs.push([-1, 0, 0]); if (iMax === Wm - 1) dirs.push([1, 0, 0]);
+      if (j === 0) dirs.push([0, 0, -1]); if (jMax === Dm - 1) dirs.push([0, 0, 1]);
+      if (kMax === F - 1) dirs.push([0, 1, 0]);
+      if (!dirs.length) return null;
+      const d = dirs[Math.floor(hash3(k + 3, i + 4, j + 5) * dirs.length)];
+      const amt = (hash3(i + 6, j + 7, k + 8) < 0.5 ? 0.5 : 2 / 3) * MODULE;
+      return [d[0] * amt, d[1] * amt, d[2] * amt];
+    }
+
+    function makeLabel(text) {
+      const cv = document.createElement('canvas'); cv.width = 256; cv.height = 64;
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#172FC7'; ctx.font = '600 30px Montserrat, Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(text, 128, 32);
+      const tex = new THREE.CanvasTexture(cv); tex.anisotropy = 4;
+      const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+      spr.scale.set(14, 3.5, 1);
+      return spr;
+    }
+
+    // push the 12 white edges of a box (centre + half-extents) into a flat array
+    function pushBoxEdges(arr, cx, cy, cz, hx, hy, hz) {
+      const x0 = cx - hx, x1 = cx + hx, y0 = cy - hy, y1 = cy + hy, z0 = cz - hz, z1 = cz + hz;
+      const v = [[x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1], [x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]];
+      const E = [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7]];
+      for (const [p, q] of E) arr.push(v[p][0], v[p][1], v[p][2], v[q][0], v[q][1], v[q][2]);
+    }
+
+    let lastDims = null;
+    function generate() {
+      // dispose previous geometry/materials, then clear
+      root.traverse(o => {
+        if (o.geometry) o.geometry.dispose();
+        if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { if (m.map) m.map.dispose(); m.dispose(); });
+      });
+      root.clear(); optionGroups = [];
+
+      const L = parseFloat(document.getElementById('in-l').value) || 32;
+      const W = parseFloat(document.getElementById('in-w').value) || 21;
+      const H = parseFloat(document.getElementById('in-h').value) || 40;
+
+      const Wm = Math.max(2, evenUp(Math.round(L / MODULE)));
+      const Dm = Math.max(2, evenUp(Math.round(W / MODULE)));
+      const F = Math.max(1, Math.round(H / MODULE));   // vertical courses, each one 8'-6" module
+      lastDims = { Wm, Dm, F };
+
+      document.getElementById('snap-note').innerHTML =
+        `Input <b>${L}×${W}×${H} m</b><br>→ <b>${Wm}×${Dm}×${F}</b> modules (8'-6" cube grid)<br>` +
+        `= ${(Wm * MODULE).toFixed(1)}×${(Dm * MODULE).toFixed(1)}×${(F * MODULE).toFixed(1)} m<br>` +
+        `module ${MODULE.toFixed(3)} m (8'-6") · 1×2 plan tile ${(2 * MODULE * MODULE).toFixed(1)} m²`;
+
+      const mode = document.getElementById('in-mode').value;
+      const opts = buildOptions(mode);
+      const M = MODULE, seam = 0;   // modules flush — no gaps; edges show the divisions
+      lastM = M; lastSeam = seam;
+      // shared brick geometries: X(2×1×1), Z(1×1×2), vertical Y(1×2×1)
+      const geoAxis = [
+        new THREE.BoxGeometry(2 * M - seam, M - seam, M - seam),
+        new THREE.BoxGeometry(M - seam, M - seam, 2 * M - seam),
+        new THREE.BoxGeometry(M - seam, 2 * M - seam, M - seam),
+      ];
+      const cellW = Wm * M, cellD = Dm * M;
+      const spacing = Math.max(cellW, cellD) * 0.75;
+      const cols = 3;
+      const gridW = cols * cellW + (cols - 1) * spacing;
+      const rowsN = Math.ceil(opts.length / cols);
+      const gridD = rowsN * cellD + (rowsN - 1) * spacing;
+
+      const optList = document.getElementById('opts');
+      optList.innerHTML = `<div style="display:flex;gap:16px;margin-bottom:12px;font-size:9px;color:var(--text-mid)">` +
+        `<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${H_COLOR};vertical-align:middle;margin-right:5px"></span>horizontal</span>` +
+        `<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${V_COLOR};vertical-align:middle;margin-right:5px"></span>vertical</span></div>`;
+      const dummy = new THREE.Object3D();
+      brickMats = []; edgeMats = []; optionData = [];
+
+      opts.forEach((o, k) => {
+        const col = k % cols, row = Math.floor(k / cols);
+        const x0 = col * (cellW + spacing) - gridW / 2;
+        const z0 = row * (cellD + spacing) - gridD / 2;
+        const og = new THREE.Group(); root.add(og); optionGroups.push(og);
+        const obData = { name: o.name, x0, z0, bricks: [] };
+
+        const flatMat = new THREE.MeshLambertMaterial({ color: new THREE.Color(H_COLOR) });
+        const vertMat = new THREE.MeshLambertMaterial({ color: new THREE.Color(V_COLOR) });
+        brickMats.push({ mat: flatMat, vert: false }, { mat: vertMat, vert: true });
+
+        const half = [
+          [(2 * M - seam) / 2, (M - seam) / 2, (M - seam) / 2],
+          [(M - seam) / 2, (M - seam) / 2, (2 * M - seam) / 2],
+          [(M - seam) / 2, (2 * M - seam) / 2, (M - seam) / 2],
+        ];
+        let bricks = dedupe(o.gen(Wm, Dm, F), Wm, Dm, F);   // never force an overlapping/oob module
+        if (densityVal < 0.999) bricks = bricks.filter(b => hash3(b[0], b[1], b[2]) < densityVal);  // even voids
+        const byAxis = [[], [], []];
+        for (const br of bricks) byAxis[br[3]].push(br);
+        const edgePos = [];
+
+        for (let a = 0; a < 3; a++) {
+          if (!byAxis[a].length) continue;
+          const inst = new THREE.InstancedMesh(geoAxis[a], a === 2 ? vertMat : flatMat, byAxis[a].length);
+          byAxis[a].forEach(([i, j, kk], n) => {
+            let cx, cy, cz;
+            if (a === 0) { cx = x0 + (i + 1) * M; cy = (kk + 0.5) * M; cz = z0 + (j + 0.5) * M; }
+            else if (a === 1) { cx = x0 + (i + 0.5) * M; cy = (kk + 0.5) * M; cz = z0 + (j + 1) * M; }
+            else { cx = x0 + (i + 0.5) * M; cy = (kk + 1) * M; cz = z0 + (j + 0.5) * M; }
+            const po = protrudeOffset(i, j, kk, a, Wm, Dm, F);
+            if (po) { cx += po[0]; cy += po[1]; cz += po[2]; }
+            dummy.position.set(cx, cy, cz); dummy.updateMatrix(); inst.setMatrixAt(n, dummy.matrix);
+            pushBoxEdges(edgePos, cx, cy, cz, half[a][0], half[a][1], half[a][2]);
+            obData.bricks.push([a, cx, cy, cz]);
+          });
+          inst.instanceMatrix.needsUpdate = true;
+          og.add(inst);
+        }
+        // white edges on every brick (brightness/opacity follow the opacity slider)
+        const eg = new THREE.BufferGeometry();
+        eg.setAttribute('position', new THREE.Float32BufferAttribute(edgePos, 3));
+        const em = new THREE.LineBasicMaterial({ color: new THREE.Color(EDGE_COLOR), transparent: true, opacity: 0.7 });
+        edgeMats.push(em);
+        og.add(new THREE.LineSegments(eg, em));
+
+        const label = makeLabel(o.name);
+        label.position.set(x0 + cellW / 2, F * M + 4, z0 + cellD / 2);
+        og.add(label);
+
+        const vertN = byAxis[2].length, total = Wm * Dm * F;
+        const vertPct = Math.round(100 * vertN * 2 / total), cov = Math.round(100 * bricks.length * 2 / total);
+        const row2 = document.createElement('div');
+        row2.className = 'opt-row';
+        row2.innerHTML = `<span class="opt-dot" style="background:${V_COLOR};opacity:${0.4 + 0.6 * vertPct / 100}"></span>` +
+          `<span style="flex:1"><div class="opt-name">${o.name}</div>` +
+          `<div class="opt-meta">${o.desc} · ${vertPct}% vert · ${cov}% filled</div></span>`;
+        row2.onclick = () => isolate(k);
+        optList.appendChild(row2);
+        optionData.push(obData);
+      });
+
+      applyOpacity();
+      frameCamera(gridW, gridD, F * M);
+    }
+
+    // Export the focused option's bricks as an OBJ of boxes — vertical or horizontal only.
+    function exportOBJ(verticalOnly) {
+      if (!optionData.length) return;
+      const oi = isolated >= 0 ? isolated : 0;
+      const d = optionData[oi];
+      const M = lastM, seam = lastSeam;
+      const sel = d.bricks.filter(b => verticalOnly ? b[0] === 2 : b[0] !== 2);
+      if (!sel.length) { alert('No ' + (verticalOnly ? 'vertical' : 'horizontal') + ' modules in this option.'); return; }
+      let obj = `# Massing Composer — ${d.name} — ${verticalOnly ? 'VERTICAL' : 'HORIZONTAL'} modules\n# module 8'-6" = ${M.toFixed(4)} m\n`;
+      let vi = 1;
+      for (const [a, cx, cy, cz] of sel) {
+        const hx = (a === 0 ? 2 * M - seam : M - seam) / 2;
+        const hy = (a === 2 ? 2 * M - seam : M - seam) / 2;
+        const hz = (a === 1 ? 2 * M - seam : M - seam) / 2;
+        // localise to the option origin so the model sits at (0,0)
+        const x = cx - d.x0, y = cy, z = cz - d.z0;
+        const c = [[x - hx, y - hy, z - hz], [x + hx, y - hy, z - hz], [x + hx, y - hy, z + hz], [x - hx, y - hy, z + hz],
+        [x - hx, y + hy, z - hz], [x + hx, y + hy, z - hz], [x + hx, y + hy, z + hz], [x - hx, y + hy, z + hz]];
+        for (const p of c) obj += `v ${p[0].toFixed(4)} ${p[1].toFixed(4)} ${p[2].toFixed(4)}\n`;
+        const f = [[1, 2, 3, 4], [5, 8, 7, 6], [1, 5, 6, 2], [2, 6, 7, 3], [3, 7, 8, 4], [4, 8, 5, 1]];
+        for (const q of f) obj += `f ${q.map(n => n + vi - 1).join(' ')}\n`;
+        vi += 8;
+      }
+      const blob = new Blob([obj], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${d.name.replace(/[^a-z0-9]+/gi, '_')}_${verticalOnly ? 'vertical' : 'horizontal'}.obj`;
+      a.click(); URL.revokeObjectURL(a.href);
+    }
+
+    function applyOpacity() {
+      const v = opacityVal, solid = v >= 0.999;
+      for (const { mat, vert } of brickMats) {
+        mat.opacity = solid ? 1 : (vert ? Math.min(1, v + 0.12) : v);
+        mat.transparent = !solid;
+        mat.depthWrite = true;   // depth-occlude even when transparent → no overlap mush
+        mat.needsUpdate = true;
+      }
+      // yellow edges: opacity follows the slider (linewidth is fixed at 1px in WebGL)
+      for (const em of edgeMats) { em.opacity = 0.3 + 0.65 * v; em.needsUpdate = true; }
+    }
+
+    let isolated = -1;
+    function isolate(k) {
+      isolated = (isolated === k) ? -1 : k;
+      optionGroups.forEach((g, i) => g.visible = (isolated === -1 || isolated === i));
+    }
+
+    function frameCamera(gridW, gridD, towerH) {
+      const span = Math.max(gridW, gridD, towerH) * 0.62 + 8;
+      const aspect = innerWidth / innerHeight;
+      if (!camera) {
+        camera = new THREE.OrthographicCamera(-span * aspect, span * aspect, span, -span, -3000, 6000);
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true; controls.dampingFactor = 0.08;
+      } else {
+        camera.left = -span * aspect; camera.right = span * aspect; camera.top = span; camera.bottom = -span;
+        camera.updateProjectionMatrix();
+      }
+      const d = span * 2;
+      camera.position.set(d, d * 0.9, d);
+      camera.updateProjectionMatrix();
+      controls.target.set(0, towerH * 0.32, 0);
+      controls.update();
+    }
+
+    document.getElementById('gen-btn').addEventListener('click', generate);
+    document.getElementById('in-mode').addEventListener('change', generate);
+    document.getElementById('exp-v').addEventListener('click', () => exportOBJ(true));
+    document.getElementById('exp-h').addEventListener('click', () => exportOBJ(false));
+    document.getElementById('in-opacity').addEventListener('input', e => {
+      opacityVal = parseFloat(e.target.value);
+      document.getElementById('op-val').textContent = Math.round(opacityVal * 100) + '%';
+      applyOpacity();
+    });
+    document.getElementById('in-density').addEventListener('input', e => {
+      densityVal = parseFloat(e.target.value);
+      document.getElementById('dn-val').textContent = Math.round(densityVal * 100) + '%';
+      generate();
+    });
+    document.getElementById('in-protrude').addEventListener('input', e => {
+      protrudeVal = parseFloat(e.target.value);
+      document.getElementById('pr-val').textContent = Math.round(protrudeVal * 100) + '%';
+      generate();
+    });
+    ['in-l', 'in-w', 'in-h', 'in-fh'].forEach(id =>
+      document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') generate(); }));
+
+    addEventListener('resize', () => {
+      renderer.setSize(innerWidth, innerHeight);
+      if (lastDims && camera) {
+        const cellW = lastDims.Wm * MODULE, cellD = lastDims.Dm * MODULE;
+        const spacing = Math.max(cellW, cellD) * 0.75;
+        frameCamera(3 * cellW + 2 * spacing, Math.ceil(6 / 3) * cellD + spacing, lastDims.F * FLOOR_H);
+      }
+    });
+
+    generate();
+    (function loop() { requestAnimationFrame(loop); if (controls) controls.update(); renderer.render(scene, camera); })();
+  </script>
+</body>
+
+</html>

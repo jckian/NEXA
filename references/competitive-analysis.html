@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProgramAgent — Competitive Analysis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #FAFAFA;
+      --surface:     #FFFFFF;
+      --surface-2:   #F4F4F6;
+      --border:      rgba(20,24,32,0.08);
+      --border-hi:   rgba(20,24,32,0.13);
+      --text-hi:     #141820;
+      --text-mid:    #5A6478;
+      --text-lo:     #9BA5B5;
+      --accent:      #0000FF;
+      --accent-2:    #4A7CFA;
+      --accent-lt:   rgba(0,0,255,0.08);
+      --accent-lt2:  rgba(0,0,255,0.04);
+      --font:        'DM Sans', system-ui, sans-serif;
+      --mono:        'JetBrains Mono', monospace;
+      --radius:      3px;
+      --shadow:      0 4px 24px rgba(0,0,0,0.06);
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: var(--bg);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+      color: var(--text-hi);
+    }
+
+    /* ═══ TOPBAR ═══ */
+    #topbar {
+      position: sticky; top: 0; z-index: 100;
+      height: 48px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .app-logo { display: flex; align-items: center; gap: 10px; }
+    .app-logo svg { width: 20px; height: 20px; }
+    .app-title-name {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--text-hi);
+    }
+    .app-title-sub {
+      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-lo);
+    }
+    .topbar-sep { width: 1px; height: 20px; background: var(--border-hi); }
+    .topbar-tag {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-lo);
+      background: var(--surface-2); border: 1px solid var(--border);
+      padding: 3px 8px; border-radius: var(--radius);
+    }
+    .topbar-right {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+      color: var(--text-lo); text-transform: uppercase;
+    }
+
+    /* ═══ MAIN LAYOUT ═══ */
+    #main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+      display: flex; flex-direction: column; gap: 48px;
+    }
+
+    /* ═══ SECTION HEADER ═══ */
+    .section-header {
+      display: flex; align-items: baseline; gap: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .section-index {
+      font-family: var(--mono); font-size: 9px; font-weight: 400;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-lo);
+    }
+    .section-title {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--text-hi);
+    }
+    .section-desc {
+      font-size: 11px; color: var(--text-lo);
+      margin-left: auto;
+      letter-spacing: 0.02em;
+    }
+
+    /* ═══ HERO / POSITIONING ═══ */
+    #hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .hero-cell {
+      background: var(--surface);
+      padding: 28px 32px;
+    }
+    .hero-cell.accent-cell {
+      background: var(--accent);
+    }
+    .hero-label {
+      font-family: var(--mono); font-size: 8px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--text-lo); margin-bottom: 8px;
+    }
+    .hero-cell.accent-cell .hero-label { color: rgba(255,255,255,0.5); }
+    .hero-value {
+      font-size: 22px; font-weight: 300; color: var(--text-hi);
+      letter-spacing: -0.01em; line-height: 1.3;
+    }
+    .hero-cell.accent-cell .hero-value { color: #fff; }
+    .hero-sub {
+      margin-top: 6px; font-size: 11px; color: var(--text-mid); line-height: 1.5;
+    }
+    .hero-cell.accent-cell .hero-sub { color: rgba(255,255,255,0.65); }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+    .hero-tag {
+      font-family: var(--mono); font-size: 8px; letter-spacing: 0.10em;
+      text-transform: uppercase; padding: 4px 9px;
+      border: 1px solid var(--border-hi); border-radius: var(--radius);
+      color: var(--text-mid);
+    }
+    .hero-cell.accent-cell .hero-tag {
+      border-color: rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.75);
+    }
+
+    /* ═══ QUADRANT CHART ═══ */
+    #quadrant-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 32px;
+    }
+    #quadrant-svg { width: 100%; height: 460px; display: block; }
+
+    /* ═══ COMPARISON TABLE ═══ */
+    #table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    table {
+      width: 100%; border-collapse: collapse;
+      font-size: 11px;
+    }
+    thead tr {
+      border-bottom: 1px solid var(--border-hi);
+    }
+    th {
+      padding: 0; font-weight: 500;
+      text-align: left; vertical-align: bottom;
+    }
+    th .th-inner {
+      padding: 14px 16px 12px;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    th .th-label {
+      font-family: var(--mono); font-size: 8px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text-lo);
+    }
+    th .th-name {
+      font-size: 11px; font-weight: 500; color: var(--text-hi);
+    }
+    th .th-type {
+      font-size: 9px; color: var(--text-lo); font-weight: 400;
+    }
+    th.our-col .th-label { color: var(--accent); }
+    th.our-col .th-name { color: var(--accent); }
+    th.our-col { background: var(--accent-lt2); }
+    th:first-child .th-inner { padding-left: 20px; }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface-2); }
+
+    td {
+      padding: 11px 16px;
+      vertical-align: middle;
+      color: var(--text-mid);
+    }
+    td:first-child {
+      padding-left: 20px;
+      color: var(--text-hi); font-weight: 500;
+    }
+    td.our-col { background: var(--accent-lt2); }
+
+    .cell-feat {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .cell-feat .feat-title {
+      font-size: 11px; font-weight: 500; color: var(--text-hi);
+    }
+    .cell-feat .feat-desc {
+      font-size: 10px; color: var(--text-lo); line-height: 1.4;
+    }
+
+    /* icons */
+    .ic { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; }
+    .ic-yes { color: var(--accent); }
+    .ic-no  { color: var(--text-lo); opacity: 0.4; }
+    .ic-partial { color: #F59E0B; }
+
+    .badge {
+      display: inline-block;
+      font-family: var(--mono); font-size: 8px; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 2px 7px;
+      border-radius: var(--radius); font-weight: 400;
+    }
+    .badge-blue   { background: var(--accent-lt); color: var(--accent); border: 1px solid rgba(0,0,255,0.15); }
+    .badge-gray   { background: var(--surface-2); color: var(--text-lo); border: 1px solid var(--border); }
+    .badge-yellow { background: rgba(245,158,11,0.1); color: #B45309; border: 1px solid rgba(245,158,11,0.2); }
+
+    /* ═══ DIFFERENTIATORS ═══ */
+    #diff-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .diff-card {
+      background: var(--surface);
+      padding: 24px 24px 28px;
+    }
+    .diff-num {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em;
+      color: var(--accent); margin-bottom: 14px; display: block;
+    }
+    .diff-title {
+      font-size: 12px; font-weight: 600; color: var(--text-hi);
+      letter-spacing: 0.01em; margin-bottom: 8px;
+    }
+    .diff-body {
+      font-size: 11px; color: var(--text-mid); line-height: 1.6;
+    }
+    .diff-card .diff-tag {
+      margin-top: 14px;
+      display: inline-block;
+      font-family: var(--mono); font-size: 8px; letter-spacing: 0.10em;
+      text-transform: uppercase; padding: 3px 8px;
+      border: 1px solid var(--accent); border-radius: var(--radius);
+      color: var(--accent);
+    }
+
+    /* ═══ MARKET LANDSCAPE ═══ */
+    #landscape {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .landscape-cell {
+      background: var(--surface);
+      padding: 22px 24px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .landscape-cell-header {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .lc-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .lc-name {
+      font-size: 12px; font-weight: 500; color: var(--text-hi);
+    }
+    .lc-type-tag {
+      font-family: var(--mono); font-size: 8px; letter-spacing: 0.10em;
+      text-transform: uppercase; padding: 2px 7px;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      color: var(--text-lo); margin-left: auto;
+    }
+    .lc-desc { font-size: 11px; color: var(--text-mid); line-height: 1.55; }
+    .lc-strengths { display: flex; flex-wrap: wrap; gap: 5px; }
+    .lc-tag {
+      font-size: 9px; color: var(--text-lo); padding: 2px 7px;
+      border: 1px solid var(--border); border-radius: var(--radius);
+    }
+    .lc-gap {
+      font-size: 10px; color: var(--text-lo);
+      border-top: 1px solid var(--border); padding-top: 10px;
+    }
+    .lc-gap span { color: var(--text-mid); font-weight: 500; }
+
+    /* ═══ CONCLUSION ═══ */
+    #conclusion {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 32px;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 32px;
+    }
+    .conclusion-left .c-label {
+      font-family: var(--mono); font-size: 8px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--text-lo); margin-bottom: 10px;
+    }
+    .conclusion-left .c-title {
+      font-size: 18px; font-weight: 300; color: var(--text-hi);
+      line-height: 1.4; letter-spacing: -0.01em;
+    }
+    .conclusion-left .c-title strong {
+      font-weight: 600; color: var(--accent);
+    }
+    .conclusion-right {
+      display: flex; flex-direction: column; gap: 12px;
+      padding-top: 2px;
+    }
+    .c-point {
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .c-point-idx {
+      font-family: var(--mono); font-size: 9px; color: var(--text-lo);
+      padding-top: 1px; flex-shrink: 0; width: 20px;
+    }
+    .c-point-text {
+      font-size: 11px; color: var(--text-mid); line-height: 1.6;
+    }
+    .c-point-text strong { color: var(--text-hi); font-weight: 500; }
+
+    /* footer rule */
+    #footer {
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    #footer .f-left {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.10em;
+      color: var(--text-lo); text-transform: uppercase;
+    }
+    #footer .f-right {
+      font-size: 10px; color: var(--text-lo);
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="topbar-left">
+    <div class="app-logo">
+      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="7" height="7" fill="#0000FF" opacity="0.9"/>
+        <rect x="11" y="2" width="7" height="7" fill="#0000FF" opacity="0.4"/>
+        <rect x="2" y="11" width="7" height="7" fill="#0000FF" opacity="0.4"/>
+        <rect x="11" y="11" width="7" height="7" fill="#0000FF" opacity="0.15"/>
+      </svg>
+      <span class="app-title-name">ProgramAgent</span>
+      <span class="app-title-sub">SCI-Arc SP26</span>
+    </div>
+    <div class="topbar-sep"></div>
+    <span class="topbar-tag">Competitive Analysis</span>
+  </div>
+  <div class="topbar-right">2026.04.20</div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- 01 POSITIONING -->
+  <section>
+    <div class="section-header">
+      <span class="section-index">01</span>
+      <span class="section-title">Project Positioning</span>
+      <span class="section-desc">What this tool is — and what it is not</span>
+    </div>
+    <div id="hero">
+      <div class="hero-cell accent-cell">
+        <div class="hero-label">This Project</div>
+        <div class="hero-value">ProgramAgent</div>
+        <div class="hero-sub">
+          An LLM-driven, agent-based architectural programming system that learns from precedents, simulates spatial adjacency, and outputs floor-by-floor distributions to Rhino and Blender.
+        </div>
+        <div class="hero-tags">
+          <span class="hero-tag">Research Tool</span>
+          <span class="hero-tag">LLM + Simulation</span>
+          <span class="hero-tag">Precedent-Based</span>
+          <span class="hero-tag">SCI-Arc SP26</span>
+        </div>
+      </div>
+      <div class="hero-cell">
+        <div class="hero-label">Market Gap Addressed</div>
+        <div class="hero-value">No existing tool combines<br>precedent reasoning with<br>agent-based placement.</div>
+        <div class="hero-sub">
+          Commercial tools optimize for speed and automation. This tool optimizes for architectural intelligence — encoding the spatial logic of OMA, Jean Nouvel, and other canonical precedents into a generative simulation.
+        </div>
+        <div class="hero-tags">
+          <span class="hero-tag">Spatial Intelligence</span>
+          <span class="hero-tag">Program Distribution</span>
+          <span class="hero-tag">Open Pipeline</span>
+          <span class="hero-tag">Rhino + Blender</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 QUADRANT -->
+  <section>
+    <div class="section-header">
+      <span class="section-index">02</span>
+      <span class="section-title">Market Landscape</span>
+      <span class="section-desc">AI sophistication vs. architectural specificity</span>
+    </div>
+    <div id="quadrant-wrap">
+      <svg id="quadrant-svg" viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" font-family="'DM Sans', sans-serif">
+        <!-- grid -->
+        <defs>
+          <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L6,3 z" fill="#9BA5B5"/>
+          </marker>
+        </defs>
+
+        <!-- axes -->
+        <line x1="80" y1="370" x2="860" y2="370" stroke="#e0e3ea" stroke-width="1"/>
+        <line x1="80" y1="370" x2="80" y2="20" stroke="#e0e3ea" stroke-width="1"/>
+        <!-- axis arrows -->
+        <line x1="860" y1="370" x2="870" y2="370" stroke="#9BA5B5" stroke-width="1" marker-end="url(#arrowhead)"/>
+        <line x1="80" y1="20" x2="80" y2="10" stroke="#9BA5B5" stroke-width="1" marker-end="url(#arrowhead)"/>
+
+        <!-- quadrant labels -->
+        <text x="200" y="395" font-size="9" fill="#9BA5B5" letter-spacing="0.14em" text-anchor="middle" font-family="'JetBrains Mono', monospace" text-transform="uppercase">GENERIC / RULES-BASED</text>
+        <text x="740" y="395" font-size="9" fill="#9BA5B5" letter-spacing="0.14em" text-anchor="middle" font-family="'JetBrains Mono', monospace">ARCHITECTURAL INTELLIGENCE</text>
+        <text x="30" y="250" font-size="9" fill="#9BA5B5" letter-spacing="0.14em" text-anchor="middle" font-family="'JetBrains Mono', monospace" transform="rotate(-90 30 250)">COMMERCIAL / AUTOMATED</text>
+        <text x="30" y="130" font-size="9" fill="#9BA5B5" letter-spacing="0.14em" text-anchor="middle" font-family="'JetBrains Mono', monospace" transform="rotate(-90 30 130)">RESEARCH / GENERATIVE</text>
+
+        <!-- center dividers (light) -->
+        <line x1="80" y1="195" x2="860" y2="195" stroke="#e0e3ea" stroke-width="0.5" stroke-dasharray="4 4"/>
+        <line x1="470" y1="20" x2="470" y2="370" stroke="#e0e3ea" stroke-width="0.5" stroke-dasharray="4 4"/>
+
+        <!-- ── BUBBLES ── -->
+        <!-- Autodesk Forma: generic-ish, commercial -->
+        <circle cx="290" cy="270" r="26" fill="#F4F4F6" stroke="#CBD2E0" stroke-width="1"/>
+        <text x="290" y="266" font-size="10" fill="#5A6478" text-anchor="middle" font-weight="500">Autodesk</text>
+        <text x="290" y="279" font-size="10" fill="#5A6478" text-anchor="middle" font-weight="500">Forma</text>
+
+        <!-- TestFit: more generic, very commercial -->
+        <circle cx="180" cy="310" r="22" fill="#F4F4F6" stroke="#CBD2E0" stroke-width="1"/>
+        <text x="180" y="306" font-size="10" fill="#5A6478" text-anchor="middle" font-weight="500">TestFit</text>
+        <text x="180" y="319" font-size="9" fill="#9BA5B5" text-anchor="middle">RE</text>
+
+        <!-- Hypar: somewhat architectural, commercial -->
+        <circle cx="560" cy="290" r="22" fill="#F4F4F6" stroke="#CBD2E0" stroke-width="1"/>
+        <text x="560" y="286" font-size="10" fill="#5A6478" text-anchor="middle" font-weight="500">Hypar</text>
+        <text x="560" y="299" font-size="9" fill="#9BA5B5" text-anchor="middle">DEV</text>
+
+        <!-- dRofus: architectural BIM, commercial -->
+        <circle cx="650" cy="290" r="22" fill="#F4F4F6" stroke="#CBD2E0" stroke-width="1"/>
+        <text x="650" y="286" font-size="10" fill="#5A6478" text-anchor="middle" font-weight="500">dRofus</text>
+        <text x="650" y="299" font-size="9" fill="#9BA5B5" text-anchor="middle">BIM</text>
+
+        <!-- Finch3D: some AI, commercial residential -->
+        <circle cx="420" cy="285" r="20" fill="#F4F4F6" stroke="#CBD2E0" stroke-width="1"/>
+        <text x="420" y="281" font-size="10" fill="#5A6478" text-anchor="middle" font-weight="500">Finch3D</text>
+        <text x="420" y="294" font-size="9" fill="#9BA5B5" text-anchor="middle">RES</text>
+
+        <!-- Speckle: data/collab, neutral -->
+        <circle cx="350" cy="180" r="20" fill="#F4F4F6" stroke="#CBD2E0" stroke-width="1"/>
+        <text x="350" y="176" font-size="10" fill="#5A6478" text-anchor="middle" font-weight="500">Speckle</text>
+        <text x="350" y="189" font-size="9" fill="#9BA5B5" text-anchor="middle">DATA</text>
+
+        <!-- LLM Prompting (ad-hoc GPT): generic AI, research-ish -->
+        <circle cx="200" cy="130" r="22" fill="#F4F4F6" stroke="#CBD2E0" stroke-width="1"/>
+        <text x="200" y="126" font-size="10" fill="#5A6478" text-anchor="middle" font-weight="500">Ad-hoc</text>
+        <text x="200" y="139" font-size="10" fill="#5A6478" text-anchor="middle" font-weight="500">LLM</text>
+
+        <!-- Grasshopper/Dynamo: architectural, research -->
+        <circle cx="620" cy="120" r="23" fill="#F4F4F6" stroke="#CBD2E0" stroke-width="1"/>
+        <text x="620" y="116" font-size="10" fill="#5A6478" text-anchor="middle" font-weight="500">Grasshopper</text>
+        <text x="620" y="129" font-size="9" fill="#9BA5B5" text-anchor="middle">/ Dynamo</text>
+
+        <!-- ProgramAgent (this project): high research + high architectural -->
+        <circle cx="790" cy="80" r="34" fill="rgba(0,0,255,0.08)" stroke="#0000FF" stroke-width="1.5"/>
+        <text x="790" y="72" font-size="11" fill="#0000FF" text-anchor="middle" font-weight="600">Program</text>
+        <text x="790" y="87" font-size="11" fill="#0000FF" text-anchor="middle" font-weight="600">Agent</text>
+        <text x="790" y="102" font-size="9" fill="rgba(0,0,255,0.6)" text-anchor="middle" font-family="'JetBrains Mono', monospace">THIS</text>
+
+        <!-- axis labels -->
+        <text x="88" y="389" font-size="9" fill="#C0C6D0" font-family="'JetBrains Mono', monospace">Architectural Intelligence →</text>
+        <text x="92" y="360" font-size="9" fill="#C0C6D0" font-family="'JetBrains Mono', monospace" transform="rotate(-90 92 360)">Research Depth →</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 03 LANDSCAPE CARDS -->
+  <section>
+    <div class="section-header">
+      <span class="section-index">03</span>
+      <span class="section-title">Tool Profiles</span>
+      <span class="section-desc">Existing solutions and their architectural gaps</span>
+    </div>
+    <div id="landscape">
+
+      <div class="landscape-cell">
+        <div class="landscape-cell-header">
+          <div class="lc-dot" style="background:#6366F1"></div>
+          <div class="lc-name">Autodesk Forma</div>
+          <span class="lc-type-tag">Commercial / Cloud</span>
+        </div>
+        <div class="lc-desc">
+          AI-assisted early-stage massing and site analysis. Strong in solar, wind, and daylight simulation at the urban scale. Recently added LLM copilot features for brief generation.
+        </div>
+        <div class="lc-strengths">
+          <span class="lc-tag">Site Analysis</span>
+          <span class="lc-tag">Climate Sim</span>
+          <span class="lc-tag">BIM Export</span>
+          <span class="lc-tag">LLM Copilot</span>
+        </div>
+        <div class="lc-gap"><span>Gap:</span> No precedent-based spatial reasoning. Program distribution is manual or rule-based, not LLM-generated from analyzed buildings.</div>
+      </div>
+
+      <div class="landscape-cell">
+        <div class="landscape-cell-header">
+          <div class="lc-dot" style="background:#10B981"></div>
+          <div class="lc-name">TestFit</div>
+          <span class="lc-type-tag">Commercial / RE Dev</span>
+        </div>
+        <div class="lc-desc">
+          Rapid building massing generator aimed at real estate developers. Optimizes for unit count, parking ratios, and pro-forma returns. Extremely fast iteration for residential and mixed-use.
+        </div>
+        <div class="lc-strengths">
+          <span class="lc-tag">Speed</span>
+          <span class="lc-tag">Unit Mix</span>
+          <span class="lc-tag">Pro-Forma</span>
+          <span class="lc-tag">Parking</span>
+        </div>
+        <div class="lc-gap"><span>Gap:</span> No architectural depth. Optimizes for financial metrics, not spatial quality, adjacency, or program categories like BOH/circulation/performance.</div>
+      </div>
+
+      <div class="landscape-cell">
+        <div class="landscape-cell-header">
+          <div class="lc-dot" style="background:#F59E0B"></div>
+          <div class="lc-name">dRofus</div>
+          <span class="lc-type-tag">Commercial / BIM</span>
+        </div>
+        <div class="lc-desc">
+          BIM-linked program management tool used by large institutional projects (hospitals, airports). Manages room data sheets, area requirements, and functional relationships across Revit models.
+        </div>
+        <div class="lc-strengths">
+          <span class="lc-tag">Room Data</span>
+          <span class="lc-tag">Revit Link</span>
+          <span class="lc-tag">Institutional</span>
+          <span class="lc-tag">Area Mgmt</span>
+        </div>
+        <div class="lc-gap"><span>Gap:</span> Data management, not generation. Requires humans to define every room. No simulation, no LLM, no generative capability.</div>
+      </div>
+
+      <div class="landscape-cell">
+        <div class="landscape-cell-header">
+          <div class="lc-dot" style="background:#EC4899"></div>
+          <div class="lc-name">Hypar</div>
+          <span class="lc-type-tag">Platform / Dev</span>
+        </div>
+        <div class="lc-desc">
+          Cloud-native generative design platform for AEC. Functions written in C# generate building elements from parameters. Good for structural and MEP layouts. Developer-friendly API.
+        </div>
+        <div class="lc-strengths">
+          <span class="lc-tag">Parametric</span>
+          <span class="lc-tag">C# API</span>
+          <span class="lc-tag">Cloud Exec</span>
+          <span class="lc-tag">3D Output</span>
+        </div>
+        <div class="lc-gap"><span>Gap:</span> Purely parametric — input parameters, get geometry. No LLM reasoning, no adjacency simulation, no precedent learning.</div>
+      </div>
+
+      <div class="landscape-cell">
+        <div class="landscape-cell-header">
+          <div class="lc-dot" style="background:#8B5CF6"></div>
+          <div class="lc-name">Grasshopper + Wallacei</div>
+          <span class="lc-type-tag">Research / Plugin</span>
+        </div>
+        <div class="lc-desc">
+          Multi-objective evolutionary optimization for architecture. Widely used in academic and research contexts to evolve building layouts against performance metrics. Deep architectural integration.
+        </div>
+        <div class="lc-strengths">
+          <span class="lc-tag">Evolutionary</span>
+          <span class="lc-tag">Multi-objective</span>
+          <span class="lc-tag">Rhino Native</span>
+          <span class="lc-tag">Research</span>
+        </div>
+        <div class="lc-gap"><span>Gap:</span> No LLM. Optimization requires manually-coded fitness functions — cannot reason about precedent spatial logic or generate program from description.</div>
+      </div>
+
+      <div class="landscape-cell">
+        <div class="landscape-cell-header">
+          <div class="lc-dot" style="background:#14B8A6"></div>
+          <div class="lc-name">Ad-hoc LLM (GPT / Claude)</div>
+          <span class="lc-type-tag">General / Prompt</span>
+        </div>
+        <div class="lc-desc">
+          Direct prompting of frontier LLMs for architectural advice, spatial description, or code generation. Flexible, but output is unstructured text — no simulation, no geometry, no pipeline.
+        </div>
+        <div class="lc-strengths">
+          <span class="lc-tag">Flexible</span>
+          <span class="lc-tag">Text Output</span>
+          <span class="lc-tag">Fast</span>
+          <span class="lc-tag">Low Barrier</span>
+        </div>
+        <div class="lc-gap"><span>Gap:</span> Output is language, not geometry. No spatial simulation, no adjacency enforcement, no export pipeline to design software.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 04 FEATURE MATRIX -->
+  <section>
+    <div class="section-header">
+      <span class="section-index">04</span>
+      <span class="section-title">Feature Matrix</span>
+      <span class="section-desc">Capability comparison across key dimensions</span>
+    </div>
+    <div id="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:200px">
+              <div class="th-inner">
+                <span class="th-label">Capability</span>
+                <span class="th-name"> </span>
+              </div>
+            </th>
+            <th class="our-col" style="width:130px">
+              <div class="th-inner">
+                <span class="th-label">This Project</span>
+                <span class="th-name">Program<br>Agent</span>
+                <span class="th-type">SCI-Arc / Research</span>
+              </div>
+            </th>
+            <th style="width:110px">
+              <div class="th-inner">
+                <span class="th-label">Commercial</span>
+                <span class="th-name">Autodesk<br>Forma</span>
+                <span class="th-type">AI Massing</span>
+              </div>
+            </th>
+            <th style="width:110px">
+              <div class="th-inner">
+                <span class="th-label">Commercial</span>
+                <span class="th-name">TestFit</span>
+                <span class="th-type">RE Dev</span>
+              </div>
+            </th>
+            <th style="width:110px">
+              <div class="th-inner">
+                <span class="th-label">Commercial</span>
+                <span class="th-name">dRofus</span>
+                <span class="th-type">BIM Program</span>
+              </div>
+            </th>
+            <th style="width:110px">
+              <div class="th-inner">
+                <span class="th-label">Platform</span>
+                <span class="th-name">Hypar</span>
+                <span class="th-type">Gen. Design</span>
+              </div>
+            </th>
+            <th style="width:110px">
+              <div class="th-inner">
+                <span class="th-label">Research</span>
+                <span class="th-name">Grasshopper<br>+ Evol.</span>
+                <span class="th-type">Optimization</span>
+              </div>
+            </th>
+            <th style="width:110px">
+              <div class="th-inner">
+                <span class="th-label">General</span>
+                <span class="th-name">Ad-hoc<br>LLM</span>
+                <span class="th-type">GPT / Claude</span>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="cell-feat">
+                <span class="feat-title">LLM Program Generation</span>
+                <span class="feat-desc">AI generates spatial brief from precedent analysis</span>
+              </div>
+            </td>
+            <td class="our-col"><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-yellow">Partial</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-yellow">Text Only</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cell-feat">
+                <span class="feat-title">Precedent Analysis</span>
+                <span class="feat-desc">Learns from canonical buildings (OMA, JN, etc.)</span>
+              </div>
+            </td>
+            <td class="our-col"><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-yellow">Partial</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cell-feat">
+                <span class="feat-title">Agent-Based Simulation</span>
+                <span class="feat-desc">Physics forces: avoidance, cohesion, adjacency</span>
+              </div>
+            </td>
+            <td class="our-col"><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-yellow">Partial</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-yellow">Partial</span></td>
+            <td><span class="badge badge-yellow">Partial</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cell-feat">
+                <span class="feat-title">Adjacency Rules</span>
+                <span class="feat-desc">Spatial relationships between program categories</span>
+              </div>
+            </td>
+            <td class="our-col"><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-yellow">Manual</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-yellow">Coded</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cell-feat">
+                <span class="feat-title">Floor-by-Floor Distribution</span>
+                <span class="feat-desc">Explicit per-level section with vertical stacking</span>
+              </div>
+            </td>
+            <td class="our-col"><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-yellow">Partial</span></td>
+            <td><span class="badge badge-yellow">Partial</span></td>
+            <td><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-yellow">Partial</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cell-feat">
+                <span class="feat-title">3D Browser Visualization</span>
+                <span class="feat-desc">Interactive Three.js viewer, no install</span>
+              </div>
+            </td>
+            <td class="our-col"><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cell-feat">
+                <span class="feat-title">Rhino / Blender Export</span>
+                <span class="feat-desc">Direct pipeline to design software</span>
+              </div>
+            </td>
+            <td class="our-col"><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-yellow">Revit Only</span></td>
+            <td><span class="badge badge-yellow">Revit Only</span></td>
+            <td><span class="badge badge-yellow">Revit Only</span></td>
+            <td><span class="badge badge-yellow">IFC</span></td>
+            <td><span class="badge badge-blue">Rhino</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cell-feat">
+                <span class="feat-title">Boundary Containment</span>
+                <span class="feat-desc">Site polygon constraint during simulation</span>
+              </div>
+            </td>
+            <td class="our-col"><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-yellow">Coded</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cell-feat">
+                <span class="feat-title">Core / Circulation Logic</span>
+                <span class="feat-desc">Fire stair, elevator, freight core rules</span>
+              </div>
+            </td>
+            <td class="our-col"><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-yellow">Partial</span></td>
+            <td><span class="badge badge-yellow">Manual</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-yellow">Coded</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cell-feat">
+                <span class="feat-title">Open / Extensible</span>
+                <span class="feat-desc">Modifiable Python + HTML, no vendor lock-in</span>
+              </div>
+            </td>
+            <td class="our-col"><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-gray">Closed</span></td>
+            <td><span class="badge badge-gray">Closed</span></td>
+            <td><span class="badge badge-gray">Closed</span></td>
+            <td><span class="badge badge-yellow">SDK</span></td>
+            <td><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-blue">Full</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cell-feat">
+                <span class="feat-title">Research / Academic Context</span>
+                <span class="feat-desc">Designed for architectural inquiry, not ROI</span>
+              </div>
+            </td>
+            <td class="our-col"><span class="badge badge-blue">Full</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+            <td><span class="badge badge-yellow">Partial</span></td>
+            <td><span class="badge badge-gray">None</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 05 DIFFERENTIATORS -->
+  <section>
+    <div class="section-header">
+      <span class="section-index">05</span>
+      <span class="section-title">Key Differentiators</span>
+      <span class="section-desc">What no existing tool does</span>
+    </div>
+    <div id="diff-grid">
+      <div class="diff-card">
+        <span class="diff-num">01 / 05</span>
+        <div class="diff-title">Precedent as Training Signal</div>
+        <div class="diff-body">
+          Rather than generating space from scratch, ProgramAgent reads canonical buildings — OMA's TPAC, Jean Nouvel's 53W53 — and encodes their spatial logic as a distribution template. The LLM is guided by real architectural decisions, not generic typology rules.
+        </div>
+        <span class="diff-tag">Unique</span>
+      </div>
+      <div class="diff-card">
+        <span class="diff-num">02 / 05</span>
+        <div class="diff-title">Agent-Based Placement with Force Fields</div>
+        <div class="diff-body">
+          Each program is a live agent with avoidance, cohesion, and adjacency forces. Over 5,000 iterations per floor, spaces self-organize without manually coding layouts. Outputs emerge from rules, not pre-defined positions.
+        </div>
+        <span class="diff-tag">Unique</span>
+      </div>
+      <div class="diff-card">
+        <span class="diff-num">03 / 05</span>
+        <div class="diff-title">Vertical Plumbing + Core Topology</div>
+        <div class="diff-body">
+          Restrooms are pulled toward the floor-below toilet stack. Fire stairs, freight elevators, and passenger cores follow real code minimums and diagonal-separation rules — encoded as simulation constraints, not lookup tables.
+        </div>
+        <span class="diff-tag">Architectural Depth</span>
+      </div>
+      <div class="diff-card">
+        <span class="diff-num">04 / 05</span>
+        <div class="diff-title">End-to-End Pipeline</div>
+        <div class="diff-body">
+          From brief (text) → LLM program → agent simulation → browser 3D → Rhino/Blender geometry. No existing tool spans this entire chain. Most tools own one step; this research owns the whole flow.
+        </div>
+        <span class="diff-tag">Pipeline</span>
+      </div>
+      <div class="diff-card">
+        <span class="diff-num">05 / 05</span>
+        <div class="diff-title">Designed for Architectural Research</div>
+        <div class="diff-body">
+          Not optimizing for unit yield, construction cost, or ROI. Optimizing for spatial intelligence — the kind of judgment that architects bring to early-stage design, now made legible, debuggable, and extensible.
+        </div>
+        <span class="diff-tag">Research Intent</span>
+      </div>
+      <div class="diff-card" style="background: var(--accent-lt2); border: none;">
+        <span class="diff-num" style="color: var(--text-lo)">Summary</span>
+        <div class="diff-title">The Whitespace</div>
+        <div class="diff-body" style="color: var(--text-hi)">
+          The market has tools for <em>massing</em> (Forma, TestFit), tools for <em>program management</em> (dRofus), and tools for <em>parametric geometry</em> (Hypar, GH). Nobody connects LLM reasoning from precedents to agent-based spatial simulation to design tool output.
+        </div>
+        <span class="diff-tag" style="border-color: var(--text-lo); color: var(--text-mid)">Market Gap</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 CONCLUSION -->
+  <section>
+    <div class="section-header">
+      <span class="section-index">06</span>
+      <span class="section-title">Strategic Position</span>
+      <span class="section-desc">Where this work sits in the broader field</span>
+    </div>
+    <div id="conclusion">
+      <div class="conclusion-left">
+        <div class="c-label">Thesis</div>
+        <div class="c-title">
+          The next frontier in architectural AI is not<br><strong>faster massing</strong> —<br>it is <strong>deeper spatial reasoning.</strong>
+        </div>
+      </div>
+      <div class="conclusion-right">
+        <div class="c-point">
+          <span class="c-point-idx">01</span>
+          <span class="c-point-text">Commercial tools (Forma, TestFit) are optimizing for <strong>speed and automation</strong>. ProgramAgent asks a different question: can an AI understand why OMA puts the BOH core at the center of TPAC?</span>
+        </div>
+        <div class="c-point">
+          <span class="c-point-idx">02</span>
+          <span class="c-point-text">The research contribution is the <strong>pipeline architecture</strong> itself — showing that LLM reasoning, agent simulation, and 3D output can be coupled into a coherent generative workflow.</span>
+        </div>
+        <div class="c-point">
+          <span class="c-point-idx">03</span>
+          <span class="c-point-text">The closest comparison is <strong>Grasshopper + Wallacei</strong> (evolutionary optimization) — but those require manually coded fitness functions. ProgramAgent replaces that with LLM-derived spatial knowledge.</span>
+        </div>
+        <div class="c-point">
+          <span class="c-point-idx">04</span>
+          <span class="c-point-text">The long-term opportunity: as LLMs get better at spatial reasoning, this architecture becomes a <strong>canonical approach</strong> for AI-assisted early-design programming — a gap none of the current commercial players are pursuing.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div id="footer">
+    <div class="f-left">SCI-Arc SP26 Research — ProgramAgent — Competitive Analysis — 2026.04.20</div>
+    <div class="f-right">Comparison covers tools available as of April 2026</div>
+  </div>
+
+</div><!-- /main -->
+</body>
+</html>

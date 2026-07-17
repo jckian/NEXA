@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Program Massing — adjacency layout from output.txt</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #F5F5F5; --blue: #172FC7; --orange: #E67033; --yellow: #EEC341;
+      --grad: linear-gradient(135deg, #172FC7, #E67033);
+      --panel-bg: rgba(255, 255, 255, 0.90);
+      --border: rgba(23, 47, 199, 0.28); --border-dim: rgba(23, 47, 199, 0.12);
+      --text-hi: #172FC7; --text-mid: rgba(23, 47, 199, 0.66); --text-lo: rgba(23, 47, 199, 0.42);
+      --radius-lg: 12px; --radius-md: 8px; --radius-sm: 5px;
+      --shadow: 0 8px 28px rgba(23, 47, 199, 0.12), 0 2px 8px rgba(23, 47, 199, 0.08);
+    }
+    body { background: var(--bg); font-family: 'Montserrat', Helvetica, Arial, sans-serif; overflow: hidden; color: var(--text-hi); }
+    #canvas-container { position: fixed; inset: 0; }
+    #title-block { position: fixed; top: 20px; left: 20px; z-index: 10; }
+    #title-block h1 { font-size: 14px; font-weight: 600; letter-spacing: 0.06em; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    #title-block p { font-size: 9px; letter-spacing: 0.18em; color: var(--text-lo); text-transform: uppercase; margin-top: 5px; }
+    .panel { position: fixed; background: var(--panel-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); z-index: 10; backdrop-filter: blur(16px); box-shadow: var(--shadow); }
+    #left-panel { top: 70px; left: 20px; width: 248px; max-height: calc(100vh - 110px); overflow-y: auto; }
+    #right-panel { top: 70px; right: 20px; width: 230px; max-height: calc(100vh - 110px); overflow-y: auto; }
+    .panel h2 { font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-lo); padding: 14px 16px 10px; font-weight: 600; }
+    .panel-section { border-top: 1px solid var(--border-dim); }
+    .ctrl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; padding: 4px 16px 12px; }
+    .ctrl-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .ctrl-field.full { grid-column: 1 / -1; }
+    .ctrl-field label { font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-lo); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ctrl-field input, .ctrl-field select { width: 100%; min-width: 0; background: rgba(23,47,199,0.05); border: 1px solid var(--border-dim); border-radius: var(--radius-sm); color: var(--text-hi); padding: 6px 8px; font-family: inherit; font-size: 11px; outline: none; }
+    .btn { display: block; width: calc(100% - 32px); margin: 0 16px 14px; padding: 10px; border: none; border-radius: var(--radius-md); background: var(--grad); color: #fff; font-family: inherit; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
+    .btn.ghost { background: rgba(23,47,199,0.06); color: var(--text-hi); border: 1px solid var(--border-dim); }
+    .btn:hover { opacity: 0.88; }
+    textarea#paste { width: calc(100% - 32px); margin: 0 16px 12px; height: 90px; resize: vertical; background: rgba(23,47,199,0.05); border: 1px solid var(--border-dim); border-radius: var(--radius-sm); color: var(--text-hi); font-family: monospace; font-size: 10px; padding: 8px; outline: none; }
+    input[type=file] { display: none; }
+    #legend { padding: 4px 16px 14px; }
+    .leg-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 10px; color: var(--text-mid); }
+    .leg-sw { width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(23,47,199,0.2); flex-shrink: 0; }
+    #stats { padding: 4px 16px 14px; }
+    .stat-row { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-mid); margin-bottom: 5px; }
+    .stat-row b { color: var(--text-hi); font-variant-numeric: tabular-nums; }
+    .stat-total { border-top: 1px solid var(--border-dim); margin-top: 6px; padding-top: 7px; font-size: 11px; }
+    #tooltip { position: fixed; pointer-events: none; z-index: 20; display: none; background: rgba(255,255,255,0.96); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 10px; font-size: 10px; color: var(--text-hi); box-shadow: var(--shadow); white-space: nowrap; }
+    #drop-overlay { position: fixed; inset: 0; z-index: 50; display: none; background: rgba(23,47,199,0.08); backdrop-filter: blur(3px); align-items: center; justify-content: center; border: 3px dashed var(--border); }
+    #drop-overlay span { font-size: 16px; letter-spacing: 0.1em; }
+    #hint { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--panel-bg); border: 1px solid var(--border); border-radius: 999px; padding: 8px 18px; z-index: 10; backdrop-filter: blur(16px); box-shadow: var(--shadow); font-size: 10px; color: var(--text-mid); }
+    #hint b { color: var(--text-hi); }
+    ::-webkit-scrollbar { width: 7px; } ::-webkit-scrollbar-thumb { background: rgba(23,47,199,0.25); border-radius: 4px; }
+  </style>
+</head>
+
+<body>
+  <div id="canvas-container"></div>
+  <div id="title-block">
+    <h1>PROGRAM MASSING</h1>
+    <p>MIX 6F + 2B &middot; ADJACENCY LAYOUT &middot; <a href="massing-composer.html" style="color:var(--orange);text-decoration:none">→ composer</a></p>
+  </div>
+
+  <div id="left-panel" class="panel">
+    <h2>Program Source (output.txt)</h2>
+    <button class="btn" id="load-btn">Load output.txt</button>
+    <input type="file" id="file-input" accept=".txt,.md" />
+    <textarea id="paste" placeholder="…or paste {type}/{area}/{level}/{category}/{w,h} lines here"></textarea>
+    <button class="btn ghost" id="paste-btn">Build from pasted text</button>
+
+    <div class="panel-section">
+      <h2>Layout</h2>
+      <div class="ctrl-grid">
+        <div class="ctrl-field"><label>Floor Ht (m)</label><input type="number" id="ctl-fh" value="4.5" step="0.1" /></div>
+        <div class="ctrl-field"><label>Colour by</label>
+          <select id="ctl-color">
+            <option value="category" selected>Category</option>
+            <option value="type">Program type</option>
+          </select>
+        </div>
+        <div class="ctrl-field full"><label>Short opacity · <span id="op-val">0.45</span></label><input type="range" id="ctl-short-op" min="0.1" max="1" step="0.05" value="0.45" /></div>
+        <div class="ctrl-field full"><label>Protrude (½–⅔ out) · <span id="pr-val">0.50</span></label><input type="range" id="ctl-protrude" min="0" max="1" step="0.05" value="0.5" /></div>
+      </div>
+    </div>
+
+    <div class="panel-section" style="padding-top:8px;">
+      <h2>Export</h2>
+      <button class="btn" id="exp-long">Export LONG (.obj)</button>
+      <button class="btn ghost" id="exp-short">Export SHORT (.obj)</button>
+    </div>
+
+    <div class="panel-section">
+      <h2>Legend</h2>
+      <div id="legend"></div>
+    </div>
+  </div>
+
+  <div id="right-panel" class="panel">
+    <h2>Statistics</h2>
+    <div id="stats"></div>
+  </div>
+
+  <div id="tooltip"></div>
+  <div id="drop-overlay"><span>Drop output.txt</span></div>
+  <div id="hint"><b>Drag</b> orbit &middot; <b>scroll</b> zoom &middot; hover a space for detail</div>
+
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+  } }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // ─────────────────────────────────────────────────────────
+    // ADJACENCY RULES  (mirrors EllipseAgent.py / CLAUDE.md)
+    //   toilets    → fire stair and elevator (passenger core)
+    //   mechanical → fire stair and elevator
+    //   storage    → fire stair and freight elevator
+    //   loading    → fire stair and freight elevator
+    //   fitting    → display
+    // Coordinates in output.txt are IGNORED; layout is generated from these.
+    // ─────────────────────────────────────────────────────────
+    const isCore = t => /fire stair|elevator|escalator|\bstair\b|\bcore\b|shaft/i.test(t);
+    const isFreight = t => /freight/i.test(t);
+    // SHORT = replaceable plug-in zones (retail / wellness / education / event) per MIX table.
+    // Everything else (housing, office, service, cores) is LONG = structural permanence.
+    const isShort = t => /coffee|showroom|pop[- ]?up|exhibition|event hall|\bdemo\b|classroom|seminar|computer lab|project review|yoga|pilates|fitness|recovery lounge|physical therapy|meditation|health coaching|lounge bar/i.test(t);
+    // CIRCULATION = generated corridor (8'-6" wide) from core to every space — not a packed block.
+    const isCorridor = t => /circulation|corridor|hallway/i.test(t);
+
+    const CAT_COLOR = { public: '#E67033', private: '#172FC7', circulation: '#EEC341' };
+    const CORE_COLOR = '#11208F';
+    function hashHue(s) { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return ((h % 360) + 360) % 360; }
+    function hslToHex(h, s, l) { s /= 100; l /= 100; const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l); const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1))); const to = x => Math.round(255 * x).toString(16).padStart(2, '0'); return '#' + to(f(0)) + to(f(8)) + to(f(4)); }
+    const prettyName = t => t.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+    // ── 8'-6" module — every program edge is a whole multiple of this ──
+    const FT = 0.3048, MODULE = 8.5 * FT, MA = MODULE * MODULE;   // module edge & area
+
+    function colorFor(p, mode) {
+      if (mode === 'type') return p.isCore ? CORE_COLOR : hslToHex(hashHue(p.type), 55, 55);
+      if (p.isCore) return CORE_COLOR;
+      return CAT_COLOR[p.category] || '#888';
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // PARSE  {type}/{area}/{level}/{category}/{w,h}
+    // ─────────────────────────────────────────────────────────
+    function parse(raw) {
+      const rows = [];
+      for (const line of raw.split('\n')) {
+        const t = line.trim();
+        if (!t || t.startsWith('#')) continue;
+        const parts = t.split('/').map(s => s.replace(/[{}]/g, '').trim());
+        if (parts.length < 3) continue;
+        const type = parts[0].toLowerCase();
+        const area = parseFloat(parts[1]);
+        const level = parseInt(parts[2], 10);
+        let category = 'private';
+        if (parts[3] && !parts[3].includes(',')) category = parts[3].toLowerCase();
+        else if (parts[4] && !parts[4].includes(',')) category = parts[4].toLowerCase();
+        if (!type || isNaN(level) || isNaN(area)) continue;
+        // {w,h} field (whichever part contains a comma) — sets the program footprint proportion
+        let w = 0, h = 0;
+        for (let i = 3; i < parts.length; i++) { if (parts[i] && parts[i].includes(',')) { const [a, b] = parts[i].split(',').map(parseFloat); if (!isNaN(a) && !isNaN(b)) { w = a; h = b; } break; } }
+        if (!w || !h) { w = h = Math.sqrt(area); }
+        rows.push({ type, area, level, category, w, h, isCore: isCore(type) });
+      }
+      return rows;
+    }
+
+    // integer-module rectangle (edges = n × module); proportion guided by h.
+    function rectDims(area, hPref) {
+      const mods = Math.max(1, Math.round(area / MA));
+      const d = Math.max(1, Math.min(mods, Math.round((hPref || Math.sqrt(area)) / MODULE)));
+      const w = Math.max(1, Math.round(mods / d));
+      return { w, d };
+    }
+
+    // ── 1×2 MODULE (8'-6"×17' brick) packing — per references/MASSING-MODULE-LOGIC.md ──
+    // SHORT (replaceable plug-in) programs are rebuilt with the POROUS true-3D
+    // interlock: no two face-adjacent bricks share an axis, so the fill weaves a
+    // ~70%-dense lattice with voids. Bricks point +X (0), +Z (1) or stand +Y (2).
+    // Deterministic position hash (identical in GLSL/Python/JS) drives all variation.
+    const hash3 = (x, y, z) => { const s = Math.sin(x * 127.1 + y * 311.7 + z * 74.7) * 43758.5453; return s - Math.floor(s); };
+
+    function porousVol(W, D, F, seed) {
+      const occ = new Int8Array(W * D * F).fill(-1);              // -1 empty, else brick axis
+      const idx = (i, j, k) => (k * D + j) * W + i;
+      const inb = (i, j, k) => i >= 0 && i < W && j >= 0 && j < D && k >= 0 && k < F;
+      const partner = (i, j, k, a) => a === 0 ? [i + 1, j, k] : a === 1 ? [i, j + 1, k] : [i, j, k + 1];
+      const nbrAxes = (i, j, k, skip) => {                       // axes of occupied orthogonal neighbours
+        const out = [];
+        for (const [dx, dy, dz] of [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]) {
+          const x = i + dx, y = j + dy, z = k + dz;
+          if (!inb(x, y, z) || (skip && x === skip[0] && y === skip[1] && z === skip[2])) continue;
+          const o = occ[idx(x, y, z)]; if (o >= 0) out.push(o);
+        }
+        return out;
+      };
+      const bricks = [];
+      for (let k = 0; k < F; k++) for (let j = 0; j < D; j++) for (let i = 0; i < W; i++) {
+        if (occ[idx(i, j, k)] >= 0) continue;
+        const cands = [];
+        for (let a = 0; a < 3; a++) { const [x, y, z] = partner(i, j, k, a); if (inb(x, y, z) && occ[idx(x, y, z)] < 0) cands.push(a); }
+        if (!cands.length) continue;                             // nothing fits → void
+        const pref = (((i + j + k + seed) % 3) + 3) % 3;          // rotate the weave
+        cands.sort((a, b) => ((a - pref + 3) % 3) - ((b - pref + 3) % 3));
+        const forb = new Set(nbrAxes(i, j, k));
+        for (const a of cands) {
+          const [x, y, z] = partner(i, j, k, a);
+          if (forb.has(a) || nbrAxes(x, y, z, [i, j, k]).includes(a)) continue;   // would touch same-axis brick
+          occ[idx(i, j, k)] = a; occ[idx(x, y, z)] = a; bricks.push([i, j, k, a]); break;
+        }
+      }
+      return bricks;
+    }
+
+    // PROTRUDE — some bricks on the room's OUTER façade pop out ½ or ⅔ of a module
+    // into open air (render offset only). Restricted to the exterior long face per
+    // side (north → +Z, south → −Z) so a protrusion can never overlap a neighbour
+    // or the floor above ("不重疊, 可留空"). `amount` = fraction that pop.
+    function protrudeOffset(i, j, k, a, W, D, F, amount, Mh, side) {
+      if (amount <= 0 || hash3(i + 0.5, j + 1.5, k + 2.5) >= amount) return null;
+      const jMax = a === 1 ? j + 1 : j;
+      let d = null;
+      if (side === 'north' && jMax === D - 1) d = [0, 0, 1];      // outer face → away from corridor
+      else if (side === 'south' && j === 0) d = [0, 0, -1];
+      if (!d) return null;
+      const f = hash3(i + 6, j + 7, k + 8) < 0.5 ? 0.5 : 2 / 3;
+      return [d[0] * f * MODULE, d[1] * f * Mh, d[2] * f * MODULE];
+    }
+
+    // Balance rooms across the two long sides of the corridor by total width
+    // (largest-first → add to whichever side is currently shorter).
+    function splitSides(rooms) {
+      const north = [], south = []; let nW = 0, sW = 0;
+      for (const r of [...rooms].sort((a, b) => b.wMod - a.wMod)) {
+        if (nW <= sW) { north.push(r); nW += r.wMod; } else { south.push(r); sW += r.wMod; }
+      }
+      return { north, south, nW, sW };
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // LAYOUT — CENTRAL DOUBLE-LOADED CORRIDOR
+    //   • A single 8'-6"-wide CIRCULATION spine runs down the middle (along x).
+    //   • Programs sit flush along BOTH long sides of the corridor (north & south),
+    //     each at its true module size — neighbours touch (no gaps between them).
+    //   • A CORE sits at each DIAGONALLY-OPPOSITE corner, embedded in a side band
+    //     (freight → south-left, passenger → north-right) as a continuous shaft,
+    //     with that side's programs packed flush against it.
+    // ─────────────────────────────────────────────────────────
+    function computeLayout(program) {
+      const levels = [...new Set(program.map(p => p.level))].sort((a, b) => a - b);
+      // ── core types (one continuous shaft each), embedded in the side bands ──
+      const coreTypes = new Map();
+      for (const c of program) { if (!c.isCore) continue; let e = coreTypes.get(c.type); if (!e) { e = { type: c.type, repArea: 0, minL: c.level, maxL: c.level, category: 'circulation', isCore: true }; coreTypes.set(c.type, e); } e.repArea = Math.max(e.repArea, c.area); e.minL = Math.min(e.minL, c.level); e.maxL = Math.max(e.maxL, c.level); }
+      const cts = [...coreTypes.values()].sort((a, b) => (isFreight(b.type) - isFreight(a.type)) || b.repArea - a.repArea);
+
+      // cores keep their own near-square footprint; freight → south band, passenger → north band
+      cts.forEach(ct => { const d = rectDims(ct.repArea, Math.sqrt(ct.repArea)); ct.wMod = d.w; ct.dMod = d.d; });
+      const coreS = cts[0] || null, coreN = cts[1] || null;
+      const cwN = coreN ? coreN.wMod : 0, cwS = coreS ? coreS.wMod : 0;
+
+      // ── per-floor rooms (true module size), split onto the two sides ──
+      const floorSplit = new Map();
+      let northDepth = 1, southDepth = 1, innerW = 1;
+      for (const lv of levels) {
+        const items = program.filter(p => p.level === lv && !p.isCore && !isCorridor(p.type))
+          .map(p => { const d = rectDims(p.area, p.h); return { ...p, wMod: d.w, dMod: d.d }; });
+        const s = splitSides(items);
+        floorSplit.set(lv, s);
+        northDepth = Math.max(northDepth, 1, coreN ? coreN.dMod : 1, ...s.north.map(r => r.dMod));
+        southDepth = Math.max(southDepth, 1, coreS ? coreS.dMod : 1, ...s.south.map(r => r.dMod));
+        innerW = Math.max(innerW, cwN + s.nW, cwS + s.sW);       // each band = its core + its programs
+      }
+      const FD = southDepth + 1 + northDepth, zMid = southDepth, FW = innerW;   // corridor at z = zMid
+
+      // ── cores at DIAGONALLY-OPPOSITE corners, each embedded in its side band ──
+      //    freight → south band, LEFT end (x=0);  passenger → north band, RIGHT end.
+      const coreShafts = [];
+      if (coreS) coreShafts.push({ ...coreS, xMod: 0, zMod: zMid - coreS.dMod });          // south-left
+      if (coreN) coreShafts.push({ ...coreN, xMod: FW - cwN, zMod: zMid + 1 });            // north-right
+
+      // ── pack each side's programs flush against its corner core; corridor = central strip ──
+      // programs abut the core (no gaps between them); slack falls at the opposite perimeter.
+      function packSide(progs, side) {
+        const list = [...progs].sort((a, b) => b.wMod - a.wMod);
+        const sum = list.reduce((s, p) => s + p.wMod, 0);
+        // south core is at the LEFT → programs run rightward from it;
+        // north core is at the RIGHT → programs are right-aligned to its left edge.
+        let x = side === 'south' ? cwS : Math.max(0, FW - cwN - sum);
+        return list.map(p => ({ ...p, xMod: (x += p.wMod) - p.wMod, zMod: side === 'north' ? zMid + 1 : zMid - p.dMod, side }));
+      }
+      const floorRects = new Map(), floorCorr = new Map();
+      for (const lv of levels) {
+        const { north, south } = floorSplit.get(lv);
+        floorRects.set(lv, [...packSide(north, 'north'), ...packSide(south, 'south')]);
+        floorCorr.set(lv, FW > 0 ? [{ xMod: 0, zMod: zMid, wMod: FW, dMod: 1 }] : []);
+      }
+      return { levels, coreShafts, floorRects, floorCorr, FW, FD };
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // THREE
+    // ─────────────────────────────────────────────────────────
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color('#F5F5F5');
+    let camera, controls;
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(innerWidth, innerHeight); renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.92));
+    const dl = new THREE.DirectionalLight(0xffffff, 0.6); dl.position.set(40, 70, 25); scene.add(dl);
+    const dl2 = new THREE.DirectionalLight(0xffffff, 0.22); dl2.position.set(-30, 25, -35); scene.add(dl2);
+    const root = new THREE.Group(); scene.add(root);
+
+    const raycaster = new THREE.Raycaster(), ndc = new THREE.Vector2();
+    const tooltip = document.getElementById('tooltip');
+    let meshes = [];
+
+    let PROGRAM = [];        // parsed rows
+    let FLOOR_H = 4.5, COLOR_MODE = 'category', SHORT_OPACITY = 0.45, PROTRUDE = 0.5;
+    // Floor height in whole 8'-6" courses (cubes) so every brick stays 8'-6"×8'-6"×17'.
+    // L1–L3 = 2 courses = 17'; other floors snap FLOOR_H to the nearest whole module.
+    const floorModulesOf = lv => (lv >= 0 && lv <= 2) ? 2 : Math.max(1, Math.round(FLOOR_H / MODULE));
+    const floorHeightOf = lv => floorModulesOf(lv) * MODULE;
+    let exportBoxes = [];    // {type,category,level,cx,cy,cz,w,h,d,vertical} for OBJ/txt export
+
+    function addBox(rec, color) {
+      const short = !!rec.short;                                 // true size → blocks sit flush, no gaps
+      const mesh = new THREE.Mesh(
+        new THREE.BoxGeometry(Math.max(rec.w, 0.05), Math.max(rec.h, 0.05), Math.max(rec.d, 0.05)),
+        new THREE.MeshLambertMaterial({ color: new THREE.Color(color), transparent: short, opacity: short ? SHORT_OPACITY : 1, depthWrite: !short })
+      );
+      mesh.position.set(rec.cx, rec.cy, rec.cz);
+      mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 })));
+      mesh.userData = rec;
+      root.add(mesh); meshes.push(mesh);
+      exportBoxes.push(rec);
+    }
+
+    function build() {
+      root.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => m.dispose()); });
+      root.clear(); meshes = []; exportBoxes = [];
+      if (!PROGRAM.length) { renderStats(); renderLegend(); return; }
+
+      const L = computeLayout(PROGRAM);
+      const M = MODULE;
+      const sx = -L.FW / 2, sz = -L.FD / 2;               // centre (modules)
+      const wx = m => (m + sx) * M, wz = m => (m + sz) * M;
+      // ── per-floor heights (L1–L3 = 17') → cumulative vertical base for each level ──
+      const yb = new Map(); let acc = 0;
+      for (const lv of L.levels) { yb.set(lv, acc); acc += floorHeightOf(lv); }
+      const yBase = lv => yb.get(lv) || 0, towerH = acc;
+
+      // continuous core shafts (run vertically through their floor range)
+      for (const s of L.coreShafts) {
+        let h = 0; for (const lv of L.levels) if (lv >= s.minL && lv <= s.maxL) h += floorHeightOf(lv);
+        addBox({
+          type: s.type, category: 'circulation', level: s.minL, vertical: true,
+          cx: wx(s.xMod + s.wMod / 2), cy: yBase(s.minL) + h / 2, cz: wz(s.zMod + s.dMod / 2),
+          w: s.wMod * M, h, d: s.dMod * M, area: s.repArea, w_d: `${s.wMod}×${s.dMod} mod`
+        }, COLOR_MODE === 'type' ? CORE_COLOR : CORE_COLOR);
+      }
+      // per-floor program plates — LONG solid, SHORT rebuilt from 8'-6"×8'-6"×17' modules
+      for (const lv of L.levels) {
+        const F = floorModulesOf(lv), slabH = floorHeightOf(lv), MH = MODULE, y0 = yBase(lv);   // course = one 8'-6" cube
+        for (const r of L.floorRects.get(lv)) {
+          const color = colorFor(r, COLOR_MODE);
+          if (!isShort(r.type)) {
+            addBox({
+              type: r.type, category: r.category, level: lv, vertical: false, isCore: false, short: false,
+              cx: wx(r.xMod + r.wMod / 2), cy: y0 + slabH / 2, cz: wz(r.zMod + r.dMod / 2),
+              w: r.wMod * M, h: slabH, d: r.dMod * M, area: r.area, w_d: `${r.wMod}×${r.dMod} mod`
+            }, color);
+            continue;
+          }
+          // SHORT → POROUS true-3D interlock brick fill (+ protrude relief)
+          const W = r.wMod, D = r.dMod, x0 = wx(r.xMod), z0 = wz(r.zMod);
+          for (const [i, j, k, a] of porousVol(W, D, F, (lv * 13 + r.xMod * 7 + r.zMod) | 0)) {
+            let cx, cy, cz, bw, bh, bd;
+            if (a === 0) { bw = 2 * M; bh = MH; bd = M; cx = x0 + (i + 1) * M; cy = y0 + (k + 0.5) * MH; cz = z0 + (j + 0.5) * M; }
+            else if (a === 1) { bw = M; bh = MH; bd = 2 * M; cx = x0 + (i + 0.5) * M; cy = y0 + (k + 0.5) * MH; cz = z0 + (j + 1) * M; }
+            else { bw = M; bh = 2 * MH; bd = M; cx = x0 + (i + 0.5) * M; cy = y0 + (k + 1) * MH; cz = z0 + (j + 0.5) * M; }
+            const off = protrudeOffset(i, j, k, a, W, D, F, PROTRUDE, MH, r.side);
+            if (off) { cx += off[0]; cy += off[1]; cz += off[2]; }
+            addBox({
+              type: r.type, category: r.category, level: lv, vertical: a === 2, isCore: false, short: true,
+              cx, cy, cz, w: bw, h: bh, d: bd, area: r.area, w_d: `${r.wMod}×${r.dMod} mod · ${a === 2 ? 'vertical' : 'horizontal'} brick${off ? ' · ⤴ protrude' : ''}`
+            }, color);
+          }
+        }
+      }
+      // circulation corridors (8'-6" wide, low strips connecting cores → every room)
+      for (const lv of L.levels) {
+        const corrH = floorHeightOf(lv) * 0.4, y0 = yBase(lv);
+        for (const r of (L.floorCorr.get(lv) || [])) {
+          addBox({
+            type: 'circulation', category: 'circulation', level: lv, vertical: false, isCore: false, flush: true,
+            cx: wx(r.xMod + r.wMod / 2), cy: y0 + corrH / 2, cz: wz(r.zMod + r.dMod / 2),
+            w: r.wMod * M, h: corrH, d: r.dMod * M, area: r.wMod * r.dMod * MA, w_d: `${r.wMod}×${r.dMod} mod`
+          }, CAT_COLOR.circulation);
+        }
+      }
+      frameCamera(Math.max(L.FW, L.FD) * M, towerH, 0);
+      renderStats(); renderLegend();
+    }
+
+    function frameCamera(plate, towerH, yMin) {
+      const span = Math.max(plate, towerH) * 0.7 + 6, aspect = innerWidth / innerHeight;
+      if (!camera) {
+        camera = new THREE.OrthographicCamera(-span * aspect, span * aspect, span, -span, -4000, 8000);
+        controls = new OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.dampingFactor = 0.08;
+      } else { camera.left = -span * aspect; camera.right = span * aspect; camera.top = span; camera.bottom = -span; camera.updateProjectionMatrix(); }
+      const d = span * 2;
+      camera.position.set(d, d * 0.85 + towerH * 0.3, d); camera.updateProjectionMatrix();
+      controls.target.set(0, yMin + towerH * 0.45, 0); controls.update();
+    }
+
+    // ── stats / legend ──
+    function renderStats() {
+      const el = document.getElementById('stats');
+      if (!PROGRAM.length) { el.innerHTML = '<div style="font-size:10px;color:var(--text-lo)">Load output.txt to build.</div>'; return; }
+      const byCat = {}; let total = 0;
+      for (const p of PROGRAM) { byCat[p.category] = (byCat[p.category] || 0) + p.area; total += p.area; }
+      const levels = new Set(PROGRAM.map(p => p.level));
+      let html = '';
+      for (const c of Object.keys(byCat).sort()) html += `<div class="stat-row"><span>${prettyName(c)}</span><b>${Math.round(byCat[c]).toLocaleString()} m²</b></div>`;
+      html += `<div class="stat-row stat-total"><span>Total GFA</span><b>${Math.round(total).toLocaleString()} m²</b></div>`;
+      html += `<div class="stat-row"><span>Floors</span><b>${levels.size}</b></div>`;
+      html += `<div class="stat-row"><span>Spaces</span><b>${PROGRAM.length}</b></div>`;
+      el.innerHTML = html;
+    }
+    function renderLegend() {
+      const el = document.getElementById('legend');
+      if (COLOR_MODE === 'type') { el.innerHTML = '<div style="font-size:10px;color:var(--text-lo)">Each program type a distinct hue; cores dark.</div>'; return; }
+      el.innerHTML = [['Public', CAT_COLOR.public], ['Private', CAT_COLOR.private], ['Circulation', CAT_COLOR.circulation], ['Core / shaft', CORE_COLOR]]
+        .map(([n, c]) => `<div class="leg-item"><span class="leg-sw" style="background:${c}"></span>${n}</div>`).join('');
+    }
+
+    // ── hover ──
+    renderer.domElement.addEventListener('pointermove', ev => {
+      const r = renderer.domElement.getBoundingClientRect();
+      ndc.x = ((ev.clientX - r.left) / r.width) * 2 - 1; ndc.y = -((ev.clientY - r.top) / r.height) * 2 + 1;
+      raycaster.setFromCamera(ndc, camera);
+      const hit = raycaster.intersectObjects(meshes, false)[0];
+      if (hit) {
+        const u = hit.object.userData;
+        tooltip.style.display = 'block'; tooltip.style.left = (ev.clientX + 14) + 'px'; tooltip.style.top = (ev.clientY + 14) + 'px';
+        tooltip.innerHTML = `<strong>${prettyName(u.type)}</strong> · ${Math.round(u.area)} m² ${u.vertical ? '· ⊥ shaft' : ''}<br><span style="color:var(--text-lo);font-size:9px">L${u.level} · ${u.category} · ${u.w_d}</span>`;
+      } else tooltip.style.display = 'none';
+    });
+
+    // ── load ──
+    function loadText(raw) { PROGRAM = parse(raw); build(); }
+    document.getElementById('load-btn').addEventListener('click', () => document.getElementById('file-input').click());
+    document.getElementById('file-input').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => loadText(rd.result); rd.readAsText(f); });
+    document.getElementById('paste-btn').addEventListener('click', () => loadText(document.getElementById('paste').value));
+    const drop = document.getElementById('drop-overlay');
+    addEventListener('dragover', e => { e.preventDefault(); drop.style.display = 'flex'; });
+    addEventListener('dragleave', e => { if (e.clientX === 0 && e.clientY === 0) drop.style.display = 'none'; });
+    addEventListener('drop', e => { e.preventDefault(); drop.style.display = 'none'; const f = e.dataTransfer.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => loadText(rd.result); rd.readAsText(f); });
+
+    document.getElementById('ctl-fh').addEventListener('change', e => { FLOOR_H = parseFloat(e.target.value) || 4.5; build(); });
+    document.getElementById('ctl-color').addEventListener('change', e => { COLOR_MODE = e.target.value; build(); });
+    document.getElementById('ctl-short-op').addEventListener('input', e => {
+      SHORT_OPACITY = parseFloat(e.target.value); document.getElementById('op-val').textContent = SHORT_OPACITY.toFixed(2);
+      for (const m of meshes) if (m.userData.short) { m.material.transparent = true; m.material.depthWrite = false; m.material.opacity = SHORT_OPACITY; m.material.needsUpdate = true; }
+    });
+    document.getElementById('ctl-protrude').addEventListener('input', e => { PROTRUDE = parseFloat(e.target.value); document.getElementById('pr-val').textContent = PROTRUDE.toFixed(2); build(); });
+
+    // ── export ──
+    function download(name, text) {
+      const blob = new Blob([text], { type: 'text/plain' }); const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = name; a.click(); URL.revokeObjectURL(a.href);
+    }
+    // SHORT = porous plug-in bricks; LONG = everything else (solid programs +
+    // cores + circulation count as LONG).
+    const isShortBox = b => !!b.short;
+    const isLongBox = b => !b.short;
+    function exportOBJ(filter, fname, title) {
+      const boxes = exportBoxes.filter(filter);
+      if (!boxes.length) { alert(`Nothing to export for ${title}.`); return; }
+      let obj = `# ${title} — module 8'-6" = ${MODULE.toFixed(4)} m\n`, vi = 1;
+      for (const b of boxes) {
+        const hx = b.w / 2, hy = b.h / 2, hz = b.d / 2, x = b.cx, y = b.cy, z = b.cz;
+        obj += `g ${b.type.replace(/\s+/g, '_')}_L${b.level}\n`;
+        const c = [[x - hx, y - hy, z - hz], [x + hx, y - hy, z - hz], [x + hx, y - hy, z + hz], [x - hx, y - hy, z + hz],
+        [x - hx, y + hy, z - hz], [x + hx, y + hy, z - hz], [x + hx, y + hy, z + hz], [x - hx, y + hy, z + hz]];
+        for (const p of c) obj += `v ${p[0].toFixed(4)} ${p[1].toFixed(4)} ${p[2].toFixed(4)}\n`;
+        for (const q of [[1, 2, 3, 4], [5, 8, 7, 6], [1, 5, 6, 2], [2, 6, 7, 3], [3, 7, 8, 4], [4, 8, 5, 1]]) obj += `f ${q.map(n => n + vi - 1).join(' ')}\n`;
+        vi += 8;
+      }
+      download(fname, obj);
+    }
+    document.getElementById('exp-long').addEventListener('click', () => exportOBJ(isLongBox, 'program_massing_LONG.obj', 'LONG program massing (solid)'));
+    document.getElementById('exp-short').addEventListener('click', () => exportOBJ(isShortBox, 'program_massing_SHORT.obj', 'SHORT program massing (porous bricks)'));
+
+    addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeight); if (camera) { const a = innerWidth / innerHeight, s = camera.top; camera.left = -s * a; camera.right = s * a; camera.updateProjectionMatrix(); } });
+
+    // ── built-in sample so it renders on open (replace by loading output.txt) ──
+    // MIX_6fl_program — module-based 6F + 2B schedule (Base Module 8'-6"×17' ≈ 13.4 m²)
+    // Levels: B2=-2  B1=-1  L1=0  L2=1  L3=2  L4=3  L5=4  L6=5
+    // Standardised module library (8'-6"×17' ≈ 13.4 m²/module). Apartments split per-unit (分戶).
+    // 3-core system: Freight + Passenger A + Passenger B → continuous shafts on every floor.
+    const SAMPLE = `# MIX_6fl_program — 6F + 2B module-based program (40m×40m footprint)
+# Levels: B2=-2 B1=-1 L1=0 L2=1 L3=2 L4=3 L5=4 L6=5
+# B2 — Parking + Mechanical
+{parking bay group}/{322}/{-2}/{private}/{16,20}
+{parking bay group}/{322}/{-2}/{private}/{16,20}
+{parking bay group}/{322}/{-2}/{private}/{16,20}
+{mechanical room}/{161}/{-2}/{private}/{10,16}
+{storage}/{107}/{-2}/{private}/{8,13}
+{electrical room}/{54}/{-2}/{private}/{7,8}
+{fire stair & freight elevator core}/{201}/{-2}/{circulation}/{10,20}
+{fire stair & passenger elevator core a}/{161}/{-2}/{circulation}/{10,16}
+{circulation}/{107}/{-2}/{circulation}/{8,13}
+# B1 — Service + Loading
+{parking bay group}/{322}/{-1}/{private}/{16,20}
+{loading dock}/{161}/{-1}/{private}/{10,16}
+{storage}/{107}/{-1}/{private}/{8,13}
+{storage}/{107}/{-1}/{private}/{8,13}
+{mechanical room}/{161}/{-1}/{private}/{10,16}
+{electrical room}/{54}/{-1}/{private}/{7,8}
+{staff area}/{80}/{-1}/{private}/{8,10}
+{it support}/{54}/{-1}/{private}/{7,8}
+{fire stair & freight elevator core}/{201}/{-1}/{circulation}/{10,20}
+{fire stair & passenger elevator core a}/{161}/{-1}/{circulation}/{10,16}
+{circulation}/{134}/{-1}/{circulation}/{10,13}
+# L1 — Urban Interface
+{coffee shop}/{161}/{0}/{public}/{10,16}
+{brand showroom}/{214}/{0}/{public}/{14,15}
+{pop-up retail}/{107}/{0}/{public}/{8,13}
+{exhibition gallery}/{268}/{0}/{public}/{16,17}
+{event hall}/{241}/{0}/{public}/{16,15}
+{foyer}/{161}/{0}/{public}/{10,16}
+{toilets}/{80}/{0}/{public}/{8,10}
+{storage}/{107}/{0}/{private}/{8,13}
+{fire stair & freight elevator core}/{201}/{0}/{circulation}/{10,20}
+{fire stair & passenger elevator core a}/{161}/{0}/{circulation}/{10,16}
+{circulation}/{107}/{0}/{circulation}/{8,13}
+# L2 — Knowledge + Work + Wellness
+{office loft}/{322}/{1}/{private}/{16,20}
+{startup office suite}/{161}/{1}/{private}/{10,16}
+{ai training classroom}/{201}/{1}/{public}/{10,20}
+{seminar room}/{161}/{1}/{public}/{10,16}
+{computer lab}/{201}/{1}/{public}/{10,20}
+{startup demo space}/{161}/{1}/{public}/{10,16}
+{yoga studio}/{161}/{1}/{public}/{10,16}
+{pilates studio}/{134}/{1}/{public}/{10,13}
+{fire stair & freight elevator core}/{201}/{1}/{circulation}/{10,20}
+{fire stair & passenger elevator core a}/{161}/{1}/{circulation}/{10,16}
+{circulation}/{107}/{1}/{circulation}/{8,13}
+# L3 — Work + Wellness
+{office loft}/{322}/{2}/{private}/{16,20}
+{shared amenity}/{161}/{2}/{public}/{10,16}
+{group fitness studio}/{241}/{2}/{public}/{16,15}
+{recovery lounge}/{134}/{2}/{public}/{10,13}
+{physical therapy suite}/{107}/{2}/{private}/{8,13}
+{meditation room}/{80}/{2}/{public}/{8,10}
+{health coaching room}/{54}/{2}/{private}/{7,8}
+{fire stair & freight elevator core}/{201}/{2}/{circulation}/{10,20}
+{fire stair & passenger elevator core a}/{161}/{2}/{circulation}/{10,16}
+{circulation}/{134}/{2}/{circulation}/{10,13}
+# L4 — Residential (4× studio, 4× 1B1B, 3× 2B2B)
+{studio apartment}/{67}/{3}/{private}/{8,8}
+{studio apartment}/{67}/{3}/{private}/{8,8}
+{studio apartment}/{67}/{3}/{private}/{8,8}
+{studio apartment}/{67}/{3}/{private}/{8,8}
+{1b1b apartment}/{107}/{3}/{private}/{8,13}
+{1b1b apartment}/{107}/{3}/{private}/{8,13}
+{1b1b apartment}/{107}/{3}/{private}/{8,13}
+{1b1b apartment}/{107}/{3}/{private}/{8,13}
+{2b2b apartment}/{134}/{3}/{private}/{10,13}
+{2b2b apartment}/{134}/{3}/{private}/{10,13}
+{2b2b apartment}/{134}/{3}/{private}/{10,13}
+{residential lounge}/{134}/{3}/{public}/{10,13}
+{community kitchen}/{107}/{3}/{public}/{8,13}
+{laundry room}/{54}/{3}/{private}/{7,8}
+{fire stair & freight elevator core}/{201}/{3}/{circulation}/{10,20}
+{fire stair & passenger elevator core a}/{161}/{3}/{circulation}/{10,16}
+{circulation}/{134}/{3}/{circulation}/{10,13}
+# L5 — Residential (4× studio, 5× 1B1B, 3× 2B2B)
+{studio apartment}/{67}/{4}/{private}/{8,8}
+{studio apartment}/{67}/{4}/{private}/{8,8}
+{studio apartment}/{67}/{4}/{private}/{8,8}
+{studio apartment}/{67}/{4}/{private}/{8,8}
+{1b1b apartment}/{107}/{4}/{private}/{8,13}
+{1b1b apartment}/{107}/{4}/{private}/{8,13}
+{1b1b apartment}/{107}/{4}/{private}/{8,13}
+{1b1b apartment}/{107}/{4}/{private}/{8,13}
+{1b1b apartment}/{107}/{4}/{private}/{8,13}
+{2b2b apartment}/{134}/{4}/{private}/{10,13}
+{2b2b apartment}/{134}/{4}/{private}/{10,13}
+{2b2b apartment}/{134}/{4}/{private}/{10,13}
+{residential lounge}/{134}/{4}/{public}/{10,13}
+{package room}/{40}/{4}/{private}/{6,7}
+{fire stair & freight elevator core}/{201}/{4}/{circulation}/{10,20}
+{fire stair & passenger elevator core a}/{161}/{4}/{circulation}/{10,16}
+{circulation}/{107}/{4}/{circulation}/{8,13}
+# L6 — Residential + Transition (2× studio, 4× 1B1B, 4× 2B2B)
+{studio apartment}/{67}/{5}/{private}/{8,8}
+{studio apartment}/{67}/{5}/{private}/{8,8}
+{1b1b apartment}/{107}/{5}/{private}/{8,13}
+{1b1b apartment}/{107}/{5}/{private}/{8,13}
+{1b1b apartment}/{107}/{5}/{private}/{8,13}
+{1b1b apartment}/{107}/{5}/{private}/{8,13}
+{2b2b apartment}/{134}/{5}/{private}/{10,13}
+{2b2b apartment}/{134}/{5}/{private}/{10,13}
+{2b2b apartment}/{134}/{5}/{private}/{10,13}
+{2b2b apartment}/{134}/{5}/{private}/{10,13}
+{shared amenity}/{161}/{5}/{public}/{10,16}
+{lounge bar}/{134}/{5}/{public}/{10,13}
+{fire stair & freight elevator core}/{201}/{5}/{circulation}/{10,20}
+{fire stair & passenger elevator core a}/{161}/{5}/{circulation}/{10,16}
+{circulation}/{107}/{5}/{circulation}/{8,13}`;
+    loadText(SAMPLE);
+
+    (function loop() { requestAnimationFrame(loop); if (controls) controls.update(); renderer.render(scene, camera); })();
+  </script>
+</body>
+
+</html>

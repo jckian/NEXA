@@ -1,0 +1,116 @@
+## Tama Art University Library — Detailed Program Distribution
+## Source: TAMA-PROGRAM.md + ProgramFormat.txt
+## Format: {program type}/{area in m2}/{floor level}/{program category}/{width,length}
+##
+## Building: Toyo Ito — Tama Art University Library (2007)
+## Site: 70m × 70m | Site area ~4,900 m²
+## Floors: B1 to L1 | Floor-to-floor: 4.0m | Total Height: ~12m above grade
+## Total GFA: ~5,730 m²
+##
+## ── CATEGORY TAXONOMY ────────────────────────────────────────────────────
+## Each program type carries its own semantic category for independent
+## filtering and color-coding in visualization.
+##
+##   entry          → arrival vestibules, lobby threshold spaces
+##   gallery        → exhibition, display, curated viewing
+##   social         → informal lounge, open congregation, non-silent gathering
+##   media          → periodicals, video, digital browsing stations
+##   reading        → open reading zones, individual reading carrels
+##   collection     → primary book stacks, compact mobile shelving, archive
+##   event          → lectures, workshops, screenings, performances
+##   learning       → seminar rooms, group study pods
+##   faculty        → rare books, faculty research rooms
+##   administration → library management, reference desk, librarian station
+##   support        → staff workrooms, book processing, cataloguing
+##   services       → restrooms, public amenities
+##   cafe           → food, beverage, vending
+##   loading        → receiving dock, delivery holding, cart staging
+##   storage        → general storage, equipment, furniture
+##   mechanical     → HVAC, electrical, MEP systems
+##   technology     → servers, IT infrastructure, AV systems
+##   circulation    → fire stairs, elevators, open stairs, service corridors
+##
+## ── STRUCTURAL SYSTEM NOTE ───────────────────────────────────────────────
+## NO conventional vertical core. Circulation is distributed and peripheral.
+## Structure = non-repetitive load-bearing arch field (thin steel plate +
+## concrete arches, intersecting at varied spans across every floor plate).
+## Egress stairs are located at the perimeter edges — never central.
+## Three fire-stair cores: SW corner (freight), NE corner, SE corner.
+##
+## ── FLOOR GROSS AREAS ────────────────────────────────────────────────────
+## B1  basement:     ~1,650 m²  (archive, infrastructure, overflow stacks)
+## L0  ground:       ~2,020 m²  (main public floor — fluid, non-silent library)
+## L1  second:       ~2,060 m²  (primary collection — semi-quiet reading)
+## Total GFA:        ~5,730 m²
+##
+## ── RESTROOM NOTE ────────────────────────────────────────────────────────
+## Library scale: 1 female stall / 25 occupants, 1 male / 50 occupants.
+## Cluster per floor: 50–110 m². Near perimeter, not at central core.
+## Basement: staff-only, smaller cluster (~50 m²).
+## ─────────────────────────────────────────────────────────────────────────
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## B1  Basement  −4.0 m
+## Infrastructure, archive collections, overflow stacks
+## Gross: ~1,650 m² | No public program — staff and systems only
+## ─────────────────────────────────────────────────────────────────────────
+{archive}/{320}/{-1}/{collection}/{18,18}
+{compact stacks}/{380}/{-1}/{collection}/{22,17}
+{book processing}/{90}/{-1}/{support}/{10,9}
+{receiving and loading}/{80}/{-1}/{loading}/{10,8}
+{storage}/{100}/{-1}/{storage}/{10,10}
+{mechanical}/{200}/{-1}/{mechanical}/{14,14}
+{server room}/{60}/{-1}/{technology}/{8,8}
+{staff workroom}/{60}/{-1}/{support}/{8,8}
+{service corridor}/{60}/{-1}/{circulation}/{5,12}
+{staff restroom}/{50}/{-1}/{services}/{7,7}
+{fire stair and freight elevator}/{100}/{-1}/{circulation}/{8,12}
+{fire stair and elevator 1}/{75}/{-1}/{circulation}/{8,10}
+{fire stair and elevator 2}/{75}/{-1}/{circulation}/{8,10}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L0  Ground Floor  0 m   (floor follows ~3° slope, east-to-west)
+## Primary public face — fluid, open, non-silent social library
+## Gross: ~2,020 m²
+## ─────────────────────────────────────────────────────────────────────────
+{entry vestibule}/{60}/{0}/{entry}/{8,8}
+{entry hall}/{180}/{0}/{entry}/{15,12}
+{exhibition gallery}/{340}/{0}/{gallery}/{22,15}
+{informal lounge}/{230}/{0}/{social}/{17,14}
+{media lounge}/{180}/{0}/{media}/{15,12}
+{open reading}/{220}/{0}/{reading}/{16,14}
+{event space}/{140}/{0}/{event}/{14,10}
+{cafe}/{90}/{0}/{cafe}/{10,9}
+{reference desk}/{50}/{0}/{administration}/{8,6}
+{staff office}/{60}/{0}/{administration}/{8,8}
+{IT support}/{40}/{0}/{technology}/{5,8}
+{public restroom}/{110}/{0}/{services}/{10,11}
+{open stair}/{80}/{0}/{circulation}/{8,10}
+{fire stair and freight elevator}/{100}/{0}/{circulation}/{8,12}
+{fire stair and elevator 1}/{70}/{0}/{circulation}/{7,10}
+{fire stair and elevator 2}/{70}/{0}/{circulation}/{7,10}
+
+
+## ─────────────────────────────────────────────────────────────────────────
+## L1  Second Floor  4.0 m
+## Primary library collection — semi-quiet, visually open across full plate
+## Gross: ~2,060 m²
+## ─────────────────────────────────────────────────────────────────────────
+{book stacks}/{620}/{1}/{collection}/{28,22}
+{reading room}/{320}/{1}/{reading}/{22,15}
+{individual reading carrels}/{100}/{1}/{reading}/{10,10}
+{group study zone}/{130}/{1}/{learning}/{13,10}
+{seminar room}/{100}/{1}/{learning}/{10,10}
+{rare books}/{80}/{1}/{faculty}/{8,10}
+{faculty study}/{80}/{1}/{faculty}/{8,10}
+{administrative office}/{70}/{1}/{administration}/{8,9}
+{librarian station}/{40}/{1}/{administration}/{5,8}
+{storage}/{50}/{1}/{storage}/{6,8}
+{IT support}/{40}/{1}/{technology}/{5,8}
+{public restroom}/{100}/{1}/{services}/{10,10}
+{open stair}/{80}/{1}/{circulation}/{8,10}
+{fire stair and freight elevator}/{100}/{1}/{circulation}/{8,12}
+{fire stair and elevator 1}/{75}/{1}/{circulation}/{8,10}
+{fire stair and elevator 2}/{75}/{1}/{circulation}/{8,10}

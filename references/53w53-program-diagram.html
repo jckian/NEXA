@@ -1,0 +1,2096 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>53W53 — Program Diagram</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --grad-start: #2563eb;
+      --grad-end: #7c3aed;
+      --grad: linear-gradient(135deg, #2563eb, #7c3aed);
+      --panel-bg: rgba(6, 6, 18, 0.92);
+      --border: rgba(120, 80, 255, 0.22);
+      --border-dim: rgba(120, 80, 255, 0.10);
+      --accent-glow: rgba(37, 99, 235, 0.12);
+      --text-hi: #f0f0ff;
+      --text-mid: #9898c0;
+      --text-lo: #44445a;
+      --radius-lg: 12px;
+      --radius-md: 8px;
+      --radius-sm: 5px;
+      --shadow: 0 8px 32px rgba(37, 99, 235, 0.10), 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    body {
+      background: #06060f;
+      font-family: 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      color: var(--text-hi);
+    }
+
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+    }
+
+    /* ── Title ── */
+    #title-block {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+    }
+
+    #title-block h1 {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    #title-block p {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      color: var(--text-lo);
+      text-transform: uppercase;
+      margin-top: 5px;
+      font-weight: 400;
+    }
+
+    /* ── Legend ── */
+    #legend {
+      position: fixed;
+      bottom: 70px;
+      left: 20px;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: var(--radius-lg);
+      z-index: 10;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      min-width: 200px;
+    }
+
+    #legend h2 {
+      font-size: 8px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-lo);
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-dim);
+      font-weight: 600;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .legend-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .legend-label {
+      font-size: 10px;
+      color: var(--text-mid);
+      letter-spacing: 0.03em;
+      font-weight: 400;
+    }
+
+    .legend-area {
+      font-size: 9px;
+      color: var(--text-lo);
+      margin-left: auto;
+      padding-left: 10px;
+      white-space: nowrap;
+    }
+
+    < !--
+
+    /* ── Floor Selector ── */
+    #floor-selector {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      justify-content: center;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+      border-radius: var(--radius-lg);
+      max-width: 88vw;
+      z-index: 10;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+    }
+
+    .floor-btn {
+      background: rgba(120, 80, 255, 0.06);
+      border: 1px solid var(--border-dim);
+      color: var(--text-lo);
+      font-size: 8px;
+      letter-spacing: 0.06em;
+      padding: 3px 7px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      min-width: 26px;
+      text-align: center;
+    }
+
+    .floor-btn:hover {
+      background: rgba(120, 80, 255, 0.16);
+      color: var(--text-hi);
+      border-color: var(--border);
+      transform: translateY(-1px);
+    }
+
+    .floor-btn.active {
+      background: var(--grad);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 2px 10px rgba(124, 58, 237, 0.4);
+    }
+
+    .floor-btn.all-btn {
+      color: var(--text-lo);
+      background: rgba(120, 80, 255, 0.03);
+      margin-right: 6px;
+    }
+
+    .floor-btn.all-btn.active {
+      background: var(--grad);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 2px 10px rgba(124, 58, 237, 0.4);
+    }
+
+    -->
+
+    /* ── Right panel ── */
+    #right-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 280px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .side-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .panel-header:hover {
+      background: rgba(120, 80, 255, 0.05);
+    }
+
+    .panel-title {
+      font-size: 8px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+      font-weight: 600;
+    }
+
+    .panel-arrow {
+      font-size: 9px;
+      color: var(--text-lo);
+      transition: transform 0.2s ease;
+    }
+
+    .panel-body {
+      padding: 10px 14px 14px;
+      border-top: 1px solid var(--border-dim);
+    }
+
+    .panel-body.collapsed {
+      display: none;
+    }
+
+    /* Stats table */
+    .stats-row {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+
+    .stats-swatch {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .stats-label {
+      font-size: 10px;
+      color: var(--text-mid);
+      flex: 1;
+      font-weight: 400;
+    }
+
+    .stats-val {
+      font-size: 10px;
+      color: var(--text-hi);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    .stats-divider {
+      border: none;
+      border-top: 1px solid var(--border-dim);
+      margin: 8px 0;
+    }
+
+    .stats-total {
+      font-size: 10px;
+      color: var(--text-hi);
+      display: flex;
+      justify-content: space-between;
+      font-weight: 500;
+    }
+
+    .stats-meta {
+      font-size: 9px;
+      color: var(--text-lo);
+      margin-top: 3px;
+      line-height: 1.6;
+    }
+
+    /* File drop zone */
+    .file-drop-zone {
+      border: 1px dashed rgba(120, 80, 255, 0.25);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      margin-bottom: 4px;
+      background: rgba(120, 80, 255, 0.03);
+    }
+
+    .file-drop-zone:hover {
+      border-color: rgba(120, 80, 255, 0.5);
+      background: rgba(120, 80, 255, 0.07);
+    }
+
+    .file-drop-zone.drag-over {
+      border-color: rgba(37, 99, 235, 0.7);
+      background: rgba(37, 99, 235, 0.08);
+    }
+
+    .file-drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .file-drop-label {
+      font-size: 8px;
+      color: var(--text-mid);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .file-drop-hint {
+      font-size: 9px;
+      color: var(--text-lo);
+      margin-top: 2px;
+    }
+
+    #loaded-filename {
+      font-size: 9px;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-top: 6px;
+      letter-spacing: 0.04em;
+      word-break: break-all;
+      min-height: 14px;
+      font-weight: 500;
+    }
+
+    #load-error {
+      font-size: 9px;
+      color: #f87171;
+      margin-top: 4px;
+      min-height: 12px;
+      letter-spacing: 0.04em;
+    }
+
+    #load-entry-count {
+      font-size: 9px;
+      color: var(--text-lo);
+      margin-top: 2px;
+    }
+
+    /* 2-col param grid */
+    .param-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 10px;
+      margin-bottom: 8px;
+    }
+
+    .param-cell label {
+      margin-top: 0 !important;
+    }
+
+    /* Site params */
+    .panel-body label {
+      font-size: 8px;
+      color: var(--text-lo);
+      letter-spacing: 0.1em;
+      display: block;
+      margin-bottom: 3px;
+      margin-top: 9px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .panel-body label:first-of-type {
+      margin-top: 0;
+    }
+
+    .param-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .param-row input[type="number"] {
+      background: rgba(120, 80, 255, 0.07);
+      border: 1px solid var(--border);
+      color: var(--text-hi);
+      font-size: 12px;
+      padding: 5px 9px;
+      border-radius: var(--radius-sm);
+      width: 70px;
+      font-family: inherit;
+      font-weight: 500;
+      transition: border-color 0.2s;
+    }
+
+    .param-row input[type="number"]:focus {
+      outline: none;
+      border-color: var(--grad-start);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .param-unit {
+      font-size: 10px;
+      color: var(--text-lo);
+    }
+
+    .panel-btn {
+      background: var(--grad);
+      border: none;
+      color: #fff;
+      font-size: 8px;
+      letter-spacing: 0.12em;
+      padding: 7px 16px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      margin-top: 10px;
+      text-transform: uppercase;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 12px rgba(124, 58, 237, 0.35);
+    }
+
+    .panel-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 18px rgba(124, 58, 237, 0.5);
+    }
+
+    .panel-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Tooltip */
+    #tooltip {
+      position: fixed;
+      background: rgba(6, 6, 18, 0.97);
+      border: 1px solid var(--border);
+      padding: 9px 12px;
+      border-radius: var(--radius-md);
+      font-size: 10px;
+      color: var(--text-mid);
+      line-height: 1.6;
+      pointer-events: none;
+      z-index: 20;
+      display: none;
+      max-width: 200px;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+    }
+
+    #tooltip strong {
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 11px;
+      display: block;
+      margin-bottom: 2px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="canvas-container"></div>
+
+
+
+  <div id="floor-selector"></div>
+
+
+
+  <div id="tooltip"></div>
+
+  <script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+  }
+}
+</script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // ─────────────────────────────────────────────────────────
+    // PROGRAM DATASET
+    // ─────────────────────────────────────────────────────────
+    const RAW_PROGRAM = `
+## ─── BASEMENT (Floor -1) ───
+{loading}/{300}/{-1}/{private}/{15,20}
+{storage}/{400}/{-1}/{private}/{20,20}
+{mechanical}/{350}/{-1}/{private}/{15,24}
+{wine cellar}/{80}/{-1}/{private}/{8,10}
+{service corridor}/{150}/{-1}/{private}/{6,25}
+{restroom}/{80}/{-1}/{public}/{8,10}
+{fire stair and freight elevator}/{200}/{-1}/{circulation}/{10,20}
+{fire stair and elevator 1}/{150}/{-1}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{-1}/{circulation}/{10,13}
+
+## ─── FLOOR 0 — Lobby / MoMA Entry ───
+{lobby}/{600}/{0}/{public}/{20,30}
+{reception}/{100}/{0}/{public}/{10,10}
+{museum gallery}/{500}/{0}/{public}/{20,25}
+{restaurant}/{400}/{0}/{public}/{16,25}
+{museum shop}/{150}/{0}/{public}/{10,15}
+{restroom}/{168}/{0}/{public}/{12,14}
+{loading}/{120}/{0}/{private}/{8,15}
+{storage}/{80}/{0}/{private}/{8,10}
+{mechanical}/{100}/{0}/{private}/{8,13}
+{fire stair and freight elevator}/{200}/{0}/{circulation}/{10,20}
+{fire stair and elevator 1}/{150}/{0}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{0}/{circulation}/{10,13}
+
+## ─── FLOOR 1 — MoMA Gallery ───
+{museum gallery}/{1000}/{1}/{public}/{25,40}
+{exhibition hall}/{350}/{1}/{public}/{14,25}
+{restroom}/{168}/{1}/{public}/{12,14}
+{art storage}/{120}/{1}/{private}/{8,15}
+{staff}/{60}/{1}/{private}/{6,10}
+{IT support}/{40}/{1}/{private}/{5,8}
+{fire stair and freight elevator}/{200}/{1}/{circulation}/{10,20}
+{fire stair and elevator 1}/{150}/{1}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{1}/{circulation}/{10,13}
+
+## ─── FLOOR 2 — MoMA Gallery ───
+{museum gallery}/{1000}/{2}/{public}/{25,40}
+{exhibition hall}/{350}/{2}/{public}/{14,25}
+{restroom}/{168}/{2}/{public}/{12,14}
+{art storage}/{120}/{2}/{private}/{8,15}
+{staff}/{60}/{2}/{private}/{6,10}
+{IT support}/{40}/{2}/{private}/{5,8}
+{fire stair and freight elevator}/{200}/{2}/{circulation}/{10,20}
+{fire stair and elevator 1}/{150}/{2}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{2}/{circulation}/{10,13}
+
+## ─── FLOOR 3 — Restaurant / Transition ───
+{restaurant}/{600}/{3}/{public}/{20,30}
+{private dining}/{150}/{3}/{public}/{10,15}
+{lounge bar}/{120}/{3}/{public}/{10,12}
+{museum shop}/{120}/{3}/{public}/{10,12}
+{restroom}/{168}/{3}/{public}/{12,14}
+{kitchen}/{120}/{3}/{private}/{10,12}
+{storage}/{80}/{3}/{private}/{8,10}
+{fire stair and freight elevator}/{200}/{3}/{circulation}/{10,20}
+{fire stair and elevator 1}/{150}/{3}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{3}/{circulation}/{10,13}
+
+## ─── L4 ───
+{residence duplex}/{280}/{4}/{private}/{14,20}
+{residence corner}/{280}/{4}/{private}/{14,20}
+{restroom}/{60}/{4}/{public}/{6,10}
+{storage}/{40}/{4}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{4}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{4}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{4}/{circulation}/{10,13}
+
+## ─── L5 ───
+{residence duplex}/{280}/{5}/{private}/{14,20}
+{residence corner}/{280}/{5}/{private}/{14,20}
+{restroom}/{60}/{5}/{public}/{6,10}
+{storage}/{40}/{5}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{5}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{5}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{5}/{circulation}/{10,13}
+
+## ─── L6 ───
+{residence duplex}/{280}/{6}/{private}/{14,20}
+{residence corner}/{280}/{6}/{private}/{14,20}
+{restroom}/{60}/{6}/{public}/{6,10}
+{storage}/{40}/{6}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{6}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{6}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{6}/{circulation}/{10,13}
+
+## ─── L7 ───
+{residence duplex}/{280}/{7}/{private}/{14,20}
+{residence corner}/{280}/{7}/{private}/{14,20}
+{restroom}/{60}/{7}/{public}/{6,10}
+{storage}/{40}/{7}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{7}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{7}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{7}/{circulation}/{10,13}
+
+## ─── L8 ───
+{residence duplex}/{280}/{8}/{private}/{14,20}
+{residence corner}/{280}/{8}/{private}/{14,20}
+{restroom}/{60}/{8}/{public}/{6,10}
+{storage}/{40}/{8}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{8}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{8}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{8}/{circulation}/{10,13}
+
+## ─── L9 ───
+{residence duplex}/{280}/{9}/{private}/{14,20}
+{residence corner}/{280}/{9}/{private}/{14,20}
+{restroom}/{60}/{9}/{public}/{6,10}
+{storage}/{40}/{9}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{9}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{9}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{9}/{circulation}/{10,13}
+
+## ─── L10 ───
+{residence duplex}/{280}/{10}/{private}/{14,20}
+{residence corner}/{280}/{10}/{private}/{14,20}
+{restroom}/{60}/{10}/{public}/{6,10}
+{storage}/{40}/{10}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{10}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{10}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{10}/{circulation}/{10,13}
+
+## ─── L11 ───
+{residence duplex}/{280}/{11}/{private}/{14,20}
+{residence corner}/{280}/{11}/{private}/{14,20}
+{restroom}/{60}/{11}/{public}/{6,10}
+{storage}/{40}/{11}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{11}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{11}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{11}/{circulation}/{10,13}
+
+## ─── L12 Fitness ───
+{gym}/{260}/{12}/{private}/{16,16}
+{changing room}/{80}/{12}/{private}/{8,10}
+{storage}/{40}/{12}/{private}/{5,8}
+{restroom}/{80}/{12}/{public}/{8,10}
+{staff}/{40}/{12}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{12}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{12}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{12}/{circulation}/{10,13}
+
+## ─── L13 Aquatics + Spa ───
+{pool}/{200}/{13}/{private}/{14,14}
+{spa}/{120}/{13}/{private}/{10,12}
+{changing room}/{80}/{13}/{private}/{8,10}
+{restroom}/{80}/{13}/{public}/{8,10}
+{storage}/{30}/{13}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{13}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{13}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{13}/{circulation}/{10,13}
+
+## ─── L14 Residents Lounge + Private Dining ───
+{residents lounge}/{200}/{14}/{public}/{14,14}
+{private dining}/{120}/{14}/{public}/{10,12}
+{lounge bar}/{80}/{14}/{public}/{8,10}
+{restroom}/{80}/{14}/{public}/{8,10}
+{kitchen}/{60}/{14}/{private}/{6,10}
+{fire stair and freight elevator}/{170}/{14}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{14}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{14}/{circulation}/{10,13}
+
+## ─── L15 Media + Library ───
+{screening room}/{180}/{15}/{public}/{12,15}
+{library}/{120}/{15}/{public}/{10,12}
+{residents lounge}/{100}/{15}/{public}/{10,10}
+{restroom}/{80}/{15}/{public}/{8,10}
+{IT support}/{40}/{15}/{private}/{5,8}
+{fire stair and freight elevator}/{170}/{15}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{15}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{15}/{circulation}/{10,13}
+
+## ─── L16 Amenity Sky Terrace ───
+{event lounge}/{200}/{16}/{public}/{14,14}
+{residents lounge}/{120}/{16}/{public}/{10,12}
+{lounge bar}/{80}/{16}/{public}/{8,10}
+{restroom}/{80}/{16}/{public}/{8,10}
+{storage}/{30}/{16}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{16}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{16}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{16}/{circulation}/{10,13}
+
+## ─── L17 ───
+{residence corner}/{200}/{17}/{private}/{13,15}
+{residence corner}/{130}/{17}/{private}/{10,13}
+{restroom}/{60}/{17}/{public}/{6,10}
+{storage}/{30}/{17}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{17}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{17}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{17}/{circulation}/{10,13}
+
+## ─── L18 ───
+{residence corner}/{200}/{18}/{private}/{13,15}
+{residence corner}/{130}/{18}/{private}/{10,13}
+{restroom}/{60}/{18}/{public}/{6,10}
+{storage}/{30}/{18}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{18}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{18}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{18}/{circulation}/{10,13}
+
+## ─── L19 ───
+{residence corner}/{200}/{19}/{private}/{13,15}
+{residence corner}/{130}/{19}/{private}/{10,13}
+{restroom}/{60}/{19}/{public}/{6,10}
+{storage}/{30}/{19}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{19}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{19}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{19}/{circulation}/{10,13}
+
+## ─── L20 ───
+{residence corner}/{200}/{20}/{private}/{13,15}
+{residence corner}/{130}/{20}/{private}/{10,13}
+{restroom}/{60}/{20}/{public}/{6,10}
+{storage}/{30}/{20}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{20}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{20}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{20}/{circulation}/{10,13}
+
+## ─── L21 ───
+{residence corner}/{200}/{21}/{private}/{13,15}
+{residence corner}/{130}/{21}/{private}/{10,13}
+{restroom}/{60}/{21}/{public}/{6,10}
+{storage}/{30}/{21}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{21}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{21}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{21}/{circulation}/{10,13}
+
+## ─── L22 ───
+{residence corner}/{200}/{22}/{private}/{13,15}
+{residence corner}/{130}/{22}/{private}/{10,13}
+{restroom}/{60}/{22}/{public}/{6,10}
+{storage}/{30}/{22}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{22}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{22}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{22}/{circulation}/{10,13}
+
+## ─── L23 ───
+{residence corner}/{200}/{23}/{private}/{13,15}
+{residence corner}/{130}/{23}/{private}/{10,13}
+{restroom}/{60}/{23}/{public}/{6,10}
+{storage}/{30}/{23}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{23}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{23}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{23}/{circulation}/{10,13}
+
+## ─── L24 ───
+{residence corner}/{200}/{24}/{private}/{13,15}
+{residence corner}/{130}/{24}/{private}/{10,13}
+{restroom}/{60}/{24}/{public}/{6,10}
+{storage}/{30}/{24}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{24}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{24}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{24}/{circulation}/{10,13}
+
+## ─── L25 ───
+{residence corner}/{200}/{25}/{private}/{13,15}
+{residence corner}/{130}/{25}/{private}/{10,13}
+{restroom}/{60}/{25}/{public}/{6,10}
+{storage}/{30}/{25}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{25}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{25}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{25}/{circulation}/{10,13}
+
+## ─── L26 ───
+{residence corner}/{150}/{26}/{private}/{12,13}
+{residence corner}/{100}/{26}/{private}/{10,10}
+{restroom}/{50}/{26}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{26}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{26}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{26}/{circulation}/{10,13}
+
+## ─── L27 ───
+{residence corner}/{150}/{27}/{private}/{12,13}
+{residence corner}/{100}/{27}/{private}/{10,10}
+{restroom}/{50}/{27}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{27}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{27}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{27}/{circulation}/{10,13}
+
+## ─── L28 ───
+{residence corner}/{150}/{28}/{private}/{12,13}
+{residence corner}/{100}/{28}/{private}/{10,10}
+{restroom}/{50}/{28}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{28}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{28}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{28}/{circulation}/{10,13}
+
+## ─── L29 ───
+{residence corner}/{150}/{29}/{private}/{12,13}
+{residence corner}/{100}/{29}/{private}/{10,10}
+{restroom}/{50}/{29}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{29}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{29}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{29}/{circulation}/{10,13}
+
+## ─── L30 ───
+{residence corner}/{150}/{30}/{private}/{12,13}
+{residence corner}/{100}/{30}/{private}/{10,10}
+{restroom}/{50}/{30}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{30}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{30}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{30}/{circulation}/{10,13}
+
+## ─── L31 ───
+{residence corner}/{150}/{31}/{private}/{12,13}
+{residence corner}/{100}/{31}/{private}/{10,10}
+{restroom}/{50}/{31}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{31}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{31}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{31}/{circulation}/{10,13}
+
+## ─── L32 ───
+{residence corner}/{150}/{32}/{private}/{12,13}
+{residence corner}/{100}/{32}/{private}/{10,10}
+{restroom}/{50}/{32}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{32}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{32}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{32}/{circulation}/{10,13}
+
+## ─── L33 ───
+{residence corner}/{150}/{33}/{private}/{12,13}
+{residence corner}/{100}/{33}/{private}/{10,10}
+{restroom}/{50}/{33}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{33}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{33}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{33}/{circulation}/{10,13}
+
+## ─── L34 ───
+{residence corner}/{150}/{34}/{private}/{12,13}
+{residence corner}/{100}/{34}/{private}/{10,10}
+{restroom}/{50}/{34}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{34}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{34}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{34}/{circulation}/{10,13}
+
+## ─── L35 ───
+{residence corner}/{150}/{35}/{private}/{12,13}
+{residence corner}/{100}/{35}/{private}/{10,10}
+{restroom}/{50}/{35}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{35}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{35}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{35}/{circulation}/{10,13}
+
+## ─── L36 ───
+{residence full floor}/{180}/{36}/{private}/{13,14}
+{restroom}/{50}/{36}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{36}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{36}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{36}/{circulation}/{10,13}
+
+## ─── L37 ───
+{residence full floor}/{180}/{37}/{private}/{13,14}
+{restroom}/{50}/{37}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{37}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{37}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{37}/{circulation}/{10,13}
+
+## ─── L38 ───
+{residence full floor}/{180}/{38}/{private}/{13,14}
+{restroom}/{50}/{38}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{38}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{38}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{38}/{circulation/{10,13}
+
+## ─── L39 ───
+{residence full floor}/{180}/{39}/{private}/{13,14}
+{restroom}/{50}/{39}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{39}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{39}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{39}/{circulation}/{10,13}
+
+## ─── L40 ───
+{residence full floor}/{180}/{40}/{private}/{13,14}
+{restroom}/{50}/{40}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{40}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{40}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{40}/{circulation}/{10,13}
+
+## ─── L41 ───
+{residence full floor}/{180}/{41}/{private}/{13,14}
+{restroom}/{50}/{41}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{41}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{41}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{41}/{circulation}/{10,13}
+
+## ─── L42 ───
+{residence full floor}/{170}/{42}/{private}/{12,14}
+{restroom}/{50}/{42}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{42}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{42}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{42}/{circulation}/{10,13}
+
+## ─── L43 ───
+{residence full floor}/{170}/{43}/{private}/{12,14}
+{restroom}/{50}/{43}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{43}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{43}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{43}/{circulation}/{10,13}
+
+## ─── L44 ───
+{residence full floor}/{160}/{44}/{private}/{12,13}
+{restroom}/{50}/{44}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{44}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{44}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{44}/{circulation}/{10,13}
+
+## ─── L45 ───
+{residence full floor}/{160}/{45}/{private}/{12,13}
+{restroom}/{50}/{45}/{public}/{5,10}
+{fire stair and freight elevator}/{170}/{45}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{45}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{45}/{circulation}/{10,13}
+
+## ─── L46 Crown Lounge ───
+{event lounge}/{200}/{46}/{public}/{14,14}
+{lounge bar}/{80}/{46}/{public}/{8,10}
+{restroom}/{80}/{46}/{public}/{8,10}
+{storage}/{30}/{46}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{46}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{46}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{46}/{circulation}/{10,13}
+
+## ─── L47 Crown Lounge ───
+{event lounge}/{200}/{47}/{public}/{14,14}
+{lounge bar}/{80}/{47}/{public}/{8,10}
+{restroom}/{80}/{47}/{public}/{8,10}
+{storage}/{30}/{47}/{private}/{5,6}
+{fire stair and freight elevator}/{170}/{47}/{circulation}/{10,17}
+{fire stair and elevator 1}/{150}/{47}/{circulation}/{10,15}
+{fire stair and elevator 2}/{130}/{47}/{circulation}/{10,13}
+
+## ─── L48 ───
+{residence penthouse}/{180}/{48}/{private}/{13,14}
+{restroom}/{40}/{48}/{public}/{5,8}
+{fire stair and freight elevator}/{150}/{48}/{circulation}/{10,15}
+{fire stair and elevator 1}/{130}/{48}/{circulation}/{10,13}
+{fire stair and elevator 2}/{110}/{48}/{circulation}/{10,11}
+
+## ─── L49 ───
+{residence penthouse}/{170}/{49}/{private}/{13,13}
+{restroom}/{40}/{49}/{public}/{5,8}
+{fire stair and freight elevator}/{150}/{49}/{circulation}/{10,15}
+{fire stair and elevator 1}/{130}/{49}/{circulation}/{10,13}
+{fire stair and elevator 2}/{110}/{49}/{circulation}/{10,11}
+
+## ─── L50 ───
+{residence penthouse}/{160}/{50}/{private}/{12,13}
+{restroom}/{40}/{50}/{public}/{5,8}
+{fire stair and freight elevator}/{150}/{50}/{circulation}/{10,15}
+{fire stair and elevator 1}/{130}/{50}/{circulation}/{10,13}
+{fire stair and elevator 2}/{110}/{50}/{circulation}/{10,11}
+
+## ─── L51 ───
+{residence penthouse}/{150}/{51}/{private}/{12,12}
+{restroom}/{40}/{51}/{public}/{5,8}
+{fire stair and freight elevator}/{150}/{51}/{circulation}/{10,15}
+{fire stair and elevator 1}/{130}/{51}/{circulation}/{10,13}
+{fire stair and elevator 2}/{110}/{51}/{circulation}/{10,11}
+
+## ─── L52 ───
+{residence penthouse}/{140}/{52}/{private}/{12,12}
+{restroom}/{40}/{52}/{public}/{5,8}
+{fire stair and freight elevator}/{150}/{52}/{circulation}/{10,15}
+{fire stair and elevator 1}/{130}/{52}/{circulation}/{10,13}
+{fire stair and elevator 2}/{110}/{52}/{circulation}/{10,11}
+
+## ─── L53 ───
+{residence penthouse}/{130}/{53}/{private}/{11,12}
+{restroom}/{40}/{53}/{public}/{5,8}
+{fire stair and freight elevator}/{150}/{53}/{circulation}/{10,15}
+{fire stair and elevator 1}/{130}/{53}/{circulation}/{10,13}
+{fire stair and elevator 2}/{110}/{53}/{circulation}/{10,11}
+
+## ─── L54 ───
+{residence penthouse}/{120}/{54}/{private}/{11,11}
+{restroom}/{40}/{54}/{public}/{5,8}
+{fire stair and freight elevator}/{150}/{54}/{circulation}/{10,15}
+{fire stair and elevator 1}/{130}/{54}/{circulation}/{10,13}
+{fire stair and elevator 2}/{110}/{54}/{circulation}/{10,11}
+
+## ─── L55 ───
+{residence penthouse}/{110}/{55}/{private}/{10,11}
+{restroom}/{40}/{55}/{public}/{5,8}
+{fire stair and freight elevator}/{150}/{55}/{circulation}/{10,15}
+{fire stair and elevator 1}/{130}/{55}/{circulation}/{10,13}
+{fire stair and elevator 2}/{110}/{55}/{circulation}/{10,11}
+
+## ─── L56 ───
+{residence penthouse}/{100}/{56}/{private}/{10,10}
+{restroom}/{30}/{56}/{public}/{5,6}
+{fire stair and freight elevator}/{120}/{56}/{circulation}/{8,15}
+{fire stair and elevator 1}/{100}/{56}/{circulation}/{8,13}
+{fire stair and elevator 2}/{90}/{56}/{circulation}/{8,11}
+
+## ─── L57 ───
+{residence penthouse}/{90}/{57}/{private}/{9,10}
+{restroom}/{30}/{57}/{public}/{5,6}
+{fire stair and freight elevator}/{120}/{57}/{circulation}/{8,15}
+{fire stair and elevator 1}/{100}/{57}/{circulation}/{8,13}
+{fire stair and elevator 2}/{90}/{57}/{circulation}/{8,11}
+
+## ─── L58 ───
+{residence penthouse}/{80}/{58}/{private}/{9,9}
+{restroom}/{30}/{58}/{public}/{5,6}
+{fire stair and freight elevator}/{120}/{58}/{circulation}/{8,15}
+{fire stair and elevator 1}/{100}/{58}/{circulation}/{8,13}
+{fire stair and elevator 2}/{90}/{58}/{circulation}/{8,11}
+
+## ─── L59 ───
+{residence penthouse}/{70}/{59}/{private}/{8,9}
+{restroom}/{30}/{59}/{public}/{5,6}
+{fire stair and freight elevator}/{120}/{59}/{circulation}/{8,15}
+{fire stair and elevator 1}/{100}/{59}/{circulation}/{8,13}
+{fire stair and elevator 2}/{90}/{59}/{circulation}/{8,11}
+
+## ─── L60 ───
+{residence penthouse}/{60}/{60}/{private}/{8,8}
+{restroom}/{30}/{60}/{public}/{5,6}
+{fire stair and freight elevator}/{120}/{60}/{circulation}/{8,15}
+{fire stair and elevator 1}/{100}/{60}/{circulation}/{8,13}
+{fire stair and elevator 2}/{90}/{60}/{circulation}/{8,11}
+
+## ─── L61 Spire Zone A ───
+{mechanical}/{80}/{61}/{private}/{8,10}
+{fire stair and freight elevator}/{80}/{61}/{circulation}/{7,11}
+{fire stair and elevator 1}/{70}/{61}/{circulation}/{7,10}
+{fire stair and elevator 2}/{60}/{61}/{circulation}/{6,10}
+
+## ─── L62 ───
+{mechanical}/{70}/{62}/{private}/{7,10}
+{fire stair and freight elevator}/{80}/{62}/{circulation}/{7,11}
+{fire stair and elevator 1}/{70}/{62}/{circulation}/{7,10}
+{fire stair and elevator 2}/{60}/{62}/{circulation}/{6,10}
+
+## ─── L63 ───
+{mechanical}/{60}/{63}/{private}/{6,10}
+{fire stair and freight elevator}/{80}/{63}/{circulation}/{7,11}
+{fire stair and elevator 1}/{70}/{63}/{circulation}/{7,10}
+{fire stair and elevator 2}/{60}/{63}/{circulation}/{6,10}
+
+## ─── L64 ───
+{mechanical}/{50}/{64}/{private}/{6,8}
+{fire stair and freight elevator}/{60}/{64}/{circulation}/{6,10}
+{fire stair and elevator 1}/{50}/{64}/{circulation}/{5,10}
+{fire stair and elevator 2}/{50}/{64}/{circulation}/{5,10}
+
+## ─── L65 ───
+{mechanical}/{40}/{65}/{private}/{5,8}
+{fire stair and freight elevator}/{60}/{65}/{circulation}/{6,10}
+{fire stair and elevator 1}/{50}/{65}/{circulation}/{5,10}
+{fire stair and elevator 2}/{50}/{65}/{circulation}/{5,10}
+
+## ─── L66 Spire Zone B ───
+{mechanical}/{30}/{66}/{private}/{5,6}
+{fire stair and freight elevator}/{50}/{66}/{circulation}/{5,10}
+{fire stair and elevator 1}/{40}/{66}/{circulation}/{5,8}
+
+## ─── L67 ───
+{mechanical}/{25}/{67}/{private}/{5,5}
+{fire stair and freight elevator}/{50}/{67}/{circulation}/{5,10}
+{fire stair and elevator 1}/{40}/{67}/{circulation}/{5,8}
+
+## ─── L68 ───
+{mechanical}/{20}/{68}/{private}/{4,5}
+{fire stair and freight elevator}/{50}/{68}/{circulation}/{5,10}
+{fire stair and elevator 1}/{40}/{68}/{circulation}/{5,8}
+
+## ─── L69 ───
+{mechanical}/{15}/{69}/{private}/{3,5}
+{fire stair and freight elevator}/{40}/{69}/{circulation}/{4,10}
+{fire stair and elevator 1}/{30}/{69}/{circulation}/{4,8}
+
+## ─── L70 ───
+{mechanical}/{10}/{70}/{private}/{2,5}
+{fire stair and freight elevator}/{30}/{70}/{circulation}/{3,10}
+{fire stair and elevator 1}/{20}/{70}/{circulation}/{3,7}
+
+## ─── L71 Spire Zone C ───
+{mechanical}/{20}/{71}/{private}/{4,5}
+{fire stair and freight elevator}/{20}/{71}/{circulation}/{4,5}
+
+## ─── L72 ───
+{mechanical}/{12}/{72}/{private}/{3,4}
+{fire stair and freight elevator}/{15}/{72}/{circulation}/{3,5}
+
+## ─── L73 ───
+{mechanical}/{6}/{73}/{private}/{2,3}
+{fire stair and freight elevator}/{8}/{73}/{circulation}/{2,4}
+`;
+
+    // ─────────────────────────────────────────────────────────
+    // COLOR SCHEME
+    // ─────────────────────────────────────────────────────────
+    const TYPE_COLORS = {
+      // MoMA / Cultural
+      museum_gallery: '#2C7873',
+      exhibition_hall: '#1d6b67',
+      museum_shop: '#4a9e99',
+      art_storage: '#2a5c58',
+      // F&B / Public
+      lobby: '#F5A623',
+      reception: '#e8941f',
+      restaurant: '#F5A623',
+      private_dining: '#d47e18',
+      lounge_bar: '#8B5CF6',
+      event_lounge: '#7C3AED',
+      residents_lounge: '#9B59B6',
+      screening_room: '#7E57C2',
+      library: '#5C6BC0',
+      // Amenity
+      gym: '#E8735A',
+      pool: '#2196F3',
+      spa: '#E91E8C',
+      changing_room: '#c2185b',
+      // Residential
+      residence_duplex: '#4A90D9',
+      residence_corner: '#357ABD',
+      residence_full_floor: '#5BA3E8',
+      residence_penthouse: '#6BB5F5',
+      // Service / BOH
+      kitchen: '#795548',
+      staff: '#607D8B',
+      it_support: '#455A64',
+      wine_cellar: '#6D4C41',
+      loading: '#424242',
+      service_corridor: '#3a3a3a',
+      storage: '#3a3a4a',
+      mechanical: '#2a2a3a',
+      restroom: '#4a4a5a',
+      // Circulation / Cores
+      fire_stair_and_freight_elevator: '#1a1a22',
+      fire_stair_and_elevator_1: '#252535',
+      fire_stair_and_elevator_2: '#202030',
+    };
+
+    // Human-readable labels for legend/stats
+    const TYPE_LABELS = {
+      museum_gallery: 'Museum Gallery',
+      exhibition_hall: 'Exhibition Hall',
+      museum_shop: 'Museum Shop',
+      art_storage: 'Art Storage',
+      lobby: 'Lobby',
+      reception: 'Reception',
+      restaurant: 'Restaurant',
+      private_dining: 'Private Dining',
+      lounge_bar: 'Lounge Bar',
+      event_lounge: 'Event Lounge',
+      residents_lounge: 'Residents Lounge',
+      screening_room: 'Screening Room',
+      library: 'Library',
+      gym: 'Gym',
+      pool: 'Pool',
+      spa: 'Spa',
+      changing_room: 'Changing Room',
+      residence_duplex: 'Residence — Duplex',
+      residence_corner: 'Residence — Corner',
+      residence_full_floor: 'Residence — Full Floor',
+      residence_penthouse: 'Residence — Penthouse',
+      kitchen: 'Kitchen',
+      staff: 'Staff',
+      it_support: 'IT Support',
+      wine_cellar: 'Wine Cellar',
+      loading: 'Loading',
+      service_corridor: 'Service Corridor',
+      storage: 'Storage',
+      mechanical: 'Mechanical',
+      restroom: 'Restroom',
+      fire_stair_and_freight_elevator: 'Fire Stair + Freight Elevator',
+      fire_stair_and_elevator_1: 'Fire Stair + Elevator 1',
+      fire_stair_and_elevator_2: 'Fire Stair + Elevator 2',
+    };
+
+    // ─────────────────────────────────────────────────────────
+    // PARSE PROGRAM TEXT
+    // ─────────────────────────────────────────────────────────
+    function parseProgramText(raw) {
+      const entries = [];
+      const lines = raw.trim().split('\n');
+      for (const line of lines) {
+        const t = line.trim();
+        if (!t || t.startsWith('#')) continue;
+        const parts = t.split('/').map(p => p.replace(/[{}]/g, '').trim());
+        if (parts.length < 5) continue;
+        const type = parts[0].toLowerCase().replace(/\s+/g, '_');
+        const area = parseFloat(parts[1]);
+        const level = parseInt(parts[2], 10);
+        // handle swapped category/dimensions like "residence_mid/260/23/16,16/private"
+        let category, dims;
+        if (parts[3].includes(',')) {
+          dims = parts[3];
+          category = parts[4] || 'private';
+        } else {
+          category = parts[3].trim().toLowerCase();
+          dims = parts[4] || '10,10';
+        }
+        const [ws, ds] = dims.split(',');
+        const w = parseFloat(ws) || 10;
+        const d = parseFloat(ds) || 10;
+        if (isNaN(area) || isNaN(level)) continue;
+        entries.push({ type, area, level, category, w, d });
+      }
+      return entries;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // SCENE STATE
+    // ─────────────────────────────────────────────────────────
+    let PROGRAM_DATA = parseProgramText(RAW_PROGRAM);
+
+    let SITE_W = 40;
+    let SITE_D = 40;
+    let SITE_CX = SITE_W / 2;
+    let SITE_CZ = SITE_D / 2;
+
+    let FLOOR_H = 4.5;
+    let TAPER = 0.55;  // at top floor, footprint = TAPER * site size
+    let TAPER_TOP = 30;    // floor level that defines the taper endpoint
+    let SHOW_DIAGRID = true;
+
+    const SLAB_GAP = 0.12; // fractional gap between slab top and next floor
+    const CORE_W = 9;    // central service core dimensions
+    const CORE_D = 9;
+
+    // ─────────────────────────────────────────────────────────
+    // THREE.JS SETUP
+    // ─────────────────────────────────────────────────────────
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.85;
+    document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf3f4f6);
+    scene.fog = new THREE.FogExp2(0xf3f4f6, 0.0028);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.5, 2000);
+    camera.position.set(SITE_CX + 120, 180, SITE_CZ + 140);
+    camera.lookAt(SITE_CX, 80, SITE_CZ);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(SITE_CX, 80, SITE_CZ);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.minDistance = 20;
+    controls.maxDistance = 800;
+    controls.maxPolarAngle = Math.PI * 0.5;
+    controls.update();
+
+    // Lighting
+    scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+    const sun = new THREE.DirectionalLight(0xfff5e0, 1.6);
+    sun.position.set(70, 100, 60);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.near = 1;
+    sun.shadow.camera.far = 800;
+    sun.shadow.camera.left = -120;
+    sun.shadow.camera.right = 120;
+    sun.shadow.camera.top = 400;
+    sun.shadow.camera.bottom = -60;
+    sun.shadow.bias = -0.0005;
+    scene.add(sun);
+    const fillLight = new THREE.DirectionalLight(0xc8d8ff, 0.3);
+    fillLight.position.set(-60, 40, -70);
+    scene.add(fillLight);
+
+    // ─────────────────────────────────────────────────────────
+    // SCENE GROUPS
+    // ─────────────────────────────────────────────────────────
+    let sceneGroup = new THREE.Group();
+    let labelObjects = []; // { el, worldPos }
+    scene.add(sceneGroup);
+
+    // ─────────────────────────────────────────────────────────
+    // MATERIAL FACTORY
+    // Each program block gets its own material instance so
+    // per-floor opacity can be set without affecting other floors.
+    // ─────────────────────────────────────────────────────────
+    function getMat(hexColor, opacity = 1.0) {
+      return new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(hexColor),
+        roughness: 0.7,
+        metalness: 0.03,
+        transparent: opacity < 1,
+        opacity,
+        side: THREE.DoubleSide
+      });
+    }
+
+    const wireMat = new THREE.MeshBasicMaterial({
+      color: new THREE.Color('#ffffff'),
+      wireframe: true,
+      opacity: 0.04,
+      transparent: true,
+    });
+
+    const edgeMat = new THREE.LineBasicMaterial({
+      color: new THREE.Color('#ffffff'),
+      opacity: 0.12,
+      transparent: true,
+    });
+
+    // Diagrid material — perimeter exoskeleton lines
+    const diagridMat = new THREE.LineBasicMaterial({
+      color: new THREE.Color('#cccccc'),
+      opacity: 0.28,
+      transparent: true,
+    });
+
+    // Core shaft material
+    const coreMat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#1a1a22'),
+      roughness: 0.9,
+      metalness: 0.05,
+    });
+
+    // Ground plane material
+    const groundMat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#0f0f16'),
+      roughness: 1.0,
+      metalness: 0,
+    });
+
+    // ─────────────────────────────────────────────────────────
+    // GROUND PLANE + GRID
+    // ─────────────────────────────────────────────────────────
+    function buildGround() {
+      const geo = new THREE.PlaneGeometry(200, 200);
+      const mesh = new THREE.Mesh(geo, groundMat);
+      mesh.rotation.x = -Math.PI / 2;
+      mesh.position.set(SITE_CX, -0.05, SITE_CZ);
+      mesh.receiveShadow = true;
+      sceneGroup.add(mesh);
+
+      // Site boundary outline
+      const pts = [
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(SITE_W, 0, 0),
+        new THREE.Vector3(SITE_W, 0, SITE_D),
+        new THREE.Vector3(0, 0, SITE_D),
+        new THREE.Vector3(0, 0, 0),
+      ];
+      const bGeo = new THREE.BufferGeometry().setFromPoints(pts);
+      const bLine = new THREE.Line(bGeo, new THREE.LineBasicMaterial({ color: '#334', opacity: 0.6, transparent: true }));
+      sceneGroup.add(bLine);
+
+      // Grid
+      const grid = new THREE.GridHelper(200, 80, new THREE.Color('#1a1a28'), new THREE.Color('#14141e'));
+      grid.position.set(SITE_CX, 0, SITE_CZ);
+      sceneGroup.add(grid);
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // TAPERED FLOOR FOOTPRINT
+    // Given a floor level and total floors, return {cx,cz,hw,hd}
+    // where hw,hd = half-extents of that floor's usable footprint.
+    // Basement and ground are full site. Above ground, taper linearly.
+    // ─────────────────────────────────────────────────────────
+    function floorFootprint(level) {
+      if (level < 0) return { cx: SITE_CX, cz: SITE_CZ, hw: SITE_W / 2, hd: SITE_D / 2 };
+      // First 4 floors (podium) = full footprint
+      const taperStart = Math.min(4, TAPER_TOP);
+      if (level <= taperStart - 1) return { cx: SITE_CX, cz: SITE_CZ, hw: SITE_W / 2, hd: SITE_D / 2 };
+      const span = Math.max(1, TAPER_TOP - taperStart);
+      const t = Math.min(1, (level - taperStart) / span); // 0 → 1
+      const scale = 1.0 - t * (1.0 - TAPER);
+      const hw = (SITE_W / 2) * scale;
+      const hd = (SITE_D / 2) * scale;
+      return { cx: SITE_CX, cz: SITE_CZ, hw, hd };
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // LAYOUT: distribute entries within the tapered footprint
+    //
+    // Strategy:
+    //   1. Fire-stair core entries are detected and placed as a horizontal
+    //      cluster at the centre of each floor, scaled to fit the tapered
+    //      footprint. Their combined bounding box defines the "core zone".
+    //   2. Remaining entries fill four rectangular zones around the core
+    //      cluster (West, East, North, South).
+    //   3. Within each zone blocks are packed column-by-column (left→right,
+    //      top→bottom), clamped to zone bounds with max aspect ratio 1:5.
+    //   4. Overflow goes to the next zone; any remainder falls back to centre.
+    // ─────────────────────────────────────────────────────────
+    const CORE_TYPES = new Set([
+      'fire_stair_and_freight_elevator',
+      'fire_stair_and_elevator_1',
+      'fire_stair_and_elevator_2',
+    ]);
+
+    // ─────────────────────────────────────────────────────────
+    // CORE REDUCTION RULE
+    // Cores are progressively removed as the tower rises:
+    //   Phase 1  (level ≤ 55% of TAPER_TOP)  — all 3 cores
+    //     Freight elevator + 2 passenger cores serve public, amenity, lower residential
+    //   Phase 2  (55%–85% of TAPER_TOP)      — 2 cores (drop freight)
+    //     Freight stops at mid-rise transfer floor; service via one passenger core
+    //   Phase 3  (> 85% of TAPER_TOP)        — 1 core (drop elevator 2)
+    //     Single stair + elevator serves the upper residential and penthouse zone
+    // Basement always keeps all 3 (loading dock + BOH infrastructure).
+    // ─────────────────────────────────────────────────────────
+    function getActiveCores(level) {
+      if (level < 0) return new Set(CORE_TYPES); // basement: full service
+      const t = level / Math.max(1, TAPER_TOP);
+      if (t <= 0.55) {
+        // All 3 cores
+        return new Set(['fire_stair_and_freight_elevator',
+          'fire_stair_and_elevator_1',
+          'fire_stair_and_elevator_2']);
+      } else if (t <= 0.85) {
+        // Freight elevator terminates — mid-rise transfer floor
+        return new Set(['fire_stair_and_elevator_1',
+          'fire_stair_and_elevator_2']);
+      } else {
+        // Elevator 2 terminates — single main stair + elevator to top
+        return new Set(['fire_stair_and_elevator_1']);
+      }
+    }
+
+    function layoutFloor(entries, level) {
+      const fp = floorFootprint(level);
+      const activeCores = getActiveCores(level);
+      // Entries in CORE_TYPES but not active this floor are simply not placed
+      const coreEntries = entries.filter(e => activeCores.has(e.type));
+      const others = entries.filter(e => !CORE_TYPES.has(e.type));
+      const placed = [];
+      const PAD = 0.25;
+
+      // ── Core cluster: place fire-stair entries side-by-side at floor centre ──
+      // Sort largest-area first so the freight elevator anchors the middle.
+      const sortedCores = [...coreEntries].sort((a, b) => b.area - a.area);
+
+      // Clamp each core's dims so the entire cluster fits within the footprint.
+      // Each core gets up to 40% of the half-width; depth up to 90% of half-depth.
+      const clamped = sortedCores.map(e => ({
+        ...e,
+        cw: Math.max(1, Math.min(e.w, fp.hw * 0.8)),
+        cd: Math.max(1, Math.min(e.d, fp.hd * 1.8)),
+      }));
+
+      const totalCoreW = clamped.reduce((s, c) => s + c.cw, 0) + PAD * Math.max(0, clamped.length - 1);
+      let curCoreX = fp.cx - totalCoreW / 2;
+
+      // Track the cluster's bounding box for zone definition
+      let clX0 = fp.cx - totalCoreW / 2;
+      let clX1 = fp.cx + totalCoreW / 2;
+      let clZ0 = fp.cz;
+      let clZ1 = fp.cz;
+
+      for (const c of clamped) {
+        const px = curCoreX + c.cw / 2;
+        const pz = fp.cz;
+        placed.push({ ...c, px, pz, pw: c.cw, pd: c.cd });
+        clZ0 = Math.min(clZ0, pz - c.cd / 2);
+        clZ1 = Math.max(clZ1, pz + c.cd / 2);
+        curCoreX += c.cw + PAD;
+      }
+
+      if (others.length === 0) return placed;
+
+      const minX = fp.cx - fp.hw;
+      const maxX = fp.cx + fp.hw;
+      const minZ = fp.cz - fp.hd;
+      const maxZ = fp.cz + fp.hd;
+
+      // Four zones around the core cluster
+      const zones = [
+        { x0: minX, x1: clX0 - PAD, z0: minZ, z1: maxZ }, // West
+        { x0: clX1 + PAD, x1: maxX, z0: minZ, z1: maxZ }, // East
+        { x0: clX0 - PAD, x1: clX1 + PAD, z0: minZ, z1: clZ0 - PAD }, // North
+        { x0: clX0 - PAD, x1: clX1 + PAD, z0: clZ1 + PAD, z1: maxZ }, // South
+      ].filter(z => (z.x1 - z.x0) > 1 && (z.z1 - z.z0) > 1)
+        .sort((a, b) => ((b.x1 - b.x0) * (b.z1 - b.z0)) - ((a.x1 - a.x0) * (a.z1 - a.z0)));
+
+      if (zones.length === 0) {
+        // Degenerate floor (spire tip) — stack at centre
+        for (const e of others) {
+          placed.push({ ...e, px: fp.cx, pz: fp.cz, pw: Math.min(e.w, fp.hw * 2 - 0.2), pd: Math.min(e.d, fp.hd * 2 - 0.2) });
+        }
+        return placed;
+      }
+
+      // Sort entries: largest area first
+      const sorted = [...others].sort((a, b) => b.area - a.area);
+
+      // Column-packing state per zone
+      const state = zones.map(z => ({ curX: z.x0, curZ: z.z0, colMaxX: z.x0 }));
+
+      for (const entry of sorted) {
+        let wasPlaced = false;
+
+        for (let zi = 0; zi < zones.length; zi++) {
+          const zone = zones[zi];
+          const st = state[zi];
+          const zoneW = zone.x1 - zone.x0;
+          const zoneD = zone.z1 - zone.z0;
+
+          // Clamp dims to zone; enforce max aspect ratio 1:5
+          let bw = Math.min(entry.w, zoneW);
+          let bd = Math.min(entry.d, zoneD);
+          if (bw > 0 && bd / bw > 5) bd = bw * 5;
+          if (bd > 0 && bw / bd > 5) bw = bd * 5;
+          bw = Math.max(bw, 1);
+          bd = Math.max(bd, 1);
+
+          if (st.curX + bw > zone.x1 + 0.01) continue; // zone exhausted
+
+          if (st.curZ + bd > zone.z1 + 0.01) {
+            // Advance to next column
+            st.curX = st.colMaxX + PAD;
+            st.curZ = zone.z0;
+            if (st.curX + bw > zone.x1 + 0.01) continue;
+          }
+
+          const px = st.curX + bw / 2;
+          const pz = st.curZ + bd / 2;
+          placed.push({ ...entry, px, pz, pw: bw, pd: bd });
+
+          st.curZ += bd + PAD;
+          if (st.curX + bw > st.colMaxX) st.colMaxX = st.curX + bw;
+          wasPlaced = true;
+          break;
+        }
+
+        if (!wasPlaced) {
+          placed.push({
+            ...entry,
+            px: fp.cx,
+            pz: fp.cz,
+            pw: Math.min(entry.w, fp.hw),
+            pd: Math.min(entry.d, fp.hd),
+          });
+        }
+      }
+
+      return placed;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // DIAGRID GEOMETRY: wireframe perimeter lines per floor zone
+    // Creates an X-braced exoskeleton outline box
+    // ─────────────────────────────────────────────────────────
+    function buildDiagridForFloor(level, yBase, slabH) {
+      if (!SHOW_DIAGRID) return null;
+      const fp = floorFootprint(level);
+      const minX = fp.cx - fp.hw;
+      const maxX = fp.cx + fp.hw;
+      const minZ = fp.cz - fp.hd;
+      const maxZ = fp.cz + fp.hd;
+      const y0 = yBase;
+      const y1 = yBase + slabH;
+
+      // Perimeter corners
+      const corners = [
+        [minX, y0, minZ], [maxX, y0, minZ],
+        [maxX, y0, maxZ], [minX, y0, maxZ],
+      ];
+
+      const pts = [];
+
+      // Bottom perimeter loop
+      for (let i = 0; i < 4; i++) {
+        const a = corners[i];
+        const b = corners[(i + 1) % 4];
+        pts.push(new THREE.Vector3(...a), new THREE.Vector3(...b));
+      }
+
+      // Top perimeter loop
+      const cornersTop = corners.map(c => [c[0], y1, c[2]]);
+      for (let i = 0; i < 4; i++) {
+        const a = cornersTop[i];
+        const b = cornersTop[(i + 1) % 4];
+        pts.push(new THREE.Vector3(...a), new THREE.Vector3(...b));
+      }
+
+      // Vertical edges at corners
+      for (let i = 0; i < 4; i++) {
+        pts.push(new THREE.Vector3(...corners[i]), new THREE.Vector3(...cornersTop[i]));
+      }
+
+      // Diagonal bracing on each face (X-pattern)
+      for (let i = 0; i < 4; i++) {
+        const a0 = new THREE.Vector3(...corners[i]);
+        const b1 = new THREE.Vector3(...cornersTop[(i + 1) % 4]);
+        const b0 = new THREE.Vector3(...corners[(i + 1) % 4]);
+        const a1 = new THREE.Vector3(...cornersTop[i]);
+        pts.push(a0, b1, b0, a1);
+      }
+
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      return new THREE.LineSegments(geo, diagridMat.clone());
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // BUILD SCENE
+    // ─────────────────────────────────────────────────────────
+
+    // Grouped by floor for opacity control
+    let floorGroups = {}; // level -> THREE.Group
+
+    function disposeGroup(group) {
+      group.traverse(obj => {
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+          if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
+          else obj.material.dispose();
+        }
+      });
+      group.clear();
+    }
+
+    function recentreCamera() {
+      // Recalculate site centre and reposition controls target.
+      // Camera position is nudged to keep a sensible orbit distance.
+      const cx = SITE_CX, cz = SITE_CZ;
+      const diag = Math.sqrt(SITE_W * SITE_W + SITE_D * SITE_D);
+      const levels = [...new Set(PROGRAM_DATA.map(e => e.level))];
+      const maxLevel = levels.length ? Math.max(...levels) : TAPER_TOP;
+      const towerH = (maxLevel + 1) * FLOOR_H;
+      controls.target.set(cx, towerH * 0.4, cz);
+      camera.position.set(cx + diag * 1.8, towerH * 0.7, cz + diag * 1.5);
+      controls.update();
+    }
+
+    function buildScene() {
+      // Recalculate derived site values whenever dimensions may have changed
+      SITE_CX = SITE_W / 2;
+      SITE_CZ = SITE_D / 2;
+
+      // Clear previous
+      disposeGroup(sceneGroup);
+      sceneGroup.clear();
+      labelObjects = [];
+      floorGroups = {};
+
+      buildGround();
+
+      // Group entries by floor — cap at TAPER_TOP
+      const byFloor = {};
+      for (const e of PROGRAM_DATA) {
+        if (e.level > TAPER_TOP) continue;
+        if (!byFloor[e.level]) byFloor[e.level] = [];
+        byFloor[e.level].push(e);
+      }
+
+      const levels = Object.keys(byFloor).map(Number).sort((a, b) => a - b);
+      const maxLevel = Math.max(...levels);
+      const slabH = FLOOR_H * (1 - SLAB_GAP);
+
+      for (const level of levels) {
+        const entries = byFloor[level];
+        const yBase = level * FLOOR_H;
+
+        const floorGroup = new THREE.Group();
+        floorGroup.name = `floor_${level}`;
+        sceneGroup.add(floorGroup);
+        floorGroups[level] = floorGroup;
+
+        // Layout
+        const layout = layoutFloor(entries, level);
+
+        for (const item of layout) {
+          const blockH = slabH;
+          const color = TYPE_COLORS[item.type] || '#667788';
+          const isMechanical = item.type === 'mechanical';
+
+          // Slightly reduce block size for visual gap
+          const bw = item.pw * 0.94;
+          const bd = item.pd * 0.94;
+          const bh = isMechanical ? blockH * 0.7 : blockH;
+
+          const geo = new THREE.BoxGeometry(bw, bh, bd);
+          const mesh = new THREE.Mesh(geo, getMat(color));
+          mesh.position.set(item.px, yBase + bh / 2, item.pz);
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          mesh.userData = { type: item.type, area: item.area, level, category: item.category };
+          floorGroup.add(mesh);
+
+          // Edge overlay for legibility
+          const edgesGeo = new THREE.EdgesGeometry(geo);
+          const edges = new THREE.LineSegments(edgesGeo, edgeMat.clone());
+          edges.position.copy(mesh.position);
+          edges.userData.isEdge = true;
+          floorGroup.add(edges);
+        }
+
+        // Diagrid perimeter wireframe
+        if (SHOW_DIAGRID && level >= 0) {
+          const diagrid = buildDiagridForFloor(level, yBase, slabH);
+          if (diagrid) {
+            diagrid.userData.isDiagrid = true;
+            floorGroup.add(diagrid);
+          }
+        }
+
+        // Floor number label (world-space position, projected to screen)
+        const fp = floorFootprint(level);
+        const labelPos = new THREE.Vector3(fp.cx - fp.hw - 2.5, yBase + slabH / 2, fp.cz);
+        labelObjects.push({ level, worldPos: labelPos });
+      }
+
+      buildUI();
+      buildLabelElements(); // rebuild projected label DOM elements
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // UI: LEGEND
+    // ─────────────────────────────────────────────────────────
+    function buildUI() {
+      buildLegend();
+      buildFloorSelector();
+      buildStats();
+    }
+
+    function buildLegend() {
+      const container = document.getElementById('legend-items');
+      if (!container) return;
+      container.innerHTML = '';
+      const seen = new Set();
+      for (const e of PROGRAM_DATA) {
+        if (seen.has(e.type)) continue;
+        seen.add(e.type);
+        const color = TYPE_COLORS[e.type] || '#667788';
+        const label = TYPE_LABELS[e.type] || e.type.replace(/_/g, ' ');
+        const div = document.createElement('div');
+        div.className = 'legend-item';
+        div.innerHTML = `<div class="legend-swatch" style="background:${color}"></div><span class="legend-label">${label}</span>`;
+        container.appendChild(div);
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // UI: FLOOR SELECTOR
+    // ─────────────────────────────────────────────────────────
+    let activeFloor = null;
+
+    function buildFloorSelector() {
+      const sel = document.getElementById('floor-selector');
+      sel.innerHTML = '';
+
+      const allBtn = document.createElement('button');
+      allBtn.className = 'floor-btn all-btn active';
+      allBtn.textContent = 'ALL';
+      allBtn.onclick = () => setActiveFloor(null);
+      sel.appendChild(allBtn);
+
+      const byFloor = {};
+      for (const e of PROGRAM_DATA) {
+        if (!byFloor[e.level]) byFloor[e.level] = [];
+        byFloor[e.level].push(e);
+      }
+      const levels = Object.keys(byFloor).map(Number).sort((a, b) => a - b);
+      for (const lvl of levels) {
+        const btn = document.createElement('button');
+        btn.className = 'floor-btn';
+        btn.textContent = lvl < 0 ? 'B1' : `F${lvl}`;
+        btn.dataset.level = lvl;
+        btn.onclick = () => setActiveFloor(lvl);
+        sel.appendChild(btn);
+      }
+    }
+
+    function setActiveFloor(level) {
+      activeFloor = level;
+      // Update buttons
+      document.querySelectorAll('.floor-btn').forEach(btn => {
+        if (btn.classList.contains('all-btn')) {
+          btn.classList.toggle('active', level === null);
+        } else {
+          btn.classList.toggle('active', parseInt(btn.dataset.level) === level);
+        }
+      });
+      // Update mesh opacities
+      for (const [lvl, group] of Object.entries(floorGroups)) {
+        const isActive = level === null || parseInt(lvl) === level;
+        group.traverse(obj => {
+          if (!obj.material) return;
+          const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+          const isEdge = !!obj.userData.isEdge;
+          const isDiagrid = !!obj.userData.isDiagrid;
+          mats.forEach(m => {
+            m.transparent = true;
+            if (isActive) {
+              m.opacity = isEdge ? 0.12 : (isDiagrid ? 0.28 : 1.0);
+            } else {
+              m.opacity = 0.04;
+            }
+          });
+        });
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // UI: STATS PANEL
+    // ─────────────────────────────────────────────────────────
+    function buildStats() {
+      const container = document.getElementById('stats-content');
+      if (!container) return;
+      container.innerHTML = '';
+
+      // Aggregate by type
+      const byType = {};
+      for (const e of PROGRAM_DATA) {
+        if (!byType[e.type]) byType[e.type] = 0;
+        byType[e.type] += e.area;
+      }
+      const totalArea = Object.values(byType).reduce((s, v) => s + v, 0);
+      const siteArea = SITE_W * SITE_D;
+      const levels = [...new Set(PROGRAM_DATA.map(e => e.level))];
+      const maxFloor = Math.max(...levels);
+      const towerH = (maxFloor + 1) * FLOOR_H;
+
+      // Sort by area desc
+      const sorted = Object.entries(byType).sort((a, b) => b[1] - a[1]);
+      for (const [type, area] of sorted) {
+        const color = TYPE_COLORS[type] || '#667788';
+        const label = TYPE_LABELS[type] || type.replace(/_/g, ' ');
+        const pct = ((area / totalArea) * 100).toFixed(1);
+        const row = document.createElement('div');
+        row.className = 'stats-row';
+        row.innerHTML = `
+      <div class="stats-swatch" style="background:${color}"></div>
+      <span class="stats-label">${label}</span>
+      <span class="stats-val">${area.toLocaleString()} m²</span>`;
+        container.appendChild(row);
+      }
+
+      const hr = document.createElement('hr');
+      hr.className = 'stats-divider';
+      container.appendChild(hr);
+
+      const totalRow = document.createElement('div');
+      totalRow.className = 'stats-total';
+      totalRow.innerHTML = `<span>Total GFA</span><span>${totalArea.toLocaleString()} m²</span>`;
+      container.appendChild(totalRow);
+
+      const meta = document.createElement('div');
+      meta.className = 'stats-meta';
+      meta.innerHTML = `
+    Floors: B1 – F${maxFloor} &nbsp;(${levels.length} levels)<br>
+    Tower height: ~${towerH.toFixed(0)} m<br>
+    Site: ${siteArea} m² &nbsp;(${SITE_W}×${SITE_D}m)<br>
+    Utilization (GFA/site): ${(totalArea / siteArea).toFixed(1)}× FAR
+  `;
+      container.appendChild(meta);
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // PANEL TOGGLE
+    // ─────────────────────────────────────────────────────────
+    function togglePanel(id) {
+      const body = document.getElementById(`body-${id}`);
+      const arrow = document.getElementById(`arrow-${id}`);
+      const collapsed = body.classList.toggle('collapsed');
+      arrow.innerHTML = collapsed ? '&#9656;' : '&#9660;';
+    }
+    window.togglePanel = togglePanel;
+
+    // ─────────────────────────────────────────────────────────
+    // RECEIVE PARAMETERS FROM PARENT (index.html)
+    // ─────────────────────────────────────────────────────────
+    window.addEventListener('message', (e) => {
+      if (e.data && e.data.action === 'applyParams') {
+        if (e.data.siteW > 0) SITE_W = e.data.siteW;
+        if (e.data.siteD > 0) SITE_D = e.data.siteD;
+        if (e.data.floorCount > 0) TAPER_TOP = e.data.floorCount;
+        if (e.data.floorH > 0) FLOOR_H = e.data.floorH;
+        if (e.data.taper !== undefined) TAPER = e.data.taper;
+        if (e.data.diagrid !== undefined) SHOW_DIAGRID = !!e.data.diagrid;
+        buildScene();
+        recentreCamera();
+      }
+    });
+
+    // ─────────────────────────────────────────────────────────
+    // RAYCASTING / TOOLTIP
+    // ─────────────────────────────────────────────────────────
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2(-9999, -9999);
+    const tooltip = document.getElementById('tooltip');
+    let hoveredMesh = null;
+
+    renderer.domElement.addEventListener('mousemove', e => {
+      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      tooltip.style.left = (e.clientX + 14) + 'px';
+      tooltip.style.top = (e.clientY - 10) + 'px';
+    });
+
+    renderer.domElement.addEventListener('mouseleave', () => {
+      tooltip.style.display = 'none';
+      if (hoveredMesh && hoveredMesh.material && hoveredMesh.material.isMeshStandardMaterial) {
+        hoveredMesh.material.emissiveIntensity = 0;
+        hoveredMesh.material.emissive.set(0x000000);
+      }
+      hoveredMesh = null;
+    });
+
+    function checkHover() {
+      raycaster.setFromCamera(mouse, camera);
+      const meshes = [];
+      sceneGroup.traverse(obj => { if (obj.isMesh && obj.userData.type) meshes.push(obj); });
+      const hits = raycaster.intersectObjects(meshes, false);
+
+      if (hits.length > 0) {
+        const hit = hits[0].object;
+        if (hit !== hoveredMesh) {
+          if (hoveredMesh && hoveredMesh.material && hoveredMesh.material.isMeshStandardMaterial) {
+            hoveredMesh.material.emissiveIntensity = 0;
+            hoveredMesh.material.emissive.set(0x000000);
+          }
+          hoveredMesh = hit;
+          if (hit.material && hit.material.isMeshStandardMaterial) {
+            hit.material.emissive.set(0xffffff);
+            hit.material.emissiveIntensity = 0.14;
+          }
+        }
+        const d = hit.userData;
+        const label = TYPE_LABELS[d.type] || d.type.replace(/_/g, ' ');
+        const floorStr = d.level < 0 ? 'B1' : `F${d.level}`;
+        tooltip.innerHTML = `<strong>${label}</strong>${floorStr} &nbsp;&middot;&nbsp; ${d.area.toLocaleString()} m²<br><span style="color:#666;font-size:9px;text-transform:uppercase;letter-spacing:0.1em">${d.category}</span>`;
+        tooltip.style.display = 'block';
+      } else {
+        if (hoveredMesh && hoveredMesh.material && hoveredMesh.material.isMeshStandardMaterial) {
+          hoveredMesh.material.emissiveIntensity = 0;
+          hoveredMesh.material.emissive.set(0x000000);
+        }
+        hoveredMesh = null;
+        tooltip.style.display = 'none';
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // HTML FLOOR LABELS (projected to screen)
+    // ─────────────────────────────────────────────────────────
+    let labelEls = [];
+
+    function buildLabelElements() {
+      labelEls.forEach(el => el.remove());
+      labelEls = [];
+      for (const lo of labelObjects) {
+        const el = document.createElement('div');
+        el.style.cssText = `
+      position:fixed;
+      font-size:8px;
+      font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+      color:#444;
+      pointer-events:none;
+      white-space:nowrap;
+      z-index:5;
+      letter-spacing:0.06em;
+    `;
+        el.textContent = lo.level < 0 ? 'B1' : `F${lo.level}`;
+        document.body.appendChild(el);
+        labelEls.push({ el, worldPos: lo.worldPos });
+      }
+    }
+
+    function updateLabels() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      for (const { el, worldPos } of labelEls) {
+        const v = worldPos.clone().project(camera);
+        const sx = (v.x * 0.5 + 0.5) * w;
+        const sy = (-v.y * 0.5 + 0.5) * h;
+        if (v.z > 1 || sx < 0 || sx > w || sy < 0 || sy > h) {
+          el.style.display = 'none';
+        } else {
+          el.style.display = 'block';
+          el.style.left = (sx - 14) + 'px';
+          el.style.top = (sy - 6) + 'px';
+        }
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // RESIZE
+    // ─────────────────────────────────────────────────────────
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ─────────────────────────────────────────────────────────
+    // ANIMATION LOOP
+    // ─────────────────────────────────────────────────────────
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      checkHover();
+      updateLabels();
+      renderer.render(scene, camera);
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // FILE LOADING
+    // ─────────────────────────────────────────────────────────
+    const fileInput = document.getElementById('file-input');
+    const dropZone = document.getElementById('drop-zone');
+    const fnDisplay = document.getElementById('loaded-filename');
+    const ecDisplay = document.getElementById('load-entry-count');
+    const errDisplay = document.getElementById('load-error');
+
+    function handleProgramFile(file) {
+      if (errDisplay) errDisplay.textContent = '';
+      if (fnDisplay) fnDisplay.textContent = '';
+      if (ecDisplay) ecDisplay.textContent = '';
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const raw = evt.target.result;
+        let parsed;
+        try {
+          parsed = parseProgramText(raw);
+        } catch (e) {
+          if (errDisplay) errDisplay.textContent = 'Parse error: ' + e.message;
+          return;
+        }
+        if (parsed.length === 0) {
+          if (errDisplay) errDisplay.textContent = 'No program entries found. Check file format.';
+          return;
+        }
+
+        PROGRAM_DATA = parsed;
+
+        const levels = parsed.map(e => e.level);
+        const maxLevel = Math.max(...levels);
+        TAPER_TOP = maxLevel;
+
+        if (fnDisplay) fnDisplay.textContent = '\u2713 ' + file.name;
+        if (ecDisplay) ecDisplay.textContent = parsed.length + ' entries across ' +
+          new Set(levels).size + ' floors';
+
+        buildScene();
+        recentreCamera();
+      };
+      reader.onerror = () => { if (errDisplay) errDisplay.textContent = 'Could not read file.'; };
+      reader.readAsText(file);
+    }
+
+    if (fileInput) {
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files[0]) handleProgramFile(e.target.files[0]);
+        e.target.value = '';
+      });
+    }
+
+    if (dropZone) {
+      dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+      dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('drag-over'); });
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file) handleProgramFile(file);
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // INIT
+    // ─────────────────────────────────────────────────────────
+    buildScene(); // also calls buildLabelElements() internally
+    animate();
+
+  </script>
+</body>
+
+</html>

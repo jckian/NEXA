@@ -1,0 +1,43 @@
+# ── Dependencies ───────────────────────────────
+node_modules/
+my-video/node_modules/
+
+# ── Heavy media / renders (not suited to GitHub) ─
+my-video/
+forVideo/
+*.mp4
+*.mov
+*.webm
+
+# RENDER is huge; keep it out but let the one image the site needs through
+RENDER/*
+!RENDER/TOWER-1.png
+
+# ...and the one assembly clip the intro site plays
+!NEXA/assembly_animation_v5_lineart.mp4
+
+# ── Old / retired branding ───────────────────────
+VORO/
+BACKUP/
+
+# ── Runtime artifacts ────────────────────────────
+pythonFiles/fileTransfer/
+__pycache__/
+*.pyc
+
+# ── Local secrets (never commit) ─────────────────
+.env
+.env.*
+*.key
+*.pem
+OpenAI_ProgramDetails.py
+
+# ── OS / editor cruft ────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ── Scratch / temp ───────────────────────────────
+scratchpad/
+*.tmp

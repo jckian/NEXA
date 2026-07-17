@@ -1,0 +1,20 @@
+{program type}/{area in m2}/{floor level(-1,0,1,2,3,4...)}/{program category}/{width, length}
+included types: storage, mechanical, staff, loading, fire stair and freight elevator, fire stair and elevator 1, fire stair and elevator 2, sales and display, fitting rooms, toilets, circulation, event lounge, event hall, lounge bar, IT support
+included program categories: public, circulation, private
+example: {toilets}/{2}/{4}/{program category}{6,8}
+
+Core generation rules:
+
+- Total number of "fire stair" types must match required exit stair count (min 3, preferred 4).
+- Core 1:
+  {fire stair and freight elevator}/~150–250/each floor/circulation/{~10,15}
+  - Located near loading/service side
+  - Connected to back-of-house circulation
+- Core 2+:
+  Each defined as:
+  {fire stair and elevator 1}/~120–180/each floor/circulation/{~10,12}
+  {fire stair and elevator 2}/~120–180/each floor/circulation/{~10,12}
+  {fire stair and elevator 3}/~120–180/each floor/circulation/{~10,12}
+- Distribution:
+  - Must satisfy ≥ 1/2 floor diagonal separation
+  - Evenly distributed across floor plate

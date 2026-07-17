@@ -1,0 +1,1824 @@
+<!DOCTYPE html><html lang="en"><head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXA — Program Input</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #172FC7;
+      --surface:  #FFFFFF;
+      --border:   rgba(20,24,32,0.09);
+      --border-hi:rgba(20,24,32,0.15);
+      --text-hi:  #141820;
+      --text-mid: #5A6478;
+      --text-lo:  #9BA5B5;
+      --accent:   #172FC7;
+      --accent-dim: rgba(23,47,199,0.08);
+      --accent-glow: rgba(23,47,199,0.18);
+      --font:     'DM Sans', system-ui, sans-serif;
+      --mono:     'JetBrains Mono', monospace;
+      --short:    #E67033;
+      --short-dim: rgba(230,112,51,0.10);
+      --yellow:   #EEC341;
+      --yellow-dim: rgba(238,195,65,0.16);
+      --err:      #d1373f;
+      /* foreground set for content sitting directly on --bg (blue); the --text-hi/mid/lo and --border-hi set above stay dark, used only inside white --surface cards */
+      --ink:      #FFFFFF;
+      --ink-mid:  rgba(255,255,255,0.72);
+      --ink-lo:   rgba(255,255,255,0.46);
+      --ink-border: rgba(255,255,255,0.24);
+      --ink-border-hi: rgba(255,255,255,0.4);
+      --ink-hover-dim: rgba(255,255,255,0.12);
+    }
+
+    html { background: var(--bg); }
+
+    html, body {
+      width: 100%; height: 100%;
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+      color: var(--ink);
+      overflow: hidden;
+    }
+    body { background: transparent; }
+    body.review-active { overflow: auto; }
+
+    /* ── TOP MARK ── */
+    #brand {
+      position: fixed; top: 32px; left: 40px;
+      display: flex; align-items: center; gap: 10px;
+      z-index: 30;
+    }
+    #brand-mark {
+      width: 28px; height: 28px; flex-shrink: 0;
+      background-color: var(--ink);
+      -webkit-mask-image: url(NEXA/NEXA-logo-mask.png); mask-image: url(NEXA/NEXA-logo-mask.png);
+      -webkit-mask-size: contain; mask-size: contain;
+      -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+      -webkit-mask-position: center; mask-position: center;
+    }
+    #brand-name {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--ink-mid);
+    }
+
+    /* ── STEP INDICATOR (top right) ── */
+    #step-indicator {
+      position: fixed; top: 36px; right: 40px;
+      display: flex; align-items: center; gap: 8px;
+      z-index: 30;
+    }
+    .step-pip {
+      width: 20px; height: 2px;
+      background: var(--ink-border);
+      border-radius: 2px;
+      transition: background 0.4s, width 0.4s;
+    }
+    .step-pip.done { background: var(--ink); }
+    .step-pip.active { background: var(--ink); width: 32px; }
+    #step-num {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--ink-lo);
+      letter-spacing: 0.08em;
+      margin-left: 4px;
+    }
+
+    /* ── MAIN DIALOG ── */
+    #dialog {
+      position: relative; z-index: 1;
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: flex-start; justify-content: center;
+      padding: 0 0 0 max(40px, calc((100vw - 640px) / 2));
+      max-width: 100vw;
+    }
+
+    /* ── ANSWERED HISTORY ── */
+    #answered { display: flex; flex-direction: column; gap: 2px; margin-bottom: 40px; min-height: 0; }
+    .answered-row { display: flex; align-items: baseline; gap: 12px; opacity: 0; animation: fadeUp 0.3s ease forwards; }
+    .answered-key {
+      font-family: var(--mono); font-size: 9px; font-weight: 500;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--ink-lo); white-space: nowrap; min-width: 110px;
+    }
+    .answered-val { font-size: 13px; font-weight: 400; color: var(--ink-mid); }
+
+    /* ── QUESTION ── */
+    #question {
+      font-size: clamp(32px, 4.5vw, 52px);
+      font-weight: 300; line-height: 1.18; letter-spacing: -0.02em;
+      color: var(--ink); max-width: 640px; margin-bottom: 36px;
+      transition: opacity 0.22s, transform 0.22s; text-wrap: balance;
+    }
+    #question em { font-style: normal; color: var(--ink); }
+    #question.hidden { opacity: 0; transform: translateY(-10px); }
+
+    /* ── CHIPS ── */
+    #chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 28px; max-width: 640px; transition: opacity 0.2s; align-items: center; }
+    #chips.hidden { opacity: 0; pointer-events: none; }
+    .chip {
+      padding: 7px 16px; border: 1px solid var(--ink-border); border-radius: 20px;
+      background: transparent; font-family: var(--font); font-size: 12px; font-weight: 400;
+      color: var(--ink-mid); cursor: pointer; user-select: none;
+      transition: background 0.14s, border-color 0.14s, color 0.14s; letter-spacing: 0.01em;
+    }
+    .chip:hover { background: var(--ink-hover-dim); border-color: var(--ink-border-hi); color: var(--ink); }
+    .chip.selected { background: var(--ink); border-color: var(--ink); color: var(--accent); }
+    .chip.selected:hover { background: var(--ink); color: var(--accent); opacity: 0.88; }
+    .chip-group-label {
+      width: 100%; font-family: var(--mono); font-size: 9px; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-lo);
+      margin-top: 10px;
+    }
+    .chip-group-label:first-child { margin-top: 0; }
+
+    /* ── INPUT ROW ── */
+    /* the back arrow sits to the LEFT of whichever input row is active, mirroring the
+       send arrow on the right — so the row reads: ← back | [ input ] | enter → */
+    #input-wrap { max-width: 640px; width: 100%; display: flex; align-items: center; gap: 12px; }
+    #input-wrap > .input-row, #input-wrap > #btn-activities { flex: 0 1 auto; }
+    .input-row {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--surface); border: 1px solid var(--border-hi); border-radius: 0px;
+      padding: 6px 6px 6px 18px; transition: border-color 0.2s, box-shadow 0.2s;
+      max-width: 580px;
+    }
+    .input-row:focus-within { border-color: rgba(23,47,199,0.35); box-shadow: 0 0 0 3px rgba(23,47,199,0.08); }
+    .input-row input {
+      flex: 1; border: none; outline: none; background: none;
+      font-family: var(--font); font-size: 13px; font-weight: 400; color: var(--text-hi);
+    }
+    .input-row input::placeholder { color: var(--text-lo); }
+
+    .size-fields { display: flex; align-items: center; gap: 6px; }
+    .size-label { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--text-mid); letter-spacing: 0.05em; }
+    .size-fields input[type="number"] {
+      width: 64px; height: 30px; background: rgba(20,24,32,0.04);
+      border: 1px solid var(--border-hi); border-radius: 3px; text-align: center;
+      font-family: var(--mono); font-size: 12px; color: var(--text-hi); outline: none;
+      transition: border-color 0.2s;
+    }
+    .size-fields input[type="number"]:focus { border-color: var(--accent); }
+    .size-unit { font-family: var(--mono); font-size: 10px; color: var(--text-lo); }
+
+    .btn-send {
+      width: 34px; height: 34px; flex-shrink: 0; border-radius: 3px;
+      background: var(--accent); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.15s, transform 0.12s;
+    }
+    .btn-send svg { width: 14px; height: 14px; stroke: #F5F5F5; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .btn-send:hover { opacity: 0.85; }
+    .btn-send:active { transform: scale(0.93); }
+    .btn-send:disabled { background: var(--text-lo); cursor: default; opacity: 0.5; }
+
+    /* same geometry as .btn-send, but it sits on the blue field, not inside the white
+       card — so it is outlined rather than filled, and never competes with Enter */
+    .btn-back-arrow { background: transparent; border: 1px solid var(--ink-border); }
+    .btn-back-arrow svg { stroke: var(--ink-mid); }
+    .btn-back-arrow:hover { background: var(--ink-hover-dim); border-color: var(--ink-border-hi); opacity: 1; }
+    .btn-back-arrow:hover svg { stroke: var(--ink); }
+
+    /* Activity confirm button (step 4) */
+    #btn-activities {
+      display: none;
+      font-family: var(--font); font-size: 13px; font-weight: 500; color: var(--accent);
+      background: var(--ink); border: none; padding: 11px 22px; cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    #btn-activities:hover { opacity: 0.85; }
+
+    #hint { margin-top: 14px; font-size: 11px; color: var(--ink-lo); font-family: var(--mono); letter-spacing: 0.04em; max-width: 600px; }
+
+    #ver {
+      position: fixed; bottom: 28px; left: 40px;
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--ink-lo); z-index: 5;
+    }
+    body.review-active #ver { display: none; }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    #noise-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; width: 100%; height: 100%; background: var(--bg); display: none; /* all-white bg: noise shader off; remove this to restore */ }
+
+    /* ══════════════ REVIEW STAGE — floor card editor ══════════════ */
+    #review {
+      position: relative; z-index: 1; display: none;
+      width: 100%; min-height: 100%;
+      padding: 110px 40px 150px;
+    }
+    #review-inner { max-width: 1020px; margin: 0 auto; }
+    #review-title { font-size: clamp(26px, 3.2vw, 38px); font-weight: 300; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 8px; }
+    #review-title em { font-style: normal; }
+    #review-sub { font-size: 12px; color: var(--ink-mid); margin-bottom: 26px; }
+
+    #floors { display: flex; flex-direction: column; gap: 8px; }
+
+    .floor-card {
+      background: var(--surface); border: 1px solid var(--border-hi);
+      padding: 12px 16px;
+      display: grid; grid-template-columns: 88px 1fr 190px; gap: 16px;
+      align-items: start;
+    }
+    @media (max-width: 820px) { .floor-card { grid-template-columns: 60px 1fr; } .share-col { grid-column: 2; } }
+
+    .floor-label { padding-top: 3px; }
+    .floor-label .lv { font-family: var(--mono); font-size: 15px; font-weight: 500; color: var(--text-hi); }
+    .floor-label .lv-sub { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-lo); margin-top: 2px; }
+
+    .pills { display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; }
+    .pill {
+      display: inline-flex; align-items: baseline; gap: 7px;
+      padding: 4px 12px; border-radius: 14px; border: 1px solid;
+      font-size: 11px; cursor: pointer; user-select: none;
+      transition: box-shadow 0.12s, opacity 0.12s;
+    }
+    .pill:hover { box-shadow: 0 0 0 2px var(--accent-dim); }
+    .pill b { font-family: var(--mono); font-weight: 500; font-size: 10px; opacity: 0.8; }
+    .pill.long  { background: var(--accent-dim); border-color: rgba(23,47,199,0.30); color: #172FC7; }
+    .pill.short { background: var(--short-dim); border-color: rgba(230,112,51,0.45); color: #b25620; }
+    .pill.circ  { background: var(--yellow-dim); border-color: rgba(238,195,65,0.6); color: #8a6a10; }
+    .pill.add   { background: transparent; border-style: dashed; border-color: var(--border-hi); color: var(--text-lo); }
+    .pill.add:hover { color: var(--accent); border-color: rgba(23,47,199,0.35); }
+
+    .share-col { padding-top: 3px; }
+    .share-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+    .share-head .share-pct { font-family: var(--mono); font-size: 10px; color: var(--text-mid); }
+    .share-head .share-cap { font-family: var(--mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-lo); }
+    .share-bar { position: relative; height: 4px; background: rgba(20,24,32,0.07); border-radius: 2px; overflow: visible; }
+    .share-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--short); border-radius: 2px; }
+    .share-tick { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--text-lo); }
+    .sftag {
+      display: inline-block; margin-top: 7px;
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+      padding: 2px 8px; border-radius: 3px;
+      background: var(--short-dim); color: #b25620; border: 1px solid rgba(230,112,51,0.4);
+    }
+
+    /* inline editor / add form inside a card */
+    .inline-form {
+      grid-column: 1 / -1;
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+      border-top: 1px dashed var(--border-hi); margin-top: 4px; padding-top: 10px;
+    }
+    .inline-form .if-name { font-family: var(--mono); font-size: 11px; color: var(--text-hi); }
+    .inline-form input[type="number"], .inline-form input[type="text"] {
+      height: 28px; background: rgba(20,24,32,0.04);
+      border: 1px solid var(--border-hi); border-radius: 3px;
+      font-family: var(--mono); font-size: 11px; color: var(--text-hi);
+      padding: 0 8px; outline: none;
+    }
+    .inline-form input[type="number"] { width: 78px; text-align: center; }
+    .inline-form input[type="text"] { width: 240px; }
+    .inline-form input:focus { border-color: var(--accent); }
+    .inline-form select {
+      height: 28px; border: 1px solid var(--border-hi); border-radius: 3px;
+      background: var(--surface); font-family: var(--mono); font-size: 11px;
+      color: var(--text-hi); outline: none; padding: 0 6px;
+    }
+    .if-btn {
+      height: 28px; padding: 0 14px; border-radius: 3px; border: none; cursor: pointer;
+      font-family: var(--font); font-size: 11px; font-weight: 500;
+      background: var(--accent); color: #F5F5F5; transition: opacity 0.15s;
+    }
+    .if-btn:hover { opacity: 0.85; }
+    .if-btn.ghost { background: transparent; color: var(--text-mid); border: 1px solid var(--border-hi); }
+    .if-btn.danger { background: transparent; color: var(--err); border: 1px solid rgba(209,55,63,0.4); }
+    .if-lab { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-lo); }
+
+    /* ── RAW TEXT PANEL ── */
+    #raw-panel { display: none; margin-top: 18px; }
+    #raw-text {
+      width: 100%; height: 300px; resize: vertical;
+      background: var(--surface); border: 1px solid var(--border-hi);
+      font-family: var(--mono); font-size: 11.5px; line-height: 1.55; color: var(--text-hi);
+      padding: 14px; outline: none;
+    }
+    #raw-text:focus { border-color: rgba(23,47,199,0.35); box-shadow: 0 0 0 3px rgba(23,47,199,0.08); }
+    #raw-actions { display: flex; gap: 12px; align-items: center; margin-top: 8px; }
+    #raw-errors { font-family: var(--mono); font-size: 10.5px; color: var(--err); margin-top: 8px; line-height: 1.6; }
+
+    /* ── STICKY FOOTER ── */
+    #footer-bar {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 25;
+      display: none;
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border-hi);
+      padding: 13px 40px;
+    }
+    body.review-active #footer-bar { display: block; }
+    #footer-inner { max-width: 1020px; margin: 0 auto; display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
+    .ft-stat { display: flex; flex-direction: column; gap: 1px; }
+    .ft-stat .k { font-family: var(--mono); font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-lo); }
+    .ft-stat .v { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--text-hi); }
+    #btn-raw-toggle {
+      margin-left: auto;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.03em;
+      background: transparent; border: 1px solid var(--border-hi); border-radius: 3px;
+      color: var(--text-mid); padding: 9px 14px; cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    #btn-raw-toggle:hover { color: var(--accent); border-color: rgba(23,47,199,0.35); }
+    #btn-restart {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.03em;
+      background: transparent; border: 1px solid var(--border-hi); border-radius: 3px;
+      color: var(--text-mid); padding: 9px 14px; cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    #btn-restart:hover { color: var(--accent); border-color: rgba(23,47,199,0.35); }
+
+    /* review-footer back: same arrow button as the wizard's, but on the white footer —
+       outlined in the dark border colour instead of the light one */
+    .btn-back-arrow-light { background: transparent; border: 1px solid var(--border-hi); }
+    .btn-back-arrow-light svg { stroke: var(--text-mid); }
+    .btn-back-arrow-light:hover { background: var(--accent-dim); border-color: rgba(23,47,199,0.35); opacity: 1; }
+    .btn-back-arrow-light:hover svg { stroke: var(--accent); }
+    #btn-build {
+      font-family: var(--font); font-size: 13px; font-weight: 500; color: #F5F5F5;
+      background: var(--accent); border: none; padding: 11px 24px; cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    #btn-build:hover { opacity: 0.85; }
+
+    /* ══════════════ SITE FORECAST entry ══════════════ */
+    #forecast-link {
+      display: none; /* shown by script only when NEXA/intel/data/site-*.js loaded */
+      margin-top: 30px;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--ink-mid);
+      cursor: pointer; user-select: none;
+    }
+    #forecast-link:hover { color: var(--ink); }
+    body.review-active #forecast-link { display: none !important; }
+
+    #forecast {
+      position: fixed; inset: 0; z-index: 40;
+      display: none; overflow-y: auto;
+      background: var(--bg);
+      padding: 96px 0 80px; /* no side inset — the band runs edge to edge */
+    }
+    #forecast-inner { width: 100%; }
+    #fc-head { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 0 40px; }
+    #fc-title { font-size: clamp(26px, 3.2vw, 38px); font-weight: 300; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 8px; }
+    #fc-title em { font-style: normal; }
+    #fc-close {
+      background: none; border: 1px solid var(--ink-border); color: var(--ink-mid);
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+      padding: 6px 12px; cursor: pointer; flex-shrink: 0;
+    }
+    #fc-close:hover { border-color: var(--ink-border-hi); color: var(--ink); }
+    #fc-scout {
+      display: inline-block; background: none; border: 1px solid var(--ink-border); color: var(--ink-mid);
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+      padding: 6px 12px; cursor: pointer; text-decoration: none;
+    }
+    #fc-scout:hover { border-color: var(--ink-border-hi); color: var(--ink); }
+    /* site switcher — rendered only when more than one site data file is loaded */
+    #fc-tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 40px; margin: 16px 0 34px; }
+    #fc-tabs:empty { display: none; }
+    .fc-tab {
+      background: none; border: 1px solid var(--ink-border); color: var(--ink-mid);
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 7px 14px; cursor: pointer;
+    }
+    .fc-tab:hover { border-color: var(--ink-border-hi); color: var(--ink); }
+    .fc-tab.active { background: var(--ink); border-color: var(--ink); color: var(--accent); }
+
+    /* observed history = one horizontal line; the scenarios are PARALLEL OPTIONS off its
+       end, so they stack vertically rather than reading as a further sequence */
+    #fc-band { display: flex; align-items: stretch; flex-wrap: nowrap; padding: 4px 24px 16px 0; }
+    /* The history is a LANE CHART, not a single line: programs that coexisted in time
+       (an ongoing district program, a rival development, a lot and the proposal to
+       replace it) get their own row. Columns advance only when a new start-year does. */
+    #fc-spine {
+      flex: 0 0 auto;
+      display: grid; grid-auto-columns: 190px; gap: 10px 34px; align-content: center;
+    }
+    .fc-tl-node {
+      position: relative;
+      display: flex; flex-direction: column; justify-content: center;
+      border: 1px solid var(--ink-border); padding: 12px 14px;
+    }
+    .fc-tl-node.present { border-color: var(--ink-border-hi); }
+    .fc-tl-node.parallel { border-style: dashed; opacity: 0.75; } /* coexisted; not this site's successor */
+    /* arrow drawn only between a node and its documented successor in the next column */
+    .fc-tl-node.succ::after {
+      content: '→'; position: absolute; right: -25px; top: 50%; transform: translateY(-50%);
+      font-family: var(--mono); font-size: 14px; color: var(--ink-lo);
+    }
+    .fc-tl-node .t { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--ink-lo); text-transform: uppercase; }
+    .fc-tl-node .n { font-size: 12px; color: var(--ink); margin-top: 2px; }
+
+    /* branch: one fork rail, then the option stack */
+    #fc-fork { flex: 0 0 auto; align-self: stretch; width: 34px; position: relative; }
+    #fc-fork::before { /* vertical rail spanning the options */
+      content: ''; position: absolute; left: 16px; top: 12%; bottom: 12%;
+      border-left: 1px dashed var(--ink-border-hi);
+    }
+    #fc-fork::after { /* stem from the last history node into the rail */
+      content: ''; position: absolute; left: 0; right: 18px; top: 50%;
+      border-top: 1px dashed var(--ink-border-hi);
+    }
+    #fc-options { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+    .fc-opt-row { display: flex; align-items: center; }
+    .fc-opt-tick { flex: 0 0 auto; width: 22px; border-top: 1px dashed var(--ink-border-hi); }
+
+    .fc-card {
+      flex: 1 1 auto; min-width: 0;
+      background: var(--surface); border: 1px solid var(--border-hi);
+      padding: 16px 20px;
+      /* minmax(0,·) on every track: a plain 1fr takes the paragraph's min-content width
+         and overflows the card past the viewport edge */
+      display: grid; grid-template-columns: minmax(0, 230px) minmax(0, 1fr) minmax(0, 240px);
+      gap: 20px; align-items: center;
+    }
+    @media (max-width: 1100px) { .fc-card { grid-template-columns: minmax(0, 1fr); gap: 10px; } }
+    .fc-card .sc-meta { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-lo); }
+    .fc-card .sc-name { font-size: 16px; font-weight: 500; color: var(--text-hi); }
+    .fc-card .sc-note { font-size: 11.5px; color: var(--text-mid); line-height: 1.5; }
+    .fc-card .sc-head { display: flex; flex-direction: column; gap: 4px; }
+    .fc-card .sc-right { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+    .fc-mix { display: flex; height: 10px; width: 100%; overflow: hidden; }
+    .fc-mix span { height: 100%; }
+    .fc-mix-legend { display: flex; flex-wrap: wrap; gap: 4px 10px; font-family: var(--mono); font-size: 9px; color: var(--text-mid); }
+    .fc-apply {
+      background: var(--accent); color: #fff; border: none;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+      padding: 8px 14px; cursor: pointer;
+    }
+    .fc-apply:hover { opacity: 0.85; }
+  </style>
+</head>
+<body>
+
+<canvas id="noise-canvas"></canvas>
+
+  <!-- Brand mark -->
+  <div id="brand">
+    <div id="brand-mark" role="img" aria-label="NEXA"></div>
+    <span id="brand-name">NEXA</span>
+  </div>
+
+  <!-- Step indicator -->
+  <div id="step-indicator">
+    <div class="step-pip active" id="pip-0"></div>
+    <div class="step-pip" id="pip-1"></div>
+    <div class="step-pip" id="pip-2"></div>
+    <div class="step-pip" id="pip-3"></div>
+    <span id="step-num">01 / 04</span>
+  </div>
+
+  <!-- Wizard dialog -->
+  <div id="dialog">
+    <div id="answered"></div>
+
+    <p id="question"><em>What building type</em><br>are we programming?</p>
+
+    <div id="chips"></div>
+
+    <div id="input-wrap">
+      <button class="btn-send btn-back-arrow" id="btn-back" title="Back to the previous question" style="display:none;">
+        <svg viewBox="0 0 18 18"><path d="M14 9H4M8 5L4 9l4 4"></path></svg>
+      </button>
+
+      <div class="input-row" id="row-number" style="display:none;">
+        <input id="input-number" type="number" min="0" autocomplete="off" placeholder="e.g. 12000">
+        <span class="size-unit">m²</span>
+        <button class="btn-send" id="btn-number" disabled>
+          <svg viewBox="0 0 18 18"><path d="M4 9h10M10 5l4 4-4 4"></path></svg>
+        </button>
+      </div>
+
+      <div class="input-row" id="row-floors" style="display:none;">
+        <div class="size-fields">
+          <span class="size-label">Above</span>
+          <input id="floors-above" type="number" min="1" max="80" value="8">
+          <span class="size-label" style="margin-left:10px;">Basement</span>
+          <input id="floors-basement" type="number" min="0" max="10" value="2">
+        </div>
+        <button class="btn-send" id="btn-floors">
+          <svg viewBox="0 0 18 18"><path d="M4 9h10M10 5l4 4-4 4"></path></svg>
+        </button>
+      </div>
+
+      <button id="btn-activities">Continue →</button>
+    </div>
+
+    <p id="hint">Sets the per-floor recipe</p>
+
+    <a id="forecast-link">▸ site forecast</a>
+  </div>
+
+  <!-- Review stage: floor card editor -->
+  <div id="review">
+    <div id="review-inner">
+      <p id="review-title">Draft <em>program</em> — floor by floor</p>
+      <p id="review-sub">Click a pill to edit or delete it; use + to add a program to a floor. Orange = SHORT (plug-in) · blue = LONG · yellow = circulation.</p>
+
+      <div id="floors"></div>
+
+      <div id="raw-panel">
+        <textarea id="raw-text" spellcheck="false"></textarea>
+        <div id="raw-actions">
+          <button id="btn-raw-apply" class="if-btn">Apply</button>
+          <span class="if-lab">re-parses the text back into the floor cards — errors leave them untouched</span>
+        </div>
+        <div id="raw-errors"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky footer (review stage only) -->
+  <div id="footer-bar">
+    <div id="footer-inner">
+      <button class="btn-send btn-back-arrow-light" id="btn-back-review" title="Back — keeps this draft">
+        <svg viewBox="0 0 18 18"><path d="M14 9H4M8 5L4 9l4 4"></path></svg>
+      </button>
+      <div class="ft-stat"><span class="k">Total GFA</span><span class="v" id="ft-gfa">—</span></div>
+      <div class="ft-stat"><span class="k">Levels</span><span class="v" id="ft-range">—</span></div>
+      <div class="ft-stat"><span class="k">Long / Short</span><span class="v" id="ft-split">—</span></div>
+      <div class="ft-stat"><span class="k">8'-6" floors</span><span class="v" id="ft-shortfloors">—</span></div>
+      <button id="btn-raw-toggle">▸ raw text</button>
+      <button id="btn-restart" title="Discard this draft and restart the wizard">↺ start over</button>
+      <button id="btn-build">Build massing →</button>
+    </div>
+  </div>
+
+  <!-- ── SITE FORECAST overlay (NEXA Intel layer — dormant unless data files loaded) ── -->
+  <div id="forecast">
+    <div id="forecast-inner">
+      <div id="fc-head">
+        <p id="fc-title">Site <em>forecast</em></p>
+        <div style="display:flex;gap:8px;flex-shrink:0;">
+          <a id="fc-scout" href="NEXA/intel/site-scout.html" target="_blank">▸ scout a new site</a>
+          <button id="fc-close">✕ back to wizard</button>
+        </div>
+      </div>
+      <div id="fc-tabs"></div>
+      <div id="fc-band">
+        <div id="fc-spine"></div>
+        <div id="fc-fork"></div>
+        <div id="fc-options"></div>
+      </div>
+    </div>
+  </div>
+
+  <datalist id="vocab-list"></datalist>
+
+  <div id="ver">SCI-Arc SP26 · Program Agent</div>
+
+<!-- NEXA Intel data (optional — a missing file only leaves that site out; no file at all
+     leaves the Site Forecast entry hidden). Adding a site = add its two tags here. -->
+<script src="NEXA/intel/data/site-citymarket.js"></script>
+<script src="NEXA/intel/data/scenarios-citymarket.js"></script>
+<script src="NEXA/intel/data/site-collegest.js"></script>
+<script src="NEXA/intel/data/scenarios-collegest.js"></script>
+<script src="NEXA/intel/data/transitions.js"></script>
+
+<script>
+  // ── WebGL mouse-reactive noise background (verbatim from chat.html) ──
+  (function() {
+    const canvas = document.getElementById('noise-canvas');
+    if (getComputedStyle(canvas).display === 'none') return; // all-white bg: shader disabled via CSS
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) return;
+
+    const vert = `
+      attribute vec2 a_pos;
+      void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
+    `;
+    const frag = `
+      precision highp float;
+      uniform vec2  u_res;
+      uniform vec2  u_mouse;
+      uniform float u_time;
+
+      vec2 hash2(vec2 p) {
+        p = vec2(dot(p,vec2(127.1,311.7)), dot(p,vec2(269.5,183.3)));
+        return fract(sin(p)*43758.5453);
+      }
+
+      float voronoi(vec2 p) {
+        vec2 i = floor(p), f = fract(p);
+        float md = 8.0;
+        for(int x=-2;x<=2;x++) for(int y=-2;y<=2;y++){
+          vec2 g = vec2(float(x),float(y));
+          vec2 o = hash2(i+g);
+          o = 0.5 + 0.5*sin(u_time*0.4 + 6.2831*o);
+          md = min(md, length(g + o - f));
+        }
+        return md;
+      }
+
+      float fbm(vec2 p) {
+        float v=0.0, a=0.5;
+        for(int i=0;i<5;i++){
+          v += a*voronoi(p);
+          p  = p*2.1 + vec2(1.7,9.2);
+          a *= 0.5;
+        }
+        return v;
+      }
+
+      void main() {
+        vec2 uv    = gl_FragCoord.xy / u_res;
+        vec2 mouse = u_mouse / u_res;
+        float md   = length(uv - mouse);
+        float pull = smoothstep(0.6, 0.0, md) * 0.38;
+
+        vec2 p = uv * 3.5 + vec2(u_time*0.055);
+        p += (mouse - 0.5) * pull * 2.2;
+
+        float n = fbm(p);
+        n = smoothstep(0.28, 0.78, n);
+
+        vec3 bg   = vec3(0.980, 0.980, 0.984);
+        vec3 mark = vec3(0.910, 0.918, 0.960);
+        vec3 col  = mix(bg, mark, n*0.85);
+        col = mix(col, vec3(0.82, 0.85, 1.0), pull*n*0.55);
+
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `;
+
+    function mkShader(type, src) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src); gl.compileShader(s); return s;
+    }
+    const prog = gl.createProgram();
+    gl.attachShader(prog, mkShader(gl.VERTEX_SHADER, vert));
+    gl.attachShader(prog, mkShader(gl.FRAGMENT_SHADER, frag));
+    gl.linkProgram(prog); gl.useProgram(prog);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, 'a_pos');
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+    const uRes   = gl.getUniformLocation(prog, 'u_res');
+    const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+    const uTime  = gl.getUniformLocation(prog, 'u_time');
+
+    let W=0, H=0, mx=0, my=0, tmx=0, tmy=0;
+    function resize() {
+      W = canvas.width  = canvas.offsetWidth;
+      H = canvas.height = canvas.offsetHeight;
+      gl.viewport(0,0,W,H);
+      mx=W/2; my=H/2; tmx=mx; tmy=my;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+    window.addEventListener('mousemove', e => { tmx=e.clientX; tmy=H-e.clientY; });
+
+    const t0 = performance.now();
+    function frame(now) {
+      mx += (tmx-mx)*0.06; my += (tmy-my)*0.06;
+      gl.clearColor(0.98, 0.98, 0.984, 1.0);
+      gl.uniform2f(uRes,   W, H);
+      gl.uniform2f(uMouse, mx, my);
+      gl.uniform1f(uTime,  (now-t0)*0.001);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })();
+</script>
+
+<script>
+  // ══════════════════════════════════════════════════════════════════
+  // SHARED CLASSIFIERS + LINE VALIDATOR
+  // ══════════════════════════════════════════════════════════════════
+  const isCore = t => /fire stair|elevator|escalator|\bstair\b|\bcore\b|shaft/i.test(t); // copied from program-massing-shortfloor.html — keep in sync
+  const isFreight = t => /freight/i.test(t); // copied from program-massing-shortfloor.html — keep in sync
+  const isShort = t => /coffee|showroom|pop[- ]?up|exhibition|event hall|\bdemo\b|classroom|seminar|computer lab|project review|yoga|pilates|fitness|recovery lounge|physical therapy|meditation|health coaching|lounge bar/i.test(t); // copied from program-massing-shortfloor.html — keep in sync
+  const isCorridor = t => /circulation|corridor|hallway/i.test(t); // copied from program-massing-shortfloor.html — keep in sync
+  const VALID_CATEGORIES = ['public', 'private', 'circulation'];
+  const SHORT_THRESHOLD = 0.5; // copied from program-massing-shortfloor.html — keep in sync
+
+  // Validates one raw line the same way shortfloor's parse() reads it, plus an
+  // "unknown category" check parse() does not enforce (it silently accepts any
+  // string) but which authors should fix before handoff.
+  function validateLine(raw) {
+    const t = raw.trim();
+    if (!t || t.startsWith('#')) return { skip: true };
+
+    const parts = t.split('/').map(s => s.replace(/[{}]/g, '').trim());
+    if (parts.length < 3) return { error: 'too few parts (need type/area/level)' };
+
+    const type = parts[0].toLowerCase();
+    const area = parseFloat(parts[1]);
+    const level = parseInt(parts[2], 10);
+    let category = 'private';
+    if (parts[3] && !parts[3].includes(',')) category = parts[3].toLowerCase();
+    else if (parts[4] && !parts[4].includes(',')) category = parts[4].toLowerCase();
+
+    if (!type) return { error: 'missing type' };
+    if (isNaN(area)) return { error: 'NaN area' };
+    if (isNaN(level)) return { error: 'NaN level' };
+    if (!VALID_CATEGORIES.includes(category)) return { error: 'unknown category "' + category + '"' };
+
+    let w = 0, h = 0, hasWH = false;
+    for (let i = 3; i < parts.length; i++) {
+      if (parts[i] && parts[i].includes(',')) {
+        const [a, b] = parts[i].split(',').map(parseFloat);
+        if (!isNaN(a) && !isNaN(b)) { w = a; h = b; hasWH = true; }
+        break;
+      }
+    }
+
+    return { type, area, level, category, wh: hasWH ? [w, h] : null };
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // WIZARD
+  // ══════════════════════════════════════════════════════════════════
+  // Every chip label below matches the isShort regex above (verified per label).
+  const ACTIVITY_GROUPS = [
+    ['Show & event', ['exhibition', 'event hall', 'showroom', 'pop-up']],
+    ['Learning',     ['classroom', 'seminar', 'computer lab', 'project review']],
+    ['Wellness',     ['yoga', 'pilates', 'fitness', 'meditation', 'recovery lounge']],
+    ['Social',       ['coffee', 'lounge bar']],
+  ];
+
+  // Per-activity emitted program lines [type, area m²]. Type names all satisfy
+  // isShort. Areas: mostly taken from the shortfloor SAMPLE's own instances
+  // (coffee shop 161, showroom 214, pop-up retail 107, exhibition gallery 268,
+  // event hall 241, lounge bar 134); fitness uses the AREA-TABLE "gym" 242;
+  // the rest are presets in the 90–215 m² band by activity kind.
+  const ACTIVITY_DEFS = {
+    'exhibition':      [['exhibition gallery', 268]],
+    'event hall':      [['event hall', 241]],
+    'showroom':        [['showroom', 214]],
+    'pop-up':          [['pop-up retail', 107], ['pop-up retail', 107]],
+    'classroom':       [['classroom', 107], ['classroom', 107]],
+    'seminar':         [['seminar room', 107]],
+    'computer lab':    [['computer lab', 107]],
+    'project review':  [['project review room', 107]],
+    'yoga':            [['yoga studio', 134]],
+    'pilates':         [['pilates studio', 107]],
+    'fitness':         [['fitness center', 242]],
+    'meditation':      [['meditation room', 90]],
+    'recovery lounge': [['recovery lounge', 107]],
+    'coffee':          [['coffee shop', 161]],
+    'lounge bar':      [['lounge bar', 134]],
+  };
+
+  const steps = [
+    {
+      type: 'chips',
+      question: '<em>What building type</em><br>are we programming?',
+      label: 'Type',
+      chips: ['Mixed-Use', 'Office', 'Housing'],
+      hint: 'Sets the per-floor recipe',
+    },
+    {
+      type: 'number',
+      question: 'What is the<br>total <em>GFA</em>?',
+      label: 'GFA',
+      chips: ['8,000 m²', '12,000 m²', '20,000 m²'],
+      placeholder: 'e.g. 12000',
+      hint: 'Gross floor area target, in square metres (all levels)',
+    },
+    {
+      type: 'floors',
+      question: 'How many <em>floors</em><br>above and below grade?',
+      label: 'Floors',
+      hint: 'Defaults: 8 above grade, 2 basement levels',
+    },
+    {
+      type: 'multi',
+      question: 'What <em>activities</em><br>plug into the building?',
+      label: 'Activities',
+      hint: 'These plug-in (SHORT) programs form a taper of 8′-6″ storeys across the lower floors — most on the lowest level, share decreasing as you climb, every level above the 50% collapse threshold — pick none for an all-LONG building.',
+    },
+  ];
+
+  let step = 0;
+  const selectedActivities = new Set();
+  const wiz = { buildingType: 'mixed-use', gfa: 12000, floorsAbove: 8, basementLevels: 2, activities: [] };
+
+  // Where the review stage was entered from, so its "← back" returns to the right place.
+  // Set by submit() (wizard) and by applyScenario() (forecast); persisted in the draft.
+  let reviewOrigin = 'wizard';
+  let openForecast = null; // assigned by initSiteForecast when intel data is present
+
+  const qEl = document.getElementById('question');
+  const chipsEl = document.getElementById('chips');
+  const answeredEl = document.getElementById('answered');
+  const hintEl = document.getElementById('hint');
+  const rowNumber = document.getElementById('row-number');
+  const rowFloors = document.getElementById('row-floors');
+  const inputNumber = document.getElementById('input-number');
+  const btnNumber = document.getElementById('btn-number');
+  const floorsAboveEl = document.getElementById('floors-above');
+  const floorsBasementEl = document.getElementById('floors-basement');
+  const btnFloors = document.getElementById('btn-floors');
+  const btnActivities = document.getElementById('btn-activities');
+  const btnBack = document.getElementById('btn-back');
+
+  function updatePips(s) {
+    for (let i = 0; i < steps.length; i++) {
+      const pip = document.getElementById('pip-' + i);
+      pip.className = 'step-pip' + (i < s ? ' done' : i === s ? ' active' : '');
+    }
+    document.getElementById('step-num').textContent = String(s + 1).padStart(2, '0') + ' / ' + String(steps.length).padStart(2, '0');
+  }
+
+  function loadStep(i) {
+    const s = steps[i];
+    step = i;            // keep the pointer and the view in sync (goBack relies on this)
+    updatePips(i);
+    renderAnswered();
+
+    qEl.classList.add('hidden');
+    setTimeout(() => { qEl.innerHTML = s.question; qEl.classList.remove('hidden'); }, 200);
+
+    chipsEl.classList.add('hidden');
+    setTimeout(() => {
+      chipsEl.innerHTML = '';
+      if (s.type === 'multi') {
+        for (const [groupName, keys] of ACTIVITY_GROUPS) {
+          const lab = document.createElement('span');
+          lab.className = 'chip-group-label';
+          lab.textContent = groupName;
+          chipsEl.appendChild(lab);
+          for (const key of keys) {
+            const c = document.createElement('button');
+            c.className = 'chip' + (selectedActivities.has(key) ? ' selected' : '');
+            c.textContent = key;
+            c.dataset.activity = key;
+            c.onclick = () => {
+              if (selectedActivities.has(key)) selectedActivities.delete(key); else selectedActivities.add(key);
+              c.classList.toggle('selected', selectedActivities.has(key));
+            };
+            chipsEl.appendChild(c);
+          }
+        }
+      } else {
+        (s.chips || []).forEach(label => {
+          const c = document.createElement('button');
+          c.className = 'chip';
+          c.textContent = label;
+          c.onclick = () => submit(label);
+          chipsEl.appendChild(c);
+        });
+      }
+      chipsEl.classList.remove('hidden');
+    }, 180);
+
+    hintEl.textContent = s.hint || '';
+    btnBack.style.display = i > 0 ? 'flex' : 'none'; // .btn-send centres its svg with flex
+
+    rowNumber.style.display = 'none';
+    rowFloors.style.display = 'none';
+    btnActivities.style.display = 'none';
+
+    if (s.type === 'number') {
+      rowNumber.style.display = 'flex';
+      // prefill on a revisit (coming back), so the previous answer is not retyped
+      inputNumber.value = answered[i] ? String(Math.round(wiz.gfa)) : '';
+      inputNumber.placeholder = s.placeholder || '';
+      btnNumber.disabled = !inputNumber.value;
+      setTimeout(() => inputNumber.focus(), 250);
+    } else if (s.type === 'floors') {
+      rowFloors.style.display = 'flex';
+      floorsAboveEl.value = wiz.floorsAbove;
+      floorsBasementEl.value = wiz.basementLevels;
+      setTimeout(() => floorsAboveEl.focus(), 250);
+    } else if (s.type === 'multi') {
+      btnActivities.style.display = 'inline-block';
+    }
+  }
+
+  // Answers are kept as data, not only as DOM rows, so "← back" can re-ask a step and a
+  // revisited step can prefill its previous value. Answers past the current step are kept
+  // (not deleted) — stepping forward re-confirms and overwrites them.
+  const answered = []; // answered[i] = { key, val } for step i, once answered
+  function renderAnswered() { // only the steps already behind the current one are shown
+    answeredEl.innerHTML = answered.slice(0, step).map(a => a
+      ? `<div class="answered-row"><span class="answered-key">${escapeHtml(a.key)}</span><span class="answered-val">${escapeHtml(a.val)}</span></div>`
+      : '').join('');
+  }
+  function recordAnswer(label) {
+    answered[step] = { key: steps[step].label, val: String(label) };
+  }
+
+  function goBack() {
+    if (step === 0) return;
+    step--;
+    loadStep(step);
+  }
+  btnBack.addEventListener('click', goBack);
+
+  function submit(value) {
+    if (step === 0) {
+      wiz.buildingType = value.toLowerCase().replace(/\s+/g, '-');
+    } else if (step === 1) {
+      const n = parseFloat(String(value).replace(/[^\d.]/g, ''));
+      wiz.gfa = isNaN(n) || n <= 0 ? 12000 : n;
+      value = Math.round(wiz.gfa).toLocaleString() + ' m²';
+    } else if (step === 2) {
+      const a = Math.max(1, parseInt(floorsAboveEl.value, 10) || 8);
+      const b = Math.max(0, parseInt(floorsBasementEl.value, 10) || 0);
+      wiz.floorsAbove = a; wiz.basementLevels = b;
+      value = a + ' above · ' + b + ' basement';
+    } else if (step === 3) {
+      wiz.activities = [...selectedActivities];
+      value = selectedActivities.size === 0 ? 'no activities' : selectedActivities.size + ' activities';
+    }
+
+    recordAnswer(value);
+
+    if (step + 1 < steps.length) {
+      loadStep(step + 1); // loadStep advances `step`
+    } else {
+      step = steps.length;
+      chipsEl.classList.add('hidden');
+      qEl.classList.add('hidden');
+      btnActivities.style.display = 'none';
+      reviewOrigin = 'wizard';
+      setTimeout(() => enterReview(), 250);
+    }
+  }
+
+  inputNumber.addEventListener('input', () => { btnNumber.disabled = !inputNumber.value.trim(); });
+  inputNumber.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && inputNumber.value.trim()) { e.preventDefault(); submit(inputNumber.value.trim()); }
+  });
+  btnNumber.addEventListener('click', () => { if (inputNumber.value.trim()) submit(inputNumber.value.trim()); });
+
+  [floorsAboveEl, floorsBasementEl].forEach(el => el.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); btnFloors.click(); }
+  }));
+  btnFloors.addEventListener('click', () => {
+    submit((floorsAboveEl.value || '8') + ' above / ' + (floorsBasementEl.value || '2') + ' basement');
+  });
+
+  btnActivities.addEventListener('click', () => submit('activities'));
+
+  loadStep(0);
+
+  // ══════════════════════════════════════════════════════════════════
+  // DRAFT GENERATOR (deterministic — no randomness)
+  // ══════════════════════════════════════════════════════════════════
+  function dims(area) {
+    const w = Math.max(1, Math.round(Math.sqrt(area)));
+    const h = Math.max(1, Math.round(area / w));
+    return [w, h];
+  }
+
+  function generateEntries(buildingType, gfaTarget, floorsAbove, basementLevels, activityKeys) {
+    // Three-tier area model (replaces the old uniform gfa/rawTotal scale):
+    //   • RIGID   — exact preset, never scaled (life-safety cores, circulation,
+    //               toilets, parking, mech/elec rooms, loading dock).
+    //   • CALIB   — scaled by a factor clamped to [0.85, 1.15] (activities,
+    //               apartment plates, lobby, sales, staff, it, storage).
+    //   • SPONGE  — absorbs the remainder (office plates ≥300; band LONG filler,
+    //               which is instead fixed by the >0.5 share guarantee below).
+    // Each line carries a `tier` tag used by the deterministic solve at the end.
+    const out = []; // {type, area, level, category, wh, tier, rawA(preset)}
+    function add(type, area, level, category, tier) {
+      const a = Math.max(1, Math.round(area));
+      const rec = { type, area: a, level, category, wh: null, tier, rawA: a };
+      out.push(rec);
+      return rec;
+    }
+
+    // ── adaptive core count (rule B): passenger core b only when the average
+    //    above-grade plate (gfa / floorsAbove) is ≥ 1400 m²; otherwise two cores
+    //    (freight + passenger a), matching the shortfloor SAMPLE's 2-core recipe
+    //    and relieving the rigid budget. 12000/8F → 1500 ≥ 1400 → 3 cores;
+    //    12000/10F → 1200 < 1400 → 2 cores.
+    const plateAvg = floorsAbove > 0 ? gfaTarget / floorsAbove : 0;
+    const threeCore = plateAvg >= 1400;
+    function addCores(level) {
+      add('fire stair & freight elevator core', 40, level, 'circulation', 'rigid');   // 17'×25'-6" = 2×3 modules (6 cells ≈ 40 m²); 25' rounded up to module-true 25'-6"
+      add('fire stair & passenger elevator core a', 40, level, 'circulation', 'rigid'); // 17'×25'-6" = 2×3 modules
+      if (threeCore) add('fire stair & passenger elevator core b', 40, level, 'circulation', 'rigid'); // 17'×25'-6" = 2×3 modules
+      add('circulation', 107, level, 'circulation', 'rigid');
+    }
+
+    // ── basements ──
+    for (let i = 1; i <= basementLevels; i++) {
+      const level = -i;
+      if (i === 1) {
+        add('loading dock', 161, level, 'private', 'rigid');
+        add('storage', 107, level, 'private', 'calib');
+        add('storage', 107, level, 'private', 'calib');
+        add('mechanical room', 161, level, 'private', 'rigid');
+        add('electrical room', 54, level, 'private', 'rigid');
+        add('staff area', 80, level, 'private', 'calib');
+        add('it support', 54, level, 'private', 'calib');
+      } else {
+        add('parking bay group', 322, level, 'private', 'rigid');
+        add('parking bay group', 322, level, 'private', 'rigid');
+        add('parking bay group', 322, level, 'private', 'rigid');
+        add('mechanical room', 161, level, 'private', 'rigid');
+        add('storage', 107, level, 'private', 'calib');
+        add('electrical room', 54, level, 'private', 'rigid');
+      }
+      addCores(level);
+    }
+
+    // ── ground floor: public anchors ──
+    add('lobby', 180, 0, 'public', 'calib');
+    add('sales and display', 220, 0, 'public', 'calib');
+    add('toilets', 80, 0, 'public', 'rigid');
+    addCores(0);
+
+    // ── SHORT activity floors: a taper of "plug-in" storeys on the lower levels ──
+    // Mirrors program-massing-shortfloor.html's SAMPLE: SHORT programs sit on the
+    // lowest floors and taper as you climb. The hard constraint is the visualizer's
+    // computeShortFloors rule — a floor collapses to an 8'-6" SHORT storey only when
+    // its SHORT share of packed (non-core, non-corridor) area is STRICTLY > 0.5. So
+    // every level that receives SHORT lines must clear 0.5, or it simply won't
+    // collapse. Two former assumptions broke that: (1) the fixed 480 m² ground
+    // anchors and (2) a fixed ~400 m² LONG filler on every SHORT level diluted the
+    // share below 0.5 for all but the densest selections. The logic below fixes both:
+    //   • whole SHORT lines are split into n bins (n≤4) with STRICTLY-decreasing raw
+    //     area, choosing the largest n whose split is strictly decreasing;
+    //   • the ground (level 0, carrying the fixed 480 anchors) leads the band ONLY
+    //     when its SHORT bin clears the anchors with room to taper — otherwise the
+    //     band starts at level 1 and the ground keeps just its anchors;
+    //   • LONG filler on each non-ground SHORT level is ADAPTIVE: capped by a
+    //     per-level target share (a gentle decreasing taper, all > 0.5) and funded
+    //     by the sponge budget (see the tiered solve below), so the floor always
+    //     clears the threshold — even at zero filler, since every band level also
+    //     carries a rigid 80 m² toilets line and keeps SHORT strictly above 80.
+    // Lines are ordered by floor affinity: coffee + Show&event first, then Learning,
+    // then Wellness, then lounge bar last. Result: SHORT raw area AND share both
+    // strictly decrease up the band and every used level collapses in the massing.
+    const upperCount = Math.max(0, floorsAbove - 1);
+    const ANCHORS = 180 + 220 + 80; // ground LONG anchors at preset (lobby+sales+toilets), used for band placement
+
+    // affinity rank per activity key, derived from ACTIVITY_GROUPS (no type strings):
+    // coffee → 0 (ground social), the four groups → 1..4, lounge bar → 5 (top social).
+    const affinity = key => {
+      if (key === 'coffee') return 0;
+      if (key === 'lounge bar') return 5;
+      const gi = ACTIVITY_GROUPS.findIndex(([, keys]) => keys.includes(key));
+      return gi < 0 ? 4 : gi + 1;
+    };
+    const actItems = [];
+    let ord = 0;
+    for (const key of activityKeys)
+      for (const [t, a] of (ACTIVITY_DEFS[key] || [])) actItems.push({ t, a, rank: affinity(key), ord: ord++ });
+    actItems.sort((x, y) => x.rank - y.rank || x.ord - y.ord);
+    const actLines = actItems.map(x => [x.t, x.a]);
+
+    const useHousingAt = f =>
+      buildingType === 'office' ? false :
+      buildingType === 'housing' ? true :
+      ((f - 1) % 2 === 1); // mixed-use: alternate by upper-floor index
+
+    // Greedy whole-line split into exactly n non-empty bins against 4:3:2:1 area
+    // targets, then accept only if bin raw areas are STRICTLY decreasing. Returns
+    // the bins (each {area, lines}) or null (→ caller tries a smaller n).
+    function splitBins(lines, n) {
+      if (n < 1 || lines.length < n) return null;
+      const tot = lines.reduce((s, x) => s + x[1], 0);
+      const weights = [4, 3, 2, 1].slice(0, n);
+      const sumW = weights.reduce((s, w) => s + w, 0);
+      const targets = weights.map(w => tot * w / sumW);
+      const bins = Array.from({ length: n }, () => ({ area: 0, lines: [] }));
+      let li = 0, acc = 0, placed = 0;
+      for (let k = 0; k < lines.length; k++) {
+        const [t, a] = lines[k];
+        const higherEmpty = n - 1 - li;                          // SHORT bins still above current
+        const mustAdvance = placed >= 1 && (lines.length - k) <= higherEmpty;
+        const wantAdvance = placed >= 1 && li < n - 1 && acc >= targets[li];
+        if (mustAdvance || wantAdvance) { li++; acc = 0; placed = 0; }
+        bins[li].lines.push([t, a]); bins[li].area += a; acc += a; placed++;
+      }
+      if (bins.some(b => b.lines.length === 0)) return null;     // an empty bin → n too big
+      for (let i = 1; i < n; i++) if (!(bins[i].area < bins[i - 1].area)) return null;
+      return bins;
+    }
+
+    // pick the largest feasible n (≤4, ≤floorsAbove, ≤lines); n=1 always splits.
+    let bins = null, nLev = 0;
+    const maxLev = Math.min(4, floorsAbove, actLines.length);
+    for (let n = maxLev; n >= 1; n--) { const b = splitBins(actLines, n); if (b) { bins = b; nLev = n; break; } }
+
+    const bins0 = bins, nLev0 = nLev;
+
+    // ══════════════════════════════════════════════════════════════════
+    // DETERMINISTIC TIERED SOLVE — two-pass build
+    // ══════════════════════════════════════════════════════════════════
+    // Pass 1 lets the existing machinery decide whether the ground leads the band.
+    // When the sponge is squeezed the band filler shrinks toward 0, which RAISES
+    // upper SHORT shares — a ground-led band can then break the strictly-decreasing
+    // share taper (the ground's share is diluted by its fixed anchors). If the final
+    // POST-SCALING check fails, pass 2 rebuilds with the band forced to start at L1
+    // (off-ground, filler = ratio·cap keeps shares provably strictly decreasing:
+    // both 80/short_i and (1−s_i)/s_i grow up the band).
+    const baseLen = out.length;   // basements + ground anchors + their cores
+    const PLATE_MIN = 300;        // sponge per-plate minimum (office plate ≥ 300)
+    // office plate split — keep ≥2 rooms/floor so the massing packs a double-loaded
+    // bar, not a core-wrapping plate (shortfloor plate gate: single room OR >70%).
+    // 280 m² ≈ a large office suite; tuneable.
+    const OFFICE_ROOM_MAX = 280;
+
+    function decomposeHousing(area) {  // greedy 134/107/67 largest-first; leftover <67 absorbed
+      const units = []; let rem = area;
+      for (const u of [134, 107, 67]) while (rem >= u) { units.push(u); rem -= u; }
+      return units;
+    }
+    const sumTier = tier => out.reduce((s, e) => s + (e.tier === tier ? e.area : 0), 0);
+
+    function buildAttempt(forceNoGround) {
+      out.length = baseLen;                 // rewind to the shared base
+      for (const e of out) e.area = e.rawA; // restore presets (idempotent rescale)
+
+      // ── SHORT band placement (machinery preserved; force flag only pins ground off) ──
+      const bandLevels = [];  // {lv, isGround, shortRecs, targetShare} ascending
+      let bandTop = 0;
+      if (bins0) {
+        let bins = bins0.map(b => ({ area: b.area, lines: b.lines.slice() }));
+        let nLev = nLev0;
+        const b0 = bins[0].area;
+        // ground leads the band only if its SHORT bin clears the anchors with enough
+        // headroom to keep every upper SHORT level strictly below it and above 0.5.
+        let includeGround = b0 > ANCHORS;
+        const gShare = b0 / (b0 + ANCHORS);
+        const uppersIfGround = nLev - 1;
+        if (includeGround && uppersIfGround > 0 && gShare <= 0.5 + uppersIfGround * 0.03 + 0.02)
+          includeGround = false;
+        if (forceNoGround) includeGround = false;
+        // if the band excludes the ground it needs nLev upper levels; fall back to
+        // ground-led (or trim) when there aren't enough above-grade floors.
+        if (!includeGround && nLev > upperCount) {
+          if (!forceNoGround && b0 > ANCHORS && (nLev - 1) <= upperCount) includeGround = true;
+          else { nLev = Math.max(1, upperCount); bins = bins.slice(0, nLev); }
+        }
+
+        const startLevel = includeGround ? 0 : 1;
+        const uppers = includeGround ? nLev - 1 : nLev;
+        // upper-level target shares: a gentle decreasing taper, all strictly > 0.5.
+        const topT = includeGround ? Math.min(0.70, gShare - 0.02) : 0.70;
+        const botT = 0.53;
+        const upperShare = j => uppers <= 1 ? topT : Math.max(0.505, topT - (topT - botT) * j / (uppers - 1));
+
+        for (let idx = 0; idx < nLev; idx++) {
+          const lv = startLevel + idx;
+          const shortRecs = bins[idx].lines.map(([t, a]) => add(t, a, lv, 'public', 'calib'));
+          const isGround = includeGround && idx === 0;
+          const j = includeGround ? idx - 1 : idx;              // upper index within the taper
+          bandLevels.push({ lv, isGround, shortRecs, targetShare: isGround ? null : upperShare(j) });
+        }
+        bandTop = startLevel + nLev - 1;
+      }
+
+      // ── toilets on every band level (rule C): rigid 80 m², public. Ground already
+      //    carries its single toilets; upper band levels each get one.
+      for (const bl of bandLevels) if (!bl.isGround) add('toilets', 80, bl.lv, 'public', 'rigid');
+
+      // ── remaining upper floors: main-use plates. Office AND housing plates are the
+      //    SPONGE: office as one resizable line (≥ PLATE_MIN); housing as a greedy
+      //    decomposition of the per-plate target into standard units (rule D — no
+      //    residential line over 160 m²). Only their per-plate target varies; unit
+      //    presets stay exact.
+      const officePlates = [];   // recs (area set by the solve)
+      const housingFloors = [];  // floor numbers (lines emitted by the solve)
+      for (let f = Math.max(1, bandTop + 1); f <= upperCount; f++) {
+        if (useHousingAt(f)) housingFloors.push(f);
+        else officePlates.push(add('office', 900, f, 'private', 'sponge'));
+      }
+      // cores on every upper floor (SHORT + main)
+      for (let f = 1; f <= upperCount; f++) addCores(f);
+
+      const nPlates = officePlates.length + housingFloors.length;
+
+      // 1) calibrated scale: clamp((gfa − rigid − spongeMin) / calibRaw, 0.85, 1.15).
+      const rigidTotal = sumTier('rigid');
+      const calibRaw = sumTier('calib');
+      let calibScale = 1;
+      if (gfaTarget > 0 && calibRaw > 0)
+        calibScale = Math.min(1.15, Math.max(0.85, (gfaTarget - rigidTotal - nPlates * PLATE_MIN) / calibRaw));
+      for (const e of out) if (e.tier === 'calib') e.area = Math.max(1, Math.round(e.rawA * calibScale));
+
+      // 2) band shrink (rule C, POST-SCALING): a level whose SHORT ≤ 80 can't clear
+      //    0.5 even with zero filler (its rigid toilet alone is 80 LONG) — merge its
+      //    SHORT lines into the neighbour bin below and drop its toilet.
+      const upperBand = bandLevels.filter(b => !b.isGround);
+      for (let guard = 0; guard < 8; guard++) {
+        let merged = false;
+        for (let i = upperBand.length - 1; i >= 0; i--) {
+          const bl = upperBand[i];
+          const shortI = bl.shortRecs.reduce((s, r) => s + r.area, 0);
+          if (shortI <= 80) {
+            const below = i >= 1 ? upperBand[i - 1] : (bandLevels.find(b => b.isGround) || null);
+            if (!below) continue;               // lone un-clearable level: leave as-is
+            for (const r of bl.shortRecs) { r.level = below.lv; below.shortRecs.push(r); }
+            const ti = out.findIndex(e => e.type === 'toilets' && e.level === bl.lv && e.tier === 'rigid');
+            if (ti >= 0) out.splice(ti, 1);
+            upperBand.splice(i, 1);
+            bandLevels.splice(bandLevels.indexOf(bl), 1);
+            merged = true; break;
+          }
+        }
+        if (!merged) break;
+      }
+
+      // 3) band LONG filler is SPONGE: per-level MAX is the taper target
+      //    (floor(shortI·(1−s)/s) − 80, LONG counted as toilet+filler); MIN is 0
+      //    (post-merge every level has SHORT > 80, so the toilet alone keeps the
+      //    share > 0.5). Fund filler up to a uniform ratio of its caps AFTER
+      //    reserving every plate's minimum.
+      const fillerLevels = upperBand.map(bl => {
+        const shortI = bl.shortRecs.reduce((s, r) => s + r.area, 0);
+        const cap = Math.max(0, Math.floor(shortI * (1 - bl.targetShare) / bl.targetShare) - 80);
+        return { bl, cap };
+      });
+      const fillerMax = fillerLevels.reduce((s, f) => s + f.cap, 0);
+      const S = gfaTarget - sumTier('rigid') - sumTier('calib');
+      const ratio = gfaTarget <= 0 ? 1 :
+        (fillerMax > 0 ? Math.max(0, Math.min(fillerMax, S - nPlates * PLATE_MIN)) / fillerMax : 0);
+      const fillerRecs = [];
+      for (const f of fillerLevels) {
+        const filler = Math.round(f.cap * ratio);
+        if (filler <= 0) continue;
+        if (useHousingAt(f.bl.lv)) {
+          for (const u of decomposeHousing(filler))    // realistic units, each ≤ 160
+            fillerRecs.push(add(u === 134 ? '2b2b apartment' : u === 107 ? '1b1b apartment' : 'studio apartment',
+              u, f.bl.lv, 'private', 'sponge'));
+        } else if (filler >= 54) {                     // office filler minimum (rule D)
+          fillerRecs.push(add('office', filler, f.bl.lv, 'private', 'sponge'));
+        }
+      }
+
+      // ── final band check on POST-SCALING areas: every level > 0.5 and SHORT raw
+      //    AND share strictly decreasing up the band.
+      const bandStats = () => bandLevels.map(bl => {
+        let shrt = 0, tot = 0;
+        for (const e of out) {
+          if (e.level !== bl.lv || isCore(e.type) || isCorridor(e.type)) continue;
+          tot += e.area;
+          if (isShort(e.type)) shrt += e.area;
+        }
+        return { shrt, share: tot > 0 ? shrt / tot : 0 };
+      });
+      const bandOk = () => {
+        const st = bandStats();
+        for (let i = 1; i < st.length; i++)
+          if (!(st[i].shrt < st[i - 1].shrt && st[i].share < st[i - 1].share)) return false;
+        return st.every(x => x.share > 0.5);
+      };
+      let ok = bandOk();
+      if (!ok && fillerRecs.length) {         // rounding blip → retry with zero filler
+        for (const rec of fillerRecs) out.splice(out.indexOf(rec), 1);
+        fillerRecs.length = 0;
+        ok = bandOk();
+      }
+
+      // 4) plates absorb the actual remainder down to PLATE_MIN. Housing plates are
+      //    emitted first (quantized to units); office plates then absorb what housing
+      //    quantization dropped. When the remainder can't even fund the minimums, the
+      //    plates sit at the floor and the total overshoots — the clamps, not a bug,
+      //    explain the residual.
+      const fillerEmitted = fillerRecs.reduce((s, e) => s + e.area, 0);
+      const budget = gfaTarget > 0
+        ? gfaTarget - sumTier('rigid') - sumTier('calib') - fillerEmitted
+        : nPlates * 900;                      // no target → presets
+      let housingEmitted = 0;
+      if (housingFloors.length) {
+        const perH = Math.max(PLATE_MIN, Math.round(budget / Math.max(1, nPlates)));
+        for (const f of housingFloors)
+          for (const u of decomposeHousing(perH)) {
+            add(u === 134 ? '2b2b apartment' : u === 107 ? '1b1b apartment' : 'studio apartment',
+              u, f, 'private', 'sponge');
+            housingEmitted += u;
+          }
+      }
+      if (officePlates.length) {
+        const perO = Math.max(PLATE_MIN, Math.round((budget - housingEmitted) / officePlates.length));
+        for (const p of officePlates) {
+          // split each floor's office target into k >= 2 rooms, none over
+          // OFFICE_ROOM_MAX, summing exactly to perO — escapes the shortfloor
+          // plate gate (rs.length===1 || mx/tot>0.70) so office floors pack as
+          // a compact double-loaded bar instead of a core-wrapping plate.
+          const k = Math.max(2, Math.ceil(perO / OFFICE_ROOM_MAX));
+          const base = Math.floor(perO / k);
+          const extra = perO - base * k;   // first `extra` rooms get +1
+          p.area = base + (extra > 0 ? 1 : 0);           // room 0 reuses p
+          for (let i = 1; i < k; i++) add('office', base + (i < extra ? 1 : 0), p.level, 'private', 'sponge');
+        }
+      }
+
+      return { ok, groundLed: bandLevels.some(b => b.isGround) };
+    }
+
+    const first = buildAttempt(false);
+    if (!first.ok && first.groundLed && upperCount >= 1) buildAttempt(true);
+
+    for (const e of out) { delete e.tier; delete e.rawA; }
+    out.sort((a, b) => a.level - b.level);
+    return out;
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // REVIEW STAGE — per-floor card editor over entries[]
+  // ══════════════════════════════════════════════════════════════════
+  let entries = [];          // {type, area, level, category, wh} — single source of truth
+  let editingIdx = null;     // index into entries[] currently being edited
+  let addingLevel = null;    // level whose add-form is open
+  let rawOpen = false;
+
+  const dialogEl = document.getElementById('dialog');
+  const stepIndicatorEl = document.getElementById('step-indicator');
+  const reviewEl = document.getElementById('review');
+  const floorsEl = document.getElementById('floors');
+  const rawPanel = document.getElementById('raw-panel');
+  const rawText = document.getElementById('raw-text');
+  const rawErrors = document.getElementById('raw-errors');
+  const btnRawToggle = document.getElementById('btn-raw-toggle');
+  const btnRawApply = document.getElementById('btn-raw-apply');
+  const btnBuild = document.getElementById('btn-build');
+
+  const VOCAB = [
+    // SHORT activities
+    'exhibition gallery', 'event hall', 'showroom', 'pop-up retail',
+    'classroom', 'seminar room', 'computer lab', 'project review room',
+    'yoga studio', 'pilates studio', 'fitness center', 'meditation room', 'recovery lounge',
+    'coffee shop', 'lounge bar',
+    // main uses / service
+    'office', 'studio apartment', '1b1b apartment', '2b2b apartment',
+    'lobby', 'sales and display', 'toilets', 'storage', 'mechanical room',
+    'electrical room', 'loading dock', 'parking bay group', 'staff area', 'it support',
+    // cores / circulation
+    'fire stair & freight elevator core', 'fire stair & passenger elevator core a',
+    'fire stair & passenger elevator core b', 'circulation',
+  ];
+  document.getElementById('vocab-list').innerHTML = VOCAB.map(v => `<option value="${v}">`).join('');
+
+  function serialize(list) {
+    const levels = [...new Set(list.map(e => e.level))].sort((a, b) => a - b);
+    let out = '';
+    for (const lv of levels) {
+      out += `# Level ${lv}${lv < 0 ? ' (basement)' : lv === 0 ? ' (ground)' : ''}\n`;
+      for (const e of list.filter(x => x.level === lv)) {
+        const [w, h] = e.wh || dims(e.area);
+        out += `{${e.type}}/{${e.area}}/{${e.level}}/{${e.category}}/{${w},${h}}\n`;
+      }
+    }
+    return out;
+  }
+
+  // Display is 1-indexed (ground = L1); internal e.level stays 0-indexed.
+  function levelLabel(lv) { return lv >= 0 ? 'L' + (lv + 1) : 'B' + (-lv); }
+  function levelSub(lv) { return lv > 0 ? 'floor ' + (lv + 1) : lv === 0 ? 'ground' : 'basement'; }
+  function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+  function computeStats() {
+    let total = 0, longArea = 0, shortArea = 0;
+    let minL = Infinity, maxL = -Infinity;
+    const perFloor = new Map(); // level -> {tot, shrt}
+    for (const e of entries) {
+      total += e.area;
+      if (e.level < minL) minL = e.level;
+      if (e.level > maxL) maxL = e.level;
+      if (isCore(e.type) || isCorridor(e.type)) continue; // SHORT-share counts packed programs only
+      if (!perFloor.has(e.level)) perFloor.set(e.level, { tot: 0, shrt: 0 });
+      const pf = perFloor.get(e.level);
+      pf.tot += e.area;
+      if (isShort(e.type)) { pf.shrt += e.area; shortArea += e.area; } else { longArea += e.area; }
+    }
+    const shortFloors = [...perFloor.entries()]
+      .filter(([lv, pf]) => pf.tot > 0 && pf.shrt / pf.tot > SHORT_THRESHOLD)
+      .map(([lv]) => lv).sort((a, b) => a - b);
+    return { total, minL, maxL, longArea, shortArea, perFloor, shortFloors };
+  }
+
+  function pillClass(e) {
+    if (isCore(e.type) || isCorridor(e.type)) return 'circ';
+    return isShort(e.type) ? 'short' : 'long';
+  }
+
+  function inlineEditorHtml(e) {
+    return `<div class="inline-form" id="pill-editor">
+      <span class="if-name">${escapeHtml(e.type)}</span>
+      <span class="if-lab">area</span>
+      <input type="number" id="edit-area" min="1" value="${e.area}">
+      <span class="if-lab">m²</span>
+      <span class="if-lab" style="margin-left:6px;">category</span>
+      <select id="edit-cat">
+        ${VALID_CATEGORIES.map(c => `<option value="${c}"${c === e.category ? ' selected' : ''}>${c}</option>`).join('')}
+      </select>
+      <button class="if-btn" id="edit-save">Save</button>
+      <button class="if-btn danger" id="edit-delete">Delete</button>
+      <button class="if-btn ghost" id="edit-cancel">Cancel</button>
+    </div>`;
+  }
+
+  function addFormHtml(lv) {
+    return `<div class="inline-form" id="add-form">
+      <span class="if-lab">add to ${levelLabel(lv)}</span>
+      <input type="text" id="add-type" list="vocab-list" placeholder="program type…">
+      <input type="number" id="add-area" min="1" placeholder="area m²">
+      <select id="add-cat">
+        ${VALID_CATEGORIES.map(c => `<option value="${c}"${c === 'private' ? ' selected' : ''}>${c}</option>`).join('')}
+      </select>
+      <button class="if-btn" id="add-confirm">Add</button>
+      <button class="if-btn ghost" id="add-cancel">Cancel</button>
+    </div>`;
+  }
+
+  function renderReview() {
+    const st = computeStats();
+    const levels = [...new Set(entries.map(e => e.level))].sort((a, b) => b - a); // top floor first
+
+    let html = '';
+    for (const lv of levels) {
+      const pf = st.perFloor.get(lv) || { tot: 0, shrt: 0 };
+      const share = pf.tot > 0 ? pf.shrt / pf.tot : 0;
+      const isSF = pf.tot > 0 && share > SHORT_THRESHOLD;
+
+      let pills = '';
+      entries.forEach((e, idx) => {
+        if (e.level !== lv) return;
+        pills += `<span class="pill ${pillClass(e)}" data-idx="${idx}">${escapeHtml(e.type)}<b>${e.area} m²</b></span>`;
+      });
+      pills += `<span class="pill add" data-add-level="${lv}">+ add</span>`;
+
+      let form = '';
+      if (editingIdx !== null && entries[editingIdx] && entries[editingIdx].level === lv) form = inlineEditorHtml(entries[editingIdx]);
+      else if (addingLevel === lv) form = addFormHtml(lv);
+
+      html += `<div class="floor-card" data-level="${lv}">
+        <div class="floor-label"><div class="lv">${levelLabel(lv)}</div><div class="lv-sub">${levelSub(lv)}</div></div>
+        <div class="pills">${pills}</div>
+        <div class="share-col">
+          <div class="share-head"><span class="share-cap">short share</span><span class="share-pct">${Math.round(share * 100)}%</span></div>
+          <div class="share-bar"><div class="share-fill" style="width:${Math.min(100, share * 100)}%"></div><div class="share-tick"></div></div>
+          ${isSF ? `<span class="sftag">8'-6" floor</span>` : ''}
+        </div>
+        ${form}
+      </div>`;
+    }
+    floorsEl.innerHTML = html;
+
+    // footer stats
+    const packable = st.longArea + st.shortArea;
+    const shortPct = packable > 0 ? st.shortArea / packable * 100 : 0;
+    document.getElementById('ft-gfa').textContent = Math.round(st.total).toLocaleString() + ' m²';
+    document.getElementById('ft-range').textContent = isFinite(st.minL) ? `${levelLabel(st.minL)} … ${levelLabel(st.maxL)}` : '—';
+    document.getElementById('ft-split').textContent = `${(100 - shortPct).toFixed(0)}% / ${shortPct.toFixed(0)}%`;
+    document.getElementById('ft-shortfloors').textContent = st.shortFloors.length
+      ? `${st.shortFloors.length} (${st.shortFloors.map(levelLabel).join(', ')})` : '0';
+
+    // wire pill + form events (full re-render each mutation keeps this simple)
+    floorsEl.querySelectorAll('.pill[data-idx]').forEach(p => {
+      p.onclick = () => { editingIdx = parseInt(p.dataset.idx, 10); addingLevel = null; renderReview(); };
+    });
+    floorsEl.querySelectorAll('.pill[data-add-level]').forEach(p => {
+      p.onclick = () => { addingLevel = parseInt(p.dataset.addLevel, 10); editingIdx = null; renderReview(); document.getElementById('add-type').focus(); };
+    });
+    const eSave = document.getElementById('edit-save');
+    if (eSave) {
+      eSave.onclick = () => {
+        const a = parseFloat(document.getElementById('edit-area').value);
+        if (!isNaN(a) && a > 0) entries[editingIdx].area = Math.round(a);
+        entries[editingIdx].category = document.getElementById('edit-cat').value;
+        editingIdx = null; renderReview(); syncRaw();
+      };
+      document.getElementById('edit-delete').onclick = () => {
+        entries.splice(editingIdx, 1);
+        editingIdx = null; renderReview(); syncRaw();
+      };
+      document.getElementById('edit-cancel').onclick = () => { editingIdx = null; renderReview(); };
+    }
+    const aConfirm = document.getElementById('add-confirm');
+    if (aConfirm) {
+      aConfirm.onclick = () => {
+        const type = document.getElementById('add-type').value.trim().toLowerCase();
+        const area = parseFloat(document.getElementById('add-area').value);
+        const cat = document.getElementById('add-cat').value;
+        if (!type || isNaN(area) || area <= 0) return;
+        entries.push({ type, area: Math.round(area), level: addingLevel, category: cat, wh: null });
+        entries.sort((a, b) => a.level - b.level);
+        addingLevel = null; renderReview(); syncRaw();
+      };
+      document.getElementById('add-cancel').onclick = () => { addingLevel = null; renderReview(); };
+    }
+    saveDraft();
+  }
+
+  function syncRaw() { if (rawOpen) { rawText.value = serialize(entries); rawErrors.innerHTML = ''; } }
+
+  // ── draft persistence: Back from the massing page reloads this page from scratch,
+  //    so review state must survive in localStorage or every retry re-runs the wizard ──
+  const DRAFT_KEY = 'programInputDraft';
+  function saveDraft() { try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ wiz, entries, reviewOrigin, answered })); } catch (e) {} }
+
+  // ── commit-on-build: values typed into a still-open inline/add form must not be
+  //    silently dropped when the user clicks Build without the small save button.
+  //    Same rules as the edit-save / add-confirm handlers above — keep in sync. ──
+  function commitInlineEdit() {
+    if (editingIdx === null || !entries[editingIdx]) { editingIdx = null; return; }
+    const areaEl = document.getElementById('edit-area');
+    if (areaEl) {
+      const a = parseFloat(areaEl.value);
+      if (!isNaN(a) && a > 0) entries[editingIdx].area = Math.round(a);
+      entries[editingIdx].category = document.getElementById('edit-cat').value;
+    }
+    editingIdx = null;
+  }
+  function commitAddForm() {
+    if (addingLevel === null) return;
+    const typeEl = document.getElementById('add-type');
+    if (typeEl) {
+      const type = typeEl.value.trim().toLowerCase();
+      const area = parseFloat(document.getElementById('add-area').value);
+      if (type && !isNaN(area) && area > 0) {
+        entries.push({ type, area: Math.round(area), level: addingLevel, category: document.getElementById('add-cat').value, wh: null });
+        entries.sort((a, b) => a.level - b.level);
+      }
+    }
+    addingLevel = null; // an empty or invalid add form is discarded, never blocks Build
+  }
+
+  function enterReview(regenerate = true) {
+    dialogEl.style.display = 'none';
+    stepIndicatorEl.style.display = 'none';
+    reviewEl.style.display = 'block';
+    document.body.classList.add('review-active');
+    if (regenerate) entries = generateEntries(wiz.buildingType, wiz.gfa, wiz.floorsAbove, wiz.basementLevels, wiz.activities);
+    renderReview();
+  }
+
+  // ── raw text panel (escape hatch) ──
+  btnRawToggle.addEventListener('click', () => {
+    rawOpen = !rawOpen;
+    rawPanel.style.display = rawOpen ? 'block' : 'none';
+    btnRawToggle.textContent = (rawOpen ? '▾' : '▸') + ' raw text';
+    if (rawOpen) { rawText.value = serialize(entries); rawErrors.innerHTML = ''; }
+  });
+
+  function applyRaw() {
+    const lines = rawText.value.split('\n');
+    const parsed = [];
+    const errs = [];
+    lines.forEach((raw, i) => {
+      const v = validateLine(raw);
+      if (v.skip) return;
+      if (v.error) { errs.push(`line ${i + 1}: ${v.error} — ${raw.trim()}`); return; }
+      parsed.push({ type: v.type, area: v.area, level: v.level, category: v.category, wh: v.wh });
+    });
+    if (errs.length) {
+      rawErrors.innerHTML = errs.map(escapeHtml).join('<br>');
+      return false; // entries untouched
+    }
+    if (!parsed.length) { rawErrors.textContent = 'no valid program lines'; return false; }
+    parsed.sort((a, b) => a.level - b.level);
+    entries = parsed;
+    editingIdx = null; addingLevel = null;
+    rawErrors.innerHTML = '';
+    rawText.value = serialize(entries); // canonicalise
+    renderReview();
+    return true;
+  }
+  btnRawApply.addEventListener('click', applyRaw);
+
+  // ── build ──
+  btnBuild.addEventListener('click', () => {
+    // raw dirtiness must be judged BEFORE committing forms, or a just-committed
+    // edit would make the (stale) textarea look dirty and applyRaw would revert it
+    const rawDirty = rawOpen && rawText.value.trim() !== serialize(entries).trim();
+    commitInlineEdit();
+    commitAddForm();
+    if (rawDirty && !applyRaw()) { renderReview(); return; } // bad raw text blocks Build, errors shown
+    renderReview(); syncRaw();
+    localStorage.setItem('programInputText', serialize(entries));
+    location.href = 'program-massing-shortfloor.html?src=input';
+  });
+
+  // ── back from review (keeps the draft) ──
+  //    forecast-sourced draft → back to the scenario list it came from;
+  //    wizard-sourced draft   → back to the last wizard step, answers intact.
+  document.getElementById('btn-back-review').addEventListener('click', () => {
+    commitInlineEdit(); commitAddForm(); saveDraft(); // don't lose an open edit on the way out
+    reviewEl.style.display = 'none';
+    document.body.classList.remove('review-active');
+    if (reviewOrigin === 'forecast' && openForecast) { openForecast(); return; }
+    dialogEl.style.display = 'flex';
+    stepIndicatorEl.style.display = 'flex';
+    loadStep(steps.length - 1); // re-ask the last question; Continue rebuilds the draft
+  });
+
+  // ── restart (discard draft, back to wizard step 1) ──
+  document.getElementById('btn-restart').addEventListener('click', () => {
+    localStorage.removeItem(DRAFT_KEY);
+    location.reload();
+  });
+
+  // ── draft restore: reopening the page (typically Back from the massing view)
+  //    resumes the review stage instead of resetting to wizard step 1 ──
+  (function restoreDraft() {
+    let d = null;
+    try { d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch (e) {}
+    if (!d || !Array.isArray(d.entries) || !d.entries.length) return;
+    Object.assign(wiz, d.wiz || {});
+    entries = d.entries;
+    if (d.reviewOrigin) reviewOrigin = d.reviewOrigin; // "back" must still know where it came from
+    if (Array.isArray(d.answered)) { answered.length = 0; d.answered.forEach(a => answered.push(a)); }
+    (wiz.activities || []).forEach(a => selectedActivities.add(a));
+    step = steps.length;
+    enterReview(false); // render the saved entries — do NOT regenerate from wiz answers
+  })();
+
+  // ── NEXA Intel: Site Forecast (additive layer — wizard and review flows above are
+  //    untouched; if no NEXA/intel/data/site-*.js loaded, the entry link stays hidden).
+  //    Every site in window.NEXA_INTEL.sites is offered; adding a site = adding a
+  //    <script src> tag above, nothing here changes. ──
+  (function initSiteForecast() {
+    const fv = x => (x && typeof x === 'object' && 'value' in x) ? x.value : x; // unwrap confidence-tagged facts
+    const SITES = (window.NEXA_INTEL && window.NEXA_INTEL.sites) || {};
+    const keys = Object.keys(SITES);
+    if (!keys.length) return;
+
+    const link = document.getElementById('forecast-link');
+    const panel = document.getElementById('forecast');
+    const titleEl = document.getElementById('fc-title');
+    const tabsEl = document.getElementById('fc-tabs');
+    const spineEl = document.getElementById('fc-spine');
+    const optsEl = document.getElementById('fc-options');
+    const MIX_COLORS = ['#172FC7', '#E67033', '#EEC341', '#5A6478', '#9BA5B5', '#141820'];
+
+    // meta.name can carry a parenthetical qualifier ("… (currently a surface parking lot)")
+    // that is right for the dossier and far too long for a tab or a title
+    const nameOf = k => {
+      const raw = String(fv(SITES[k].dossier && SITES[k].dossier.meta && SITES[k].dossier.meta.name) || k);
+      const short = raw.split('(')[0].trim().replace(/[,;]$/, '');
+      return short.length > 4 ? short : raw;
+    };
+
+    link.textContent = '▸ site forecast' + (keys.length === 1 ? ' · ' + nameOf(keys[0]) : ' · ' + keys.length + ' sites');
+    link.style.display = 'inline-block';
+
+    // site tabs (hidden when only one site is loaded)
+    tabsEl.innerHTML = keys.length > 1
+      ? keys.map(k => '<button class="fc-tab" data-key="' + escapeHtml(k) + '">' + escapeHtml(nameOf(k)) + '</button>').join('')
+      : '';
+    tabsEl.querySelectorAll('.fc-tab').forEach(b =>
+      b.addEventListener('click', () => renderSite(b.dataset.key)));
+
+    let scenarios = []; // scenarios of the currently rendered site — applyScenario reads this
+
+    function renderSite(key) {
+      const site = SITES[key];
+      if (!site) return;
+      tabsEl.querySelectorAll('.fc-tab').forEach(b => b.classList.toggle('active', b.dataset.key === key));
+      titleEl.innerHTML = 'Site <em>forecast</em> — ' + escapeHtml(nameOf(key));
+
+      // The history is a LANE CHART of the site's observed programs, not one line.
+      // Two programs that overlapped in time (a district program still running, a rival
+      // development, a parking lot and the proposal meant to replace it) are NOT a
+      // sequence — chaining them with arrows would assert a succession the record does
+      // not contain. So: column = rank of the start year, row = first lane with no time
+      // overlap, arrow = only where a succeeded_by edge actually links two neighbours.
+      // Future-epoch nodes are excluded — a projected build-out is itself a scenario.
+      const NOW = new Date().getFullYear();
+      const allNodes = (site.timeline && site.timeline.nodes) || [];
+      const allEdges = (site.timeline && site.timeline.edges) || [];
+      const succEdges = allEdges.filter(e => e.relation === 'succeeded_by');
+      const succ = new Set(succEdges.map(e => e.from + '>' + e.to));
+      const inChain = new Set();
+      succEdges.forEach(e => { inChain.add(e.from); inChain.add(e.to); });
+
+      const tlNodes = allNodes
+        .filter(n => n.kind === 'program' && n.epoch !== 'future')
+        .sort((a, b) => (a.tStart || 0) - (b.tStart || 0) || ((a.tEnd || NOW) - (b.tEnd || NOW)));
+      const endOf = n => (n.tEnd != null ? n.tEnd : NOW);
+      const startYears = [...new Set(tlNodes.map(n => n.tStart))].sort((a, b) => a - b);
+
+      // Lane assignment. Two rules that matter:
+      //  1. Succession-chain nodes are placed FIRST, so the site's actual lineage holds the
+      //     top row and a rival that merely coexisted (China City) cannot displace it.
+      //  2. Overlap is a real interval test in both directions — an earlier, shorter node
+      //     may legitimately share a row with a much later one.
+      const lanes = []; // lanes[i] = nodes already placed on row i
+      const placed = [];
+      const place = n => {
+        const free = row => row.every(m => endOf(m) <= n.tStart || endOf(n) <= m.tStart);
+        let lane = lanes.findIndex(free);
+        if (lane === -1) { lanes.push([]); lane = lanes.length - 1; }
+        lanes[lane].push(n);
+        placed.push({ n, lane, col: startYears.indexOf(n.tStart) });
+      };
+      tlNodes.filter(n => inChain.has(n.id)).forEach(place);
+      tlNodes.filter(n => !inChain.has(n.id)).forEach(place);
+
+      spineEl.innerHTML = placed.map(({ n, lane, col }) => {
+        const span = (n.tStart != null ? n.tStart : '…') + '–' + (n.tEnd != null ? n.tEnd : 'now');
+        // arrow only to a documented successor sitting on the same row, one column along
+        const hasArrow = placed.some(p => p.lane === lane && p.col === col + 1 && succ.has(n.id + '>' + p.n.id));
+        const cls = 'fc-tl-node'
+          + (endOf(n) >= NOW ? ' present' : '')
+          + (inChain.has(n.id) ? '' : ' parallel')
+          + (hasArrow ? ' succ' : '');
+        return '<div class="' + cls + '" style="grid-column:' + (col + 1) + ';grid-row:' + (lane + 1) + '"' +
+          (inChain.has(n.id) ? '' : ' title="coexisted with the site\'s program — not a step in its succession"') + '>' +
+          '<div class="t">' + escapeHtml(String(span)) + '</div>' +
+          '<div class="n">' + escapeHtml(n.label || '') + '</div></div>';
+      }).join('');
+
+      // Scenarios are PARALLEL OPTIONS from today, not a sequence — stacked, not chained.
+      scenarios = (site.scenarios || []).slice().sort((a, b) => (a.horizon || 0) - (b.horizon || 0));
+      if (!scenarios.length) {
+        optsEl.innerHTML = '<p style="color:var(--ink-mid);font-size:12px;padding:20px 0;">No forecast scenarios generated yet for this site — dossier and timeline only.</p>';
+        return;
+      }
+      optsEl.innerHTML = scenarios.map((sc, i) => {
+        const mix = sc.programMix || [];
+        const bar = mix.map((m, j) =>
+          '<span style="width:' + (m.share * 100).toFixed(1) + '%;background:' + MIX_COLORS[j % MIX_COLORS.length] + '"></span>').join('');
+        const legend = mix.map((m, j) =>
+          '<span><i style="display:inline-block;width:7px;height:7px;background:' + MIX_COLORS[j % MIX_COLORS.length] + ';margin-right:4px;"></i>' +
+          escapeHtml(m.type) + ' ' + (m.share * 100).toFixed(0) + '%</span>').join('');
+        return '<div class="fc-opt-row"><span class="fc-opt-tick"></span>' +
+          '<div class="fc-card">' +
+            '<div class="sc-head">' +
+              '<div class="sc-meta">scenario ' + escapeHtml(String(sc.id || i + 1)) + ' · horizon ' + escapeHtml(String(sc.horizon || '—')) + '</div>' +
+              '<div class="sc-name">' + escapeHtml(sc.name || '') + '</div>' +
+            '</div>' +
+            '<div class="sc-note">' + escapeHtml(sc.likelihoodNote || '') + '</div>' +
+            '<div class="sc-right">' +
+              '<div class="fc-mix">' + bar + '</div>' +
+              '<div class="fc-mix-legend">' + legend + '</div>' +
+              '<button class="fc-apply" data-idx="' + i + '">apply → edit program</button>' +
+            '</div>' +
+          '</div></div>';
+      }).join('');
+      optsEl.querySelectorAll('.fc-apply').forEach(btn =>
+        btn.addEventListener('click', () => applyScenario(scenarios[+btn.dataset.idx])));
+    }
+
+    function applyScenario(sc) {
+      const parsed = [], errs = [];
+      (sc.programFormatDraft || '').split('\n').forEach((raw, i) => {
+        const v = validateLine(raw);
+        if (v.skip) return;
+        if (v.error) { errs.push('line ' + (i + 1) + ': ' + v.error); return; }
+        parsed.push({ type: v.type, area: v.area, level: v.level, category: v.category, wh: v.wh });
+      });
+      if (errs.length || !parsed.length) { // drafts are validated before shipping — this means a broken data file
+        alert('Scenario draft failed validation:\n' + (errs.join('\n') || 'no valid program lines'));
+        return;
+      }
+      parsed.sort((a, b) => a.level - b.level);
+      entries = parsed;
+      wiz.buildingType = 'forecast-' + (sc.id || 'scenario');
+      reviewOrigin = 'forecast'; // so review's "← back" returns here, not into the wizard
+      panel.style.display = 'none';
+      enterReview(false); // render the scenario draft — user edits, then Build hands off as usual
+      saveDraft();
+    }
+
+    // exposed so the review stage's "← back" can reopen this panel (see btn-back-review)
+    openForecast = () => {
+      panel.style.display = 'block';
+      reviewEl.style.display = 'none';
+      document.body.classList.remove('review-active');
+    };
+
+    link.addEventListener('click', () => { panel.style.display = 'block'; });
+    document.getElementById('fc-close').addEventListener('click', () => {
+      panel.style.display = 'none';
+      // the wizard is behind the overlay unless a draft is already in review
+      if (!document.body.classList.contains('review-active')) {
+        dialogEl.style.display = 'flex';
+        stepIndicatorEl.style.display = 'flex';
+      }
+    });
+
+    // URL hooks (demo links + headless verification):
+    //   ?site=<key>              select the site (default: first loaded)
+    //   ?forecast=1              open the overlay
+    //   ?forecast=<scenario id>  apply that scenario of the selected site straight into review
+    const q = new URLSearchParams(location.search);
+    const wanted = q.get('site');
+    renderSite(keys.includes(wanted) ? wanted : keys[0]);
+
+    const fcq = q.get('forecast');
+    if (fcq === '1' || fcq === 'open') panel.style.display = 'block';
+    else if (fcq) {
+      const sc = scenarios.find(s => String(s.id).toLowerCase() === fcq.toLowerCase());
+      if (sc) applyScenario(sc);
+    }
+  })();
+
+  // test hook (read-only accessors for the headless verification pipeline)
+  window.__debug = { entries: () => entries, serialize: () => serialize(entries) };
+</script>
+
+</body></html>
