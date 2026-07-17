@@ -55,36 +55,27 @@ Every app is a single HTML file using CDN Three.js. **No build step. Open it in 
 | `NEXA/NEXA-site.html` | Project intro site (concept, pipeline, program-lifespan / design-for-disassembly). |
 | `NEXA/intel/` | Site-intelligence layer: reads a real site's history and forecasts its plausible future programs. |
 | `NEXA/intel/site-scout.html` | GIS tool: address to parcel to zoning and neighborhood context. |
-| `MODULE-TOOLS/` | Module-system dev tools (8'-6" / 1:2 domino kit of parts). |
-| `references/` | Program-format spec, case-study distributions, module logic, sizing rules. |
-| `agentops/` | The Claude Code multi-agent workflow used to develop NEXA. |
+| `references/` | Program-format spec and case-study distributions (OMA TPAC, Jean Nouvel 53W53). |
 
 ---
 
-## Quick start
+## Try it
 
-The web apps need no setup:
+**Live: https://jckian.github.io/NEXA/**
+
+No install. Open the site, click through to the program input, describe a building, and it
+continues straight into the massing and structure visualizer.
+
+To run it locally, serve the folder with any static server (the apps use CDN Three.js and
+have no build step):
 
 ```
-# any static server works, e.g.
 npx serve .
-# then open program-input.html in a browser
+# then open index.html (or program-input.html) in a browser
 ```
 
 Start at `program-input.html`, describe a program, and continue into
 `program-massing-shortfloor.html` to see the massing and structure.
-
-### Python simulation (optional)
-
-An earlier agent-based distribution simulation lives in `pythonFiles/`:
-
-```
-cd pythonFiles
-python ProgramDeveloperEllipseBoundary.py
-```
-
-Dependencies: `openai`, `numpy`. It expects an `OpenAI_ProgramDetails.py` module supplying
-your own API key (not included in the repo; keep keys out of version control).
 
 ---
 

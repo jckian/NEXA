@@ -1,6 +1,13 @@
-# ── Dependencies ───────────────────────────────
+# ─────────────────────────────────────────────────────────────
+# NEXA public repo keeps ONLY the runnable platform + its assets:
+#   index.html  ->  NEXA/NEXA-site.html  ->  program-input.html
+#                    ->  program-massing-shortfloor.html
+# Everything else (research scaffolding, generators, dev logs,
+# agent tooling) stays local and is ignored here.
+# ─────────────────────────────────────────────────────────────
+
+# ── Dependencies ─────────────────────────────────
 node_modules/
-my-video/node_modules/
 
 # ── Heavy media / renders (not suited to GitHub) ─
 my-video/
@@ -8,17 +15,55 @@ forVideo/
 *.mp4
 *.mov
 *.webm
+# ...but let the one assembly clip the site plays through
+!NEXA/assembly_animation_v5_lineart.mp4
 
-# RENDER is huge; keep it out but let the one image the site needs through
+# RENDER is huge; keep only the one image the site needs
 RENDER/*
 !RENDER/TOWER-1.png
 
-# ...and the one assembly clip the intro site plays
-!NEXA/assembly_animation_v5_lineart.mp4
-
-# ── Old / retired branding ───────────────────────
+# ── Old / retired branding & backups ─────────────
 VORO/
 BACKUP/
+
+# ── Research scaffolding & dev tooling (local only) ─
+session-log/
+agentops/
+TEST/
+MODULE-TOOLS/
+structure-generator/
+massing-model-generator/
+pythonFiles/
+site/
+.claude/
+CLAUDE.md
+package.json
+package-lock.json
+
+# ── NEXA: keep the site + loaded data, drop planning docs ─
+NEXA/*.md
+NEXA/intel/*.md
+NEXA/intel/prompts/
+NEXA/intel/data/*.md
+
+# ── references: keep only what the platform + README use ─
+references/*
+!references/ProgramFormat.txt
+!references/TPAC-PROGRAM-DISTRIBUTION.txt
+!references/53W53-PROGRAM-DISTRIBUTION.txt
+!references/System Workflow- FOR GITHUB.png
+!references/UI-massing.png
+!references/UI-structure.png
+!references/screenshot/
+references/screenshot/*
+!references/screenshot/step-brief.png
+!references/screenshot/step-massing.png
+!references/screenshot/step-structure.png
+!references/website-placeholder/
+references/website-placeholder/*
+!references/website-placeholder/F2-carre-03-bis.jpg
+!references/website-placeholder/F2-carre-11.jpg
+!references/website-placeholder/F2-carre-12.jpg
 
 # ── Runtime artifacts ────────────────────────────
 pythonFiles/fileTransfer/
@@ -37,6 +82,7 @@ OpenAI_ProgramDetails.py
 Thumbs.db
 .vscode/
 .idea/
+__MACOSX/
 
 # ── Scratch / temp ───────────────────────────────
 scratchpad/
