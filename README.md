@@ -32,6 +32,18 @@ proprietary suites can use and extend it.
 
 ---
 
+## Workflow
+
+![NEXA system workflow: from lifespan mismatch to lifecycle management](references/System%20Workflow-%20FOR%20GITHUB.png)
+
+A narrative brief (program, area, site) is analyzed by program lifespan and split into
+long-duration and short-duration programs. Structural zoning resolves these into a
+permanent structure and relocatable units, producing Architecture Version 0. From there a
+digital twin monitors the building and drives refresh, turnover, conversion, and reuse,
+feeding an economic analysis and looping back into the next architecture.
+
+---
+
 ## What's here
 
 Every app is a single HTML file using CDN Three.js. **No build step. Open it in a browser.**
