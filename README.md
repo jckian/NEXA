@@ -50,12 +50,41 @@ Every app is a single HTML file using CDN Three.js. **No build step. Open it in 
 
 | File | What it does |
 |---|---|
-| `program-input.html` | Plain-language program-input wizard (building type, per-floor recipe, GFA, floors). Hands off to the visualizer via `localStorage`. |
+| `index.html` | Landing redirect. Sends the bare site URL to `NEXA-site.html`. |
+| `NEXA-site.html` | Project intro site (concept, pipeline, program-lifespan / design-for-disassembly). The public front door. |
+| `program-input.html` | Plain-language program-input wizard (building type, per-floor recipe, GFA, floors). |
 | `program-massing-shortfloor.html` | Massing and structure visualizer: module packing, RC core / aluminium frame / glass curtain wall / timber fins, OBJ export, and automatic code, egress, and restroom checks. |
-| `NEXA/NEXA-site.html` | Project intro site (concept, pipeline, program-lifespan / design-for-disassembly). |
-| `NEXA/intel/` | Site-intelligence layer: reads a real site's history and forecasts its plausible future programs. |
-| `NEXA/intel/site-scout.html` | GIS tool: address to parcel to zoning and neighborhood context. |
+| `NEXA/intel/` | Site-intelligence layer loaded by `program-input.html`: reads a real site's history and forecasts its plausible future programs. |
+| `NEXA/intel/site-scout.html` | GIS tool (linked from the input page): address to parcel to zoning and neighborhood context. |
 | `references/` | Program-format spec and case-study distributions (OMA TPAC, Jean Nouvel 53W53). |
+
+---
+
+## How the files connect
+
+The apps form one linear flow. Each arrow is a real link or handoff in the code:
+
+```
+index.html
+   │  meta-refresh redirect
+   ▼
+NEXA-site.html ───────────────► program-input.html ───────────────► program-massing-shortfloor.html
+   "Distribute your program"        wizard: type, GFA, floors            reads the program, builds the
+   CTA buttons link here            │                                    massing + structure, exports OBJ
+                                    │  loads at startup
+                                    ▼
+                            NEXA/intel/  (site history + forecasts)
+                            NEXA/intel/site-scout.html  (GIS lookup, opens in a new tab)
+```
+
+| From | To | How it's wired |
+|---|---|---|
+| `index.html` | `NEXA-site.html` | `<meta http-equiv="refresh">` redirect |
+| `NEXA-site.html` | `program-input.html` | CTA `<a href="program-input.html">` (hero + closing buttons) |
+| `program-input.html` | `program-massing-shortfloor.html` | on submit, saves the program to `localStorage['programInputText']`, then `location.href = 'program-massing-shortfloor.html?src=input'` |
+| `program-input.html` | `NEXA/intel/data/*.js` | `<script src>` loaded at startup (populates the site-forecast panel) |
+| `program-input.html` | `NEXA/intel/site-scout.html` | `<a>` link, opens the GIS scout in a new tab |
+| `program-massing-shortfloor.html` | — | reads `localStorage['programInputText']`, renders, and offers OBJ export |
 
 ---
 
