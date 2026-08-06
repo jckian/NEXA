@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEXA · Kit of parts</title>
+  <link rel="icon" href="NEXA/NEXA-logo-mask.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* The three kit slides from the midterm deck, shown as they are.
+       Nothing is cropped and no copy is written over them: the slides already carry their
+       own titles, callouts and technical tables, so anything added here would only repeat
+       them in a second voice. One slide per screen, scrolled like the main site. */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #000000;
+      --text: #F0F0FA;
+      --line-2: rgba(245, 245, 245, 0.06);
+      --font-body: 'Poppins', 'FF Mark', 'Mark Pro', 'Montserrat', Helvetica, Arial, sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    html { scroll-snap-type: y mandatory; }
+    @media (max-width: 760px), (max-height: 560px) { html { scroll-snap-type: y proximity; } }
+    @media (prefers-reduced-motion: reduce) { html { scroll-snap-type: none; } }
+
+    /* one slide, one screen, whole. `contain` is the point: a 16:9 slide in a viewport that
+       is not exactly 16:9 gets bars rather than losing a corner of a drawing. */
+    .slide {
+      height: 100svh; min-height: 420px;
+      scroll-snap-align: start; scroll-snap-stop: always;
+      display: flex; align-items: center; justify-content: center;
+      padding: clamp(64px, 10vh, 104px) clamp(12px, 3vw, 44px) clamp(24px, 5vh, 56px);
+    }
+    .slide img { max-width: 100%; max-height: 100%; width: auto; height: auto; display: block; }
+
+    /* ---------- nav, same bar as the site ---------- */
+    #nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: clamp(16px, 3vh, 28px) clamp(20px, 5vw, 60px);
+      pointer-events: none;
+    }
+    #nav > * { pointer-events: auto; }
+    #nav a { text-decoration: none; }
+    #nav .brand { display: flex; align-items: center; gap: 10px; }
+    #nav .brand img { height: 18px; width: auto; display: block; }
+    #nav .brand span { font-family: var(--mono); font-weight: 500; font-size: 13px; letter-spacing: 0.24em; color: var(--text); }
+    /* the page names itself top right, where the site's own nav links sit */
+    #nav .right { display: flex; align-items: baseline; gap: clamp(16px, 2.6vw, 34px); }
+    #nav .title {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em;
+      text-transform: uppercase; color: var(--text);
+    }
+    #nav .back {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--text); opacity: 0.6; transition: opacity 0.2s ease;
+    }
+    #nav .back:hover { opacity: 1; }
+    @media (max-width: 620px) { #nav .title { display: none; } }
+
+    #foot {
+      scroll-snap-align: end;
+      border-top: 1px solid var(--line-2);
+      padding: clamp(26px, 5vh, 44px) clamp(20px, 5vw, 60px);
+      font-size: 11px; letter-spacing: 0.06em; color: rgba(245, 245, 245, 0.36);
+    }
+    #foot b { color: var(--text); font-weight: 600; }
+  </style>
+</head>
+
+<body>
+  <div id="nav">
+    <a class="brand" href="NEXA-site.html" aria-label="NEXA, back to the site">
+      <img src="NEXA/NEXA-logo-mask.png" alt="" />
+      <span>NEXA</span>
+    </a>
+    <div class="right">
+      <span class="title">Kit of parts</span>
+      <a class="back" href="NEXA-site.html#system">&larr; Back</a>
+    </div>
+  </div>
+
+  <section class="slide" id="frame">
+    <img src="NEXA/deck/kit-frame.jpg" alt="Demountable frame: exploded axonometrics of FRAME-01 and FRAME-02 with connectors and notched base frame, and their technical specifications" />
+  </section>
+
+  <section class="slide" id="infill">
+    <img src="NEXA/deck/kit-infill.jpg" alt="Relocatable infill: exploded axonometric with window, notched deck and notched base frame, and its technical specification" loading="lazy" />
+  </section>
+
+  <section class="slide" id="connection">
+    <img src="NEXA/deck/kit-connection.jpg" alt="Design-for-disassembly connection: notched rail with hidden levelling screws, slotted rail, and the assembled joint" loading="lazy" />
+  </section>
+
+  <footer id="foot">
+    <b>NEXA</b> &middot; SCI-Arc SP26 &middot; Yenhsing Cheng &middot; slides from the midterm deck
+  </footer>
+</body>
+
+</html>

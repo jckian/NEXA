@@ -1,6 +1,6 @@
 # ─────────────────────────────────────────────────────────────
 # NEXA public repo keeps ONLY the runnable platform + its assets:
-#   index.html  ->  NEXA/NEXA-site.html  ->  program-input.html
+#   index.html  ->  NEXA-site.html  ->  program-input.html
 #                    ->  program-massing-shortfloor.html
 # Everything else (research scaffolding, generators, dev logs,
 # agent tooling) stays local and is ignored here.
@@ -15,15 +15,22 @@ forVideo/
 *.mp4
 *.mov
 *.webm
-# ...but let the one assembly clip the site plays through
+# ...but let the two clips the site plays through
 !NEXA/assembly_animation_v5_lineart.mp4
+!NEXA/deck/scenario-260730.mp4
 
-# RENDER is huge; keep only the one image the site needs
+# RENDER is huge; keep only the one image the site needs. It lives in RENDER/VORO/ since
+# 260727, and git will not look inside an excluded directory, so VORO/ has to be un-ignored
+# before its contents can be excluded again.
 RENDER/*
-!RENDER/TOWER-1.png
+!RENDER/VORO/
+RENDER/VORO/*
+!RENDER/VORO/TOWER-1.png
 
 # ── Old / retired branding & backups ─────────────
-VORO/
+# Anchored: an unanchored "VORO/" also matches RENDER/VORO/, which holds the one render
+# the public site loads.
+/VORO/
 BACKUP/
 
 # ── Research scaffolding & dev tooling (local only) ─
@@ -36,9 +43,12 @@ massing-model-generator/
 pythonFiles/
 site/
 .claude/
+.mcp.json
 CLAUDE.md
 package.json
 package-lock.json
+# local key proxy for the program brief (reads the key from the environment)
+nexa-llm.js
 
 # ── NEXA: keep the site + loaded data, drop planning docs ─
 NEXA/*.md
@@ -87,3 +97,6 @@ __MACOSX/
 # ── Scratch / temp ───────────────────────────────
 scratchpad/
 *.tmp
+
+# ── Reel / video build (local only) ──────────────
+reel/
