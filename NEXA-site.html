@@ -494,7 +494,7 @@
   <!-- ═══ 01 · cover ═══════════════════════════════════════════════════════════════ -->
   <section class="panel" id="hero">
     <div class="panel-media">
-      <video id="scenario-video" src="NEXA/deck/scenario-260730.mp4" poster="NEXA/deck/scenario-poster.jpg"
+      <video id="scenario-video" src="NEXA/deck/scenario-260730.mp4#t=2" poster="NEXA/deck/scenario-poster.jpg"
              autoplay muted loop playsinline preload="metadata"></video>
     </div>
     <div class="panel-copy">
@@ -798,9 +798,9 @@
           v.addEventListener('play', set);
         }
         if (start) {
-          // the 30s clip opens on a logo card, which is a title, not the argument. It starts
-          // past it. `loop` would drop back to zero and replay the card every time round, so
-          // the loop is run by hand off `ended` instead.
+          // both clips skip their first two seconds: the 30s clip opens on a logo card, and
+          // the cover is cut to match it. `loop` would drop back to zero and replay that
+          // opening every time round, so the loop is run by hand off `ended` instead.
           v.loop = false;
           var seek = function () { if (v.currentTime < start) v.currentTime = start; };
           v.addEventListener('loadedmetadata', seek);
@@ -812,7 +812,7 @@
           if (es[0].isIntersecting) { v.play().catch(function () {}); } else { v.pause(); }
         }, { threshold: 0.25 }).observe(panel);
       }
-      bind('hero', 1);
+      bind('hero', 1, 2);
       bind('mismatch', 1, 2);
       bind('system', 2);
     })();
