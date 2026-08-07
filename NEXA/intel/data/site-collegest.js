@@ -6,12 +6,17 @@
 // ⚠️ TWO CAVEATS — see the .md header before using any of this:
 // (1) Research was TERMINATED MID-STREAM by an API outage. ZIMAS, the project case file, the Central City
 //     North Community Plan page, the TOC tier lookup and 130college.com were never queried. Those fields are
-//     "unknown", not guessed. NOT A SINGLE FACT HERE IS "verified" — no primary document was directly read.
+//     "unknown", not guessed.
 // (2) Everything before 2023 is DISTRICT/BLOCK resolution, not parcel resolution: the parcel's own pre-2023
 //     history is undocumented beyond "surface parking lot" (start date unknown). Node facts say which.
 // 260713 BACKFILL: zoning/overlay/APN fields below were machine-queried from the LA City Planning GeoHub
 //     zoning layer + LA County Assessor parcels (reported tier — a live layer query, not a read document).
 //     The mapped zoning is a DTLA 2040 NEW-FORMAT code, which partially resolves caveat (1)'s zoning gap.
+// 260729 CODE READING: regulation.codeReading was read DIRECTLY from the adopted New Zoning Code text
+//     (zoning.lacity.gov, Articles 2/3/5/6), so those entries are the FIRST "verified"-tier facts in this
+//     file — the earlier blanket statement that nothing here was verified no longer holds. What is still
+//     only `reported` is the MAPPING of this parcel to the code string; the meaning of the string is now
+//     read from the primary document. FAR and height are consequently no longer "unknown".
 
 window.NEXA_INTEL = window.NEXA_INTEL || {};
 window.NEXA_INTEL.sites = window.NEXA_INTEL.sites || {};
@@ -85,8 +90,21 @@ window.NEXA_INTEL.sites["130-college-st"] = {
       adaptiveReuseArea: { value: "Downtown Adaptive Reuse Program area (ARIA) — polygon hit at the geocoded point", source: "LA City Planning MapServer/6 point query", url: "https://maps.lacity.org/lahub/rest/services/City_Planning_Department/MapServer/6", accessed: "260713", confidence: "reported" },
       communityPlan: { value: "Reported as the Central City North Community Plan area (which covers Chinatown, Arts District, Little Tokyo, Victor Heights). WHETHER Chinatown has been folded into DTLA 2040 (adopted May 2023) or remains under the older Central City North plan was NOT RESOLVED — the LA City Planning page fetch never completed. A 'DTLA 2040 Chinatown plan summary' PDF exists, suggesting Chinatown is inside the DTLA 2040 study area, but this is unconfirmed. Largest open regulatory question for this site.", source: "Project CEQA Environmental Setting via search snippet + LA City Planning Central City North page (never fetched)", url: "https://planning.lacity.gov/plans-policies/community-plan-area/central-city-north", accessed: "260712", confidence: "reported" },
       overlayZones: { value: "Transit Priority Area (TPA) per SB 743, as identified in ZIMAS per the project's environmental setting document (search snippet, PDF not directly read). TPA status removes vehicle-LOS from CEQA analysis and supports reduced parking.", source: "CEQAnet Environmental Setting PDF (via search snippet)", url: "https://files.ceqanet.lci.ca.gov/300697-2/", accessed: "260712", confidence: "reported" },
-      far: { value: null, confidence: "unknown" },
-      height: { value: null, confidence: "unknown" },
+      // ── DTLA 2040 CODE READING (260729) ────────────────────────────────────────────────
+      // Read directly from the adopted New Zoning Code text at zoning.lacity.gov, so the
+      // MEANING of each district is `verified` (primary document seen). The mapping of this
+      // parcel to [DM2-G1-5][CX2-FA][CPIO] remains `reported`: GeoHub point query, not ZIMAS.
+      // These are the first `verified`-tier facts in this file.
+      codeReading: {
+        formDistrict: { value: "DM2 = Moderate-Rise Medium 2 (Sec. 2B.16.2). Base FAR 3.0, bonus FAR max 8.5, NO maximum height, building width max 160 ft, building coverage max 90%. Moderate-Rise FAR category (>6.0-8.5), Medium width category (100-210 ft).", source: "LA New Zoning Code Art. 2 (Form), Sec. 2A.1.4 + 2B.16.2", url: "https://zoning.lacity.gov/browse/2", accessed: "260729", confidence: "verified" },
+        useDistrict: { value: "CX2 = Commercial-Mixed 2 (Sec. 5B.5.2). Intent: commercial uses generally within a 50,000 sq ft establishment size on the ground story, plus 'a wide range of housing types', supporting a broad range of residential, commercial and civic facility uses. DWELLING = 'S': permitted through the Inclusionary Housing Special Use Program (Sec. 5C.3.1). NO manufacturing-pairing requirement, unlike the IX3 district on the sibling City Market site.", source: "LA New Zoning Code Art. 5 (Use), Sec. 5B.5.2", url: "https://zoning.lacity.gov/browse/5", accessed: "260729", confidence: "verified" },
+        densityDistrict: { value: "FA = 'Floor Area' Density District (Art. 6). Floor area is the ONLY practical limit on density: effective minimum lot area per dwelling unit is zero square feet. Unit count is capped by FAR, not by a per-unit lot-area rule.", source: "LA New Zoning Code Art. 6 (Density), Density District Naming Convention", url: "https://zoning.lacity.gov/browse/6", accessed: "260729", confidence: "verified" },
+        frontageDistrict: { value: "G1 = General 1 (Sec. 3B.3.1). Build-to depth max 10 ft primary / 15 ft side, build-to width min 90% primary / 70% side, pedestrian amenity allowance max 30% primary, parking setback min 15 ft primary. Applies from the ground through story 5.", source: "LA New Zoning Code Art. 3 (Frontage), Sec. 3B.3.1", url: "https://zoning.lacity.gov/browse/3", accessed: "260729", confidence: "verified" },
+        permissionKey: { value: "P = permitted, no specific standards. * = a use standard applies. S = permitted only as established by an applied Special Use Program. CU1/CU2/CU3 = conditional use permit. '--' = not permitted.", source: "LA New Zoning Code Sec. 5A.3.2-5A.3.7", url: "https://zoning.lacity.gov/browse/5", accessed: "260729", confidence: "verified" },
+        implication: { value: "This overturns the premise the 2023 reporting rested on. The mapped CX2-FA district already allows a wide range of housing (via the Inclusionary Housing Program) and commercial up to ~50,000 sq ft ground-story establishments, with density limited only by floor area. So the scenario B housing pivot is SUPPORTED by the mapped code, not blocked by it: the 260713 note that its 'zoning does not allow it' premise was uncertain is now resolved in favour of housing being permitted. The GPA + zone change the press reported was sought under the legacy code framing; whether it is still required depends on when the new code became operative for this parcel, which this research did not establish.", confidence: "estimated" },
+      },
+      far: { value: "As mapped (DM2): base FAR 3.0, bonus FAR max 8.5. See codeReading.formDistrict.", source: "LA New Zoning Code Sec. 2B.16.2", url: "https://zoning.lacity.gov/browse/2", accessed: "260729", confidence: "verified" },
+      height: { value: "No maximum height in the DM2 form district. Height is governed by FAR, building width (160 ft max) and coverage (90% max) instead of by a height limit.", source: "LA New Zoning Code Sec. 2B.16.2", url: "https://zoning.lacity.gov/browse/2", accessed: "260729", confidence: "verified" },
       setbacks: { value: null, confidence: "unknown" },
       parkingReq: { value: null, confidence: "unknown" },
       historicStatus: { value: "NONE FOUND for this parcel (currently a surface parking lot). Chinatown Central Plaza IS City of LA Historic-Cultural Monument No. 826 (designated 2005; East and West Gates) — but Central Plaza is several blocks WEST and does NOT cover 130 College Street.", source: "Historical Marker Database; Wikipedia: List of LA Historic-Cultural Monuments in Downtown LA", url: "https://www.hmdb.org/m.asp?m=219859", accessed: "260712", confidence: "reported" },

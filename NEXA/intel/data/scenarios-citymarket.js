@@ -64,7 +64,7 @@ window.NEXA_INTEL.sites = window.NEXA_INTEL.sites || {};
       "{lobby}/{207}/{0}/{public}/{14,15}\n{exhibition gallery}/{308}/{0}/{public}/{18,17}\n{coffee shop}/{185}/{0}/{public}/{14,13}\n{pop-up retail}/{123}/{0}/{public}/{11,11}\n{toilets}/{80}/{0}/{public}/{9,9}\n" + CORES(0) +
       "{classroom}/{123}/{1}/{public}/{11,11}\n{classroom}/{123}/{1}/{public}/{11,11}\n{classroom}/{123}/{1}/{public}/{11,11}\n{seminar room}/{123}/{1}/{public}/{11,11}\n{computer lab}/{123}/{1}/{public}/{11,11}\n{toilets}/{80}/{1}/{public}/{9,9}\n" + CORES(1) +
       "{classroom}/{123}/{2}/{public}/{11,11}\n{classroom}/{123}/{2}/{public}/{11,11}\n{project review room}/{123}/{2}/{public}/{11,11}\n{computer lab}/{123}/{2}/{public}/{11,11}\n{seminar room}/{123}/{2}/{public}/{11,11}\n{toilets}/{80}/{2}/{public}/{9,9}\n" + CORES(2) +
-      "{office}/{278}/{3}/{private}/{17,16}\n{office}/{278}/{3}/{private}/{17,16}\n{office}/{278}/{3}/{private}/{17,16}\n" + CORES(3) +
+      "{office}/{278}/{3}/{private}/{17,16}\n{office}/{278}/{3}/{private}/{17,16}\n{office}/{278}/{3}/{private}/{17,16}\n{toilets}/{80}/{3}/{public}/{9,9}\n" + CORES(3) +
       "{2b2b apartment}/{134}/{4}/{private}/{12,11}\n{2b2b apartment}/{134}/{4}/{private}/{12,11}\n{2b2b apartment}/{134}/{4}/{private}/{12,11}\n{2b2b apartment}/{134}/{4}/{private}/{12,11}\n{studio apartment}/{67}/{4}/{private}/{8,8}\n{studio apartment}/{67}/{4}/{private}/{8,8}\n" + CORES(4) +
       "{event hall}/{277}/{5}/{public}/{17,16}\n{lounge bar}/{154}/{5}/{public}/{12,13}\n{toilets}/{80}/{5}/{public}/{9,9}\n" + CORES(5),
     generation: { promptFile: "NEXA/intel/prompts/260712-scenarios-citymarket.md", inputsHash: "site:27E049CC859276F483E8A846203876BA transitions:23280A41C595ACCC438EDA77E2C1F185", date: "260713" }
@@ -87,7 +87,7 @@ window.NEXA_INTEL.sites = window.NEXA_INTEL.sites || {};
       "{lobby}/{207}/{0}/{public}/{14,15}\n{event hall}/{277}/{0}/{public}/{17,16}\n{exhibition gallery}/{308}/{0}/{public}/{18,17}\n{coffee shop}/{185}/{0}/{public}/{14,13}\n{toilets}/{80}/{0}/{public}/{9,9}\n" + CORES(0) +
       "{exhibition gallery}/{308}/{1}/{public}/{18,17}\n{showroom}/{246}/{1}/{public}/{16,15}\n{pop-up retail}/{123}/{1}/{public}/{11,11}\n{toilets}/{80}/{1}/{public}/{9,9}\n" + CORES(1) +
       "{event hall}/{277}/{2}/{public}/{17,16}\n{lounge bar}/{154}/{2}/{public}/{12,13}\n{sales and display}/{253}/{2}/{public}/{16,16}\n{toilets}/{80}/{2}/{public}/{9,9}\n" + CORES(2) +
-      "{office}/{278}/{3}/{private}/{17,16}\n{office}/{278}/{3}/{private}/{17,16}\n{office}/{278}/{3}/{private}/{17,16}\n" + CORES(3) +
+      "{office}/{278}/{3}/{private}/{17,16}\n{office}/{278}/{3}/{private}/{17,16}\n{office}/{278}/{3}/{private}/{17,16}\n{toilets}/{80}/{3}/{public}/{9,9}\n" + CORES(3) +
       "{2b2b apartment}/{134}/{4}/{private}/{12,11}\n{2b2b apartment}/{134}/{4}/{private}/{12,11}\n{2b2b apartment}/{134}/{4}/{private}/{12,11}\n{studio apartment}/{67}/{4}/{private}/{8,8}\n" + CORES(4),
     generation: { promptFile: "NEXA/intel/prompts/260712-scenarios-citymarket.md", inputsHash: "site:27E049CC859276F483E8A846203876BA transitions:23280A41C595ACCC438EDA77E2C1F185", date: "260713" }
   },

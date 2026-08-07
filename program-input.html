@@ -56,11 +56,8 @@
     }
     #brand-mark {
       width: 28px; height: 28px; flex-shrink: 0;
-      background-color: var(--ink);
-      -webkit-mask-image: url(NEXA/NEXA-logo-mask.png); mask-image: url(NEXA/NEXA-logo-mask.png);
-      -webkit-mask-size: contain; mask-size: contain;
-      -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-      -webkit-mask-position: center; mask-position: center;
+      /* inlined cut-out: a CSS mask of NEXA-logo-mask.png draws nothing over file://, and this page is meant to open by double-click */
+      background: url(data:image/png;base64,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) center / contain no-repeat;
     }
     #brand-name {
       font-size: 11px; font-weight: 600;
@@ -168,6 +165,121 @@
     .size-fields input[type="number"]:focus { border-color: var(--accent); }
     .size-unit { font-family: var(--mono); font-size: 10px; color: var(--text-lo); }
 
+    /* ── SITE row (step 1: "Where is your site?") ── */
+    /* the address row is wider than the numeric ones — a full street address needs it */
+    #row-site { max-width: 580px; width: 100%; }
+    #row-site input { min-width: 0; }
+    /* demo shortcuts sit directly under the address row */
+    #site-demos { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 12px; max-width: 580px; }
+    #site-demos .sd-label {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--ink-lo); margin-right: 2px;
+    }
+    .sd-chip {
+      padding: 5px 12px; border: 1px solid var(--ink-border); border-radius: 20px;
+      background: transparent; font-family: var(--font); font-size: 11.5px;
+      color: var(--ink-mid); cursor: pointer;
+      transition: background 0.14s, border-color 0.14s, color 0.14s;
+    }
+    .sd-chip:hover { background: var(--ink-hover-dim); border-color: var(--ink-border-hi); color: var(--ink); }
+
+    /* sits on the blue field under the input row, so it uses the --ink scale, not --text */
+    #site-panel {
+      display: none; max-width: 580px; margin-top: 14px;
+      border: 1px solid var(--ink-border); padding: 12px 16px;
+      font-size: 12px; color: var(--ink-mid); line-height: 1.55;
+    }
+    #site-panel.busy { color: var(--ink-lo); }
+    #site-panel .sp-row { display: flex; gap: 12px; padding: 3px 0; }
+    #site-panel .sp-k {
+      flex: 0 0 88px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ink-lo); padding-top: 2px;
+    }
+    #site-panel .sp-v { flex: 1; min-width: 0; color: var(--ink); word-break: break-word; }
+    #site-panel .sp-v em { font-style: normal; color: var(--ink-lo); }
+    #site-panel .sp-note {
+      margin-top: 8px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em;
+      color: var(--ink-lo); line-height: 1.6;
+    }
+    /* ── development potential (rule-based Site Forecast for the looked-up parcel) ── */
+    #site-forecast { display: none; max-width: 580px; margin-top: 10px; }
+    #site-forecast .sf-head {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--ink-lo); margin-bottom: 8px;
+    }
+    .sf-cap {
+      border: 1px solid var(--ink-border); padding: 12px 16px; margin-bottom: 10px;
+      font-size: 12px; color: var(--ink-mid); line-height: 1.55;
+    }
+    .sf-cap b { color: var(--ink); }
+    .sf-far { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+    .sf-far label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-lo); }
+    .sf-far input {
+      width: 62px; background: rgba(255,255,255,0.1); border: 1px solid var(--ink-border);
+      color: var(--ink); font-family: var(--mono); font-size: 11px; padding: 3px 6px; outline: none; text-align: center;
+    }
+    .sf-far input:focus { border-color: var(--ink-border-hi); }
+    .sf-far .sf-src { font-family: var(--mono); font-size: 9px; color: var(--ink-lo); }
+
+    .sf-from { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .sf-from label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-lo); }
+    .sf-from select {
+      background: rgba(255,255,255,0.1); border: 1px solid var(--ink-border); color: var(--ink);
+      font-family: var(--font); font-size: 12px; padding: 4px 8px; outline: none;
+    }
+    .sf-from select option { color: #111; }
+
+    .sf-card {
+      border: 1px solid var(--ink-border); padding: 12px 16px; margin-bottom: 8px;
+      display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start;
+    }
+    .sf-card .sf-name { font-size: 14px; color: var(--ink); margin-bottom: 4px; }
+    .sf-card .sf-basis { font-size: 11.5px; color: var(--ink-mid); line-height: 1.5; }
+    .sf-card .sf-block { font-family: var(--mono); font-size: 9px; letter-spacing: 0.04em; color: var(--ink-lo); margin-top: 6px; line-height: 1.6; }
+    .sf-tier {
+      display: inline-block; font-family: var(--mono); font-size: 8px; letter-spacing: 0.14em;
+      text-transform: uppercase; border: 1px solid var(--ink-border); padding: 2px 7px; margin-bottom: 6px; color: var(--ink-mid);
+    }
+    .sf-tier.high { background: var(--ink); border-color: var(--ink); color: var(--accent); }
+    .sf-use {
+      background: none; border: 1px solid var(--ink-border); color: var(--ink-mid);
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 7px 12px; cursor: pointer; white-space: nowrap;
+    }
+    .sf-use:hover { background: var(--ink); border-color: var(--ink); color: var(--accent); }
+    #site-forecast .sf-note {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; color: var(--ink-lo); line-height: 1.6;
+    }
+    /* M9 — the district signal read, deliberately styled apart from the DB tier chip so the
+       two never look like the same kind of claim */
+    .sf-sig {
+      display: inline-block; font-family: var(--mono); font-size: 8px; letter-spacing: 0.14em;
+      text-transform: uppercase; border: 1px dashed var(--ink-border); padding: 2px 7px;
+      margin: 0 0 6px 6px; color: var(--ink-mid);
+    }
+    .sf-sig.supported { border-color: var(--ink); color: var(--ink); }
+    .sf-sig.unsupported { border-color: rgba(230,112,51,0.7); color: #b25620; }
+    .sf-sigline {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.04em; line-height: 1.7;
+      color: var(--ink-lo); margin-top: 4px;
+    }
+
+    #site-actions { display: flex; align-items: center; gap: 16px; margin-top: 12px; }
+    #site-skip, #site-scout-link {
+      background: none; border: none; padding: 0;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--ink-lo); cursor: pointer; text-decoration: none;
+    }
+    #site-skip:hover, #site-scout-link:hover { color: var(--ink); }
+    /* the one unambiguous way forward once a site resolves — the send arrow doubling as
+       "continue" was not readable as such */
+    #site-continue {
+      background: var(--ink); border: 1px solid var(--ink); color: var(--accent);
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 7px 14px; cursor: pointer;
+    }
+    #site-continue:hover { opacity: 0.85; }
+
     .btn-send {
       width: 34px; height: 34px; flex-shrink: 0; border-radius: 3px;
       background: var(--accent); border: none; cursor: pointer;
@@ -194,6 +306,49 @@
       transition: opacity 0.15s;
     }
     #btn-activities:hover { opacity: 0.85; }
+
+    /* ── BRIEF CHAT (step 2) ── */
+    /* a sentence instead of four steps of chips; same white row idiom as the address row */
+    #row-brief { max-width: 580px; width: 100%; }
+    #row-brief input { min-width: 0; }
+    #brief-panel {
+      display: none; max-width: 580px; margin-top: 14px;
+      border: 1px solid var(--ink-border); padding: 12px 16px;
+      font-size: 12px; color: var(--ink-mid); line-height: 1.55;
+      max-height: 32vh; overflow-y: auto;
+    }
+    #brief-panel.busy { color: var(--ink-lo); }
+    .bp-you { color: var(--ink-lo); margin-bottom: 8px; }
+    .bp-note { color: var(--ink); margin-bottom: 10px; }
+    .bp-err { color: var(--yellow); }
+    .bp-row { display: flex; gap: 12px; padding: 3px 0; }
+    .bp-k {
+      flex: 0 0 88px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ink-lo); padding-top: 2px;
+    }
+    .bp-v { flex: 1; min-width: 0; color: var(--ink); }
+    .bp-v em { font-style: normal; color: var(--ink-lo); }
+    .bp-act { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 12px; }
+    .bp-go {
+      background: var(--ink); border: 1px solid var(--ink); color: var(--accent);
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 7px 14px; cursor: pointer;
+    }
+    .bp-go:hover { opacity: 0.85; }
+    .bp-link {
+      background: none; border: none; padding: 0;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--ink-lo); cursor: pointer;
+    }
+    .bp-link:hover { color: var(--ink); }
+    .bp-key { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    .bp-key input {
+      flex: 1; min-width: 0; background: rgba(255,255,255,0.1); border: 1px solid var(--ink-border);
+      color: var(--ink); font-family: var(--mono); font-size: 11px; padding: 5px 8px; outline: none;
+    }
+    .bp-key input:focus { border-color: var(--ink-border-hi); }
+    .bp-fine { margin-top: 8px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; color: var(--ink-lo); line-height: 1.6; }
+    .bp-fine b { color: var(--ink-mid); font-weight: 500; }
 
     #hint { margin-top: 14px; font-size: 11px; color: var(--ink-lo); font-family: var(--mono); letter-spacing: 0.04em; max-width: 600px; }
 
@@ -304,6 +459,151 @@
     #raw-text:focus { border-color: rgba(23,47,199,0.35); box-shadow: 0 0 0 3px rgba(23,47,199,0.08); }
     #raw-actions { display: flex; gap: 12px; align-items: center; margin-top: 8px; }
     #raw-errors { font-family: var(--mono); font-size: 10.5px; color: var(--err); margin-top: 8px; line-height: 1.6; }
+
+    /* ── PROGRAM FORECAST (review stage) ──
+       Same year axis the Site Forecast entry gets, derived from this program instead of a
+       parcel. Sits on the blue field like the floor cards, so its head uses the --ink scale
+       and its body the white --surface one. */
+    #prog-forecast { display: none; margin-top: 24px; }
+    .pf-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 9px; }
+    .pf-head .pf-t { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-lo); }
+    .pf-head .pf-sub { font-size: 11.5px; color: var(--ink-mid); }
+    .pf-body { background: var(--surface); border: 1px solid var(--border-hi); padding: 15px 18px 16px; }
+    .pf-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding-bottom: 13px; border-bottom: 1px solid var(--border-hi); margin-bottom: 4px; }
+    .pf-ctl > div { display: flex; align-items: center; gap: 7px; }
+    .pf-ctl label { font-family: var(--mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-lo); }
+    .pf-ctl input[type="number"] {
+      width: 54px; height: 26px; text-align: center; background: rgba(20,24,32,0.04);
+      border: 1px solid var(--border-hi); border-radius: 3px;
+      font-family: var(--mono); font-size: 11px; color: var(--text-hi); outline: none;
+    }
+    .pf-ctl select {
+      height: 26px; max-width: 220px; background: var(--surface); border: 1px solid var(--border-hi);
+      border-radius: 3px; font-family: var(--font); font-size: 11.5px; color: var(--text-hi);
+      outline: none; padding: 0 6px;
+    }
+    .pf-ctl input:focus, .pf-ctl select:focus { border-color: var(--accent); }
+    .pf-ctl .pf-src { font-family: var(--mono); font-size: 9px; color: var(--text-lo); }
+
+    .pf-ev { display: grid; grid-template-columns: 56px 1fr; gap: 14px; padding: 11px 0; border-top: 1px dashed var(--border-hi); }
+    .pf-ev:first-of-type { border-top: none; }   /* the control row already rules off above it */
+    .pf-yr { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--text-hi); padding-top: 1px; }
+    .pf-yr span { display: block; font-size: 8px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-lo); margin-top: 1px; }
+    .pf-what { font-size: 12.5px; color: var(--text-hi); line-height: 1.5; }
+    .pf-what b { font-weight: 500; }
+    .pf-where { font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; color: var(--text-lo); margin-top: 4px; }
+    .pf-basis { font-size: 11.5px; color: var(--text-mid); line-height: 1.55; margin-top: 6px; }
+    .pf-cite { font-family: var(--mono); font-size: 9px; letter-spacing: 0.04em; color: var(--text-lo); line-height: 1.7; margin-top: 5px; }
+    .pf-tier {
+      display: inline-block; font-family: var(--mono); font-size: 8px; letter-spacing: 0.14em;
+      text-transform: uppercase; border: 1px solid var(--border-hi); border-radius: 2px;
+      padding: 1px 6px; margin-right: 7px; color: var(--text-mid); vertical-align: 1px;
+    }
+    .pf-tier.high { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .pf-tier.short { background: var(--short-dim); border-color: rgba(230,112,51,0.45); color: #b25620; }
+
+    /* site reading: measured facts, laid out as facts */
+    .pf-ctx { padding: 12px 0 4px; border-bottom: 1px solid var(--border-hi); margin-bottom: 4px; }
+    .ctx-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px 20px; }
+    .ctx-cell label { display: block; font-family: var(--mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-lo); margin-bottom: 4px; }
+    .ctx-cell .ctx-v { font-size: 13px; color: var(--text-hi); }
+    .ctx-cell .ctx-b { font-family: var(--mono); font-size: 9px; color: var(--text-lo); line-height: 1.6; margin-top: 2px; }
+    .ctx-mix { display: flex; flex-wrap: wrap; gap: 3px 12px; }
+    .ctx-n { font-size: 11.5px; color: var(--text-mid); }
+    .ctx-n b { font-family: var(--mono); font-size: 12px; color: var(--text-hi); font-weight: 500; }
+
+    .pf-sup { margin-top: 7px; }
+    .pf-stand {
+      display: inline-block; font-family: var(--mono); font-size: 8px; letter-spacing: 0.12em;
+      text-transform: uppercase; border-radius: 2px; padding: 1px 6px; border: 1px solid var(--border-hi); color: var(--text-mid);
+    }
+    .pf-stand.supported { background: rgba(23,47,199,0.08); border-color: rgba(23,47,199,0.35); color: var(--accent); }
+    .pf-stand.unsupported { background: var(--short-dim); border-color: rgba(230,112,51,0.45); color: #b25620; }
+    .pf-for, .pf-agn, .pf-ctxrow { font-size: 11.5px; line-height: 1.55; margin-top: 3px; }
+    .pf-for { color: var(--text-mid); }
+    .pf-agn { color: #b25620; }
+    .pf-ctxrow { color: var(--text-lo); }
+
+    /* M9 — the discourse read. Dashed left rule so it never reads as the measured block
+       above it: one is a count of what is there, the other is what somebody published. */
+    .pf-sig { border-left: 1px dashed var(--border-hi); padding-left: 10px; margin-top: 9px; }
+    .pf-sig .pf-for b, .pf-sig .pf-ctxrow b { color: var(--text-hi); font-weight: 500; }
+    .pf-sig .pf-agn b { color: #b25620; font-weight: 500; }
+    .pf-sig-gh {
+      font-family: var(--mono); font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--text-lo); margin: 8px 0 3px;
+    }
+    .pf-sig-tag {
+      font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-lo); margin-left: 6px; white-space: nowrap;
+    }
+    .pf-sig-basis { font-size: 11px; line-height: 1.6; color: var(--text-lo); margin-top: 2px; }
+    /* citations stay in the panel's own citation style — a default browser link here shouts
+       louder than the finding it is attached to */
+    .pf-cite a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--border-hi); }
+    .pf-cite a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .pf-signals .pf-sig-ch { margin-bottom: 11px; }
+    .pf-sig-chname {
+      font-family: var(--mono); font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--text-lo); border-bottom: 1px solid var(--border-hi); padding-bottom: 3px; margin-bottom: 6px;
+    }
+    .pf-sig-item { padding: 5px 0 6px 9px; border-left: 2px solid var(--border-hi); margin-bottom: 5px; font-size: 11.5px; color: var(--text-mid); }
+    .pf-sig-item.pf-dir-for { border-left-color: rgba(23,47,199,0.4); }
+    .pf-sig-item.pf-dir-against { border-left-color: rgba(230,112,51,0.5); }
+    .pf-sig-detail { font-size: 11px; line-height: 1.65; color: var(--text-lo); margin-top: 4px; }
+
+    /* M10 — the moving read. Solid left rule, unlike M9's dashed one: these ARE numbers, they
+       are just numbers measured somewhere larger than this parcel. The scale they were measured
+       at is printed next to every one of them so that never gets lost. */
+    .pf-dyn { border-left: 2px solid rgba(23,47,199,0.28); padding-left: 10px; margin-top: 9px; }
+    .pf-dyn .pf-for b, .pf-dyn .pf-ctxrow b { color: var(--text-hi); font-weight: 500; }
+    .pf-dyn .pf-agn b { color: #b25620; font-weight: 500; }
+    .pf-dyn-tag {
+      font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-lo); margin-left: 6px; white-space: nowrap;
+    }
+    /* the trend chip is the one place a direction of travel is stated as such */
+    .pf-tr {
+      font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 1px 5px; border: 1px solid var(--border-hi); border-radius: 2px; margin-left: 6px;
+      color: var(--text-lo); white-space: nowrap;
+    }
+    .pf-tr.rising { border-color: rgba(23,47,199,0.4); color: var(--accent); }
+    .pf-tr.falling { border-color: rgba(230,112,51,0.5); color: #b25620; }
+    .pf-tr.volatile { border-color: rgba(230,112,51,0.35); color: #b25620; }
+    .pf-tr.unknown { border-style: dashed; }
+    /* the series itself, printed as dated values so the reader can check the trend chip */
+    .pf-series { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; margin: 5px 0 3px; }
+    .pf-sp { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 52px; }
+    .pf-sp-bar { width: 20px; background: rgba(23,47,199,0.18); border-top: 2px solid rgba(23,47,199,0.5); }
+    .pf-sp-bar.neg { background: var(--short-dim); border-top-color: rgba(230,112,51,0.6); }
+    .pf-sp-v { font-family: var(--mono); font-size: 9.5px; color: var(--text-hi); }
+    .pf-sp-t { font-family: var(--mono); font-size: 8px; letter-spacing: 0.06em; color: var(--text-lo); }
+    .pf-dyn-read { font-size: 11.5px; line-height: 1.6; color: var(--text-mid); margin-top: 3px; }
+    .pf-dyn-cav { font-size: 11px; line-height: 1.6; color: var(--text-lo); margin-top: 3px; }
+    .pf-dyn-gap { border-left-color: var(--border-hi); }
+    .pf-dyn-item { padding: 7px 0 8px 9px; border-left: 2px solid rgba(23,47,199,0.28); margin-bottom: 6px; font-size: 11.5px; color: var(--text-mid); }
+    .pf-dyn-item.pf-gap { border-left-style: dashed; border-left-color: var(--border-hi); }
+    .pf-geo {
+      font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-lo); border: 1px solid var(--border-hi); border-radius: 2px; padding: 1px 4px; margin-left: 6px;
+    }
+
+    .pf-branch { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-hi); }
+    .pf-b-head { font-family: var(--mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-lo); margin-bottom: 7px; }
+    .pf-b-row { display: flex; gap: 10px; align-items: baseline; font-size: 11.5px; color: var(--text-mid); padding: 3px 0; }
+    .pf-b-row .pf-b-yr { font-family: var(--mono); font-size: 10px; color: var(--text-lo); flex: 0 0 42px; }
+    .pf-b-row b { color: var(--text-hi); font-weight: 500; }
+
+    .pf-note { font-family: var(--mono); font-size: 9px; letter-spacing: 0.05em; color: var(--text-lo); line-height: 1.7; margin-top: 13px; padding-top: 11px; border-top: 1px solid var(--border-hi); }
+    .pf-empty { font-size: 12px; color: var(--text-mid); line-height: 1.6; padding: 2px 0 4px; }
+    /* the timeline runs but cannot move anything — say so before it is mistaken for a bug */
+    .pf-flat {
+      font-size: 12px; color: #b25620; line-height: 1.6; margin: 10px 0 2px;
+      background: var(--short-dim); border: 1px solid rgba(230,112,51,0.35); border-radius: 3px; padding: 9px 12px;
+    }
+    .pf-flat b { font-weight: 500; }
 
     /* ── STICKY FOOTER ── */
     #footer-bar {
@@ -454,6 +754,17 @@
       padding: 8px 14px; cursor: pointer;
     }
     .fc-apply:hover { opacity: 0.85; }
+    /* cards no longer carry their own action — they state where they sit on the timeline */
+    .fc-when {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-lo);
+    }
+    #fc-timeline {
+      background: var(--ink); border: 1px solid var(--ink); color: var(--accent);
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+      padding: 6px 12px; cursor: pointer; flex-shrink: 0;
+    }
+    #fc-timeline:hover { opacity: 0.85; }
   </style>
 </head>
 <body>
@@ -467,12 +778,9 @@
   </div>
 
   <!-- Step indicator -->
+  <!-- pips are built by updatePips() from steps.length, so adding a step needs no edit here -->
   <div id="step-indicator">
-    <div class="step-pip active" id="pip-0"></div>
-    <div class="step-pip" id="pip-1"></div>
-    <div class="step-pip" id="pip-2"></div>
-    <div class="step-pip" id="pip-3"></div>
-    <span id="step-num">01 / 04</span>
+    <span id="step-num">01 / 05</span>
   </div>
 
   <!-- Wizard dialog -->
@@ -487,6 +795,13 @@
       <button class="btn-send btn-back-arrow" id="btn-back" title="Back to the previous question" style="display:none;">
         <svg viewBox="0 0 18 18"><path d="M14 9H4M8 5L4 9l4 4"></path></svg>
       </button>
+
+      <div class="input-row" id="row-site" style="display:none;">
+        <input id="input-site" type="text" autocomplete="off" placeholder="e.g. 130 W College St, Los Angeles, CA 90012">
+        <button class="btn-send" id="btn-site" disabled>
+          <svg viewBox="0 0 18 18"><path d="M4 9h10M10 5l4 4-4 4"></path></svg>
+        </button>
+      </div>
 
       <div class="input-row" id="row-number" style="display:none;">
         <input id="input-number" type="number" min="0" autocomplete="off" placeholder="e.g. 12000">
@@ -508,8 +823,40 @@
         </button>
       </div>
 
+      <!-- Step 2 also takes a whole sentence: a model reads it into the answers the chips
+           and the three steps after this one would otherwise collect one at a time. -->
+      <div class="input-row" id="row-brief" style="display:none;">
+        <input id="input-brief" type="text" autocomplete="off" placeholder="or describe it: 8 floors of mixed-use, 12,000 m², a coffee shop and a gallery">
+        <button class="btn-send" id="btn-brief" disabled>
+          <svg viewBox="0 0 18 18"><path d="M4 9h10M10 5l4 4-4 4"></path></svg>
+        </button>
+      </div>
+
       <button id="btn-activities">Continue →</button>
     </div>
+
+    <!-- Demo sites (step 1 only): the two sites the NEXA Intel layer already carries, so a
+         click gives a working lookup without needing an LA address to hand -->
+    <div id="site-demos" style="display:none;">
+      <span class="sd-label">Demo sites</span>
+      <button class="sd-chip" data-addr="1057 S San Pedro St, Los Angeles, CA 90015">City Market of LA</button>
+      <button class="sd-chip" data-addr="130 W College St, Los Angeles, CA 90012">130 W College St</button>
+    </div>
+
+    <!-- Site lookup result (step 1 only) — filled by lookupSite(), hidden otherwise -->
+    <div id="site-panel"></div>
+
+    <!-- Rule-based Site Forecast for the found parcel: capacity envelope + the M3
+         program-transition DB filtered by the parcel's current use. No API, no LLM. -->
+    <div id="site-forecast"></div>
+    <div id="site-actions" style="display:none;">
+      <button id="site-continue" style="display:none;">continue →</button>
+      <button id="site-skip">skip · no site yet</button>
+      <a id="site-scout-link" href="NEXA/intel/site-scout.html" target="_blank">▸ full site scout</a>
+    </div>
+
+    <!-- What the model read out of the sentence typed at step 2 -->
+    <div id="brief-panel"></div>
 
     <p id="hint">Sets the per-floor recipe</p>
 
@@ -523,6 +870,10 @@
       <p id="review-sub">Click a pill to edit or delete it; use + to add a program to a floor. Orange = SHORT (plug-in) · blue = LONG · yellow = circulation.</p>
 
       <div id="floors"></div>
+
+      <!-- What this program becomes over time. Filled by renderProgramForecast(); the same
+           events are handed to the massing view's year slider on Build. -->
+      <div id="prog-forecast"></div>
 
       <div id="raw-panel">
         <textarea id="raw-text" spellcheck="false"></textarea>
@@ -557,6 +908,7 @@
       <div id="fc-head">
         <p id="fc-title">Site <em>forecast</em></p>
         <div style="display:flex;gap:8px;flex-shrink:0;">
+          <button id="fc-timeline" style="display:none;">▸ open timeline in 3D</button>
           <a id="fc-scout" href="NEXA/intel/site-scout.html" target="_blank">▸ scout a new site</a>
           <button id="fc-close">✕ back to wizard</button>
         </div>
@@ -581,6 +933,15 @@
 <script src="NEXA/intel/data/site-collegest.js"></script>
 <script src="NEXA/intel/data/scenarios-collegest.js"></script>
 <script src="NEXA/intel/data/transitions.js"></script>
+<!-- M9 site signals (policy, news, landmarks, district trend). Optional in the same way:
+     a missing file just means the forecast has no signal read for that site. -->
+<script src="NEXA/intel/data/signals-citymarket.js"></script>
+<script src="NEXA/intel/data/signals-collegest.js"></script>
+<!-- M10 site dynamics (the moving layer: footfall, events, leasing, demography, market).
+     Optional in the same way. A missing file means the forecast has no dynamic read and
+     ranks exactly as it did before M10. -->
+<script src="NEXA/intel/data/dynamics-citymarket.js"></script>
+<script src="NEXA/intel/data/dynamics-collegest.js"></script>
 
 <script>
   // ── WebGL mouse-reactive noise background (verbatim from chat.html) ──
@@ -700,7 +1061,16 @@
   // ══════════════════════════════════════════════════════════════════
   const isCore = t => /fire stair|elevator|escalator|\bstair\b|\bcore\b|shaft/i.test(t); // copied from program-massing-shortfloor.html — keep in sync
   const isFreight = t => /freight/i.test(t); // copied from program-massing-shortfloor.html — keep in sync
-  const isShort = t => /coffee|showroom|pop[- ]?up|exhibition|event hall|\bdemo\b|classroom|seminar|computer lab|project review|yoga|pilates|fitness|recovery lounge|physical therapy|meditation|health coaching|lounge bar/i.test(t); // copied from program-massing-shortfloor.html — keep in sync
+  // copied from program-massing-shortfloor.html — keep in sync (families: F&B · retail · show
+  // and event · learning · wellness). Everything unmatched is LONG.
+  const SHORT_RE = new RegExp([
+    'coffee|caf[eé]|restaurant|food hall|\\bbar\\b',
+    '\\bretail\\b|sales and display|\\bdisplay\\b|showroom|pop[- ]?up|\\bshop\\b|market',
+    'exhibition|event hall|\\bdemo\\b',
+    'classroom|seminar|computer lab|project review',
+    'yoga|pilates|fitness|\\bgym\\b|recovery lounge|physical therapy|meditation|health coaching',
+  ].join('|'), 'i');
+  const isShort = t => SHORT_RE.test(t);
   const isCorridor = t => /circulation|corridor|hallway/i.test(t); // copied from program-massing-shortfloor.html — keep in sync
   const VALID_CATEGORIES = ['public', 'private', 'circulation'];
   const SHORT_THRESHOLD = 0.5; // copied from program-massing-shortfloor.html — keep in sync
@@ -775,11 +1145,18 @@
 
   const steps = [
     {
+      type: 'site',
+      question: 'Where is your <em>site</em>?',
+      label: 'Site',
+      placeholder: 'e.g. 130 W College St, Los Angeles, CA 90012',
+      hint: 'Type a street address and press Enter. It geocodes, then pulls the LA County parcel and LA City zoning. Any US address geocodes; parcel and zoning are LA only. Optional: skip if you have no site yet.',
+    },
+    {
       type: 'chips',
       question: '<em>What building type</em><br>are we programming?',
       label: 'Type',
       chips: ['Mixed-Use', 'Office', 'Housing'],
-      hint: 'Sets the per-floor recipe',
+      hint: 'Sets the per-floor recipe. Or write the brief in one line and let a model fill in the size, floors and activities.',
     },
     {
       type: 'number',
@@ -805,7 +1182,9 @@
 
   let step = 0;
   const selectedActivities = new Set();
-  const wiz = { buildingType: 'mixed-use', gfa: 12000, floorsAbove: 8, basementLevels: 2, activities: [] };
+  // wiz.site stays null until step 1 resolves an address (or forever, if it is skipped).
+  // It is carried for CONTEXT only — nothing downstream sizes geometry from it.
+  const wiz = { buildingType: 'mixed-use', gfa: 12000, floorsAbove: 8, basementLevels: 2, activities: [], site: null };
 
   // Where the review stage was entered from, so its "← back" returns to the right place.
   // Set by submit() (wizard) and by applyScenario() (forecast); persisted in the draft.
@@ -825,13 +1204,36 @@
   const btnFloors = document.getElementById('btn-floors');
   const btnActivities = document.getElementById('btn-activities');
   const btnBack = document.getElementById('btn-back');
+  const rowSite = document.getElementById('row-site');
+  const inputSite = document.getElementById('input-site');
+  const btnSite = document.getElementById('btn-site');
+  const sitePanel = document.getElementById('site-panel');
+  const siteActions = document.getElementById('site-actions');
+  const siteDemos = document.getElementById('site-demos');
+  const siteContinue = document.getElementById('site-continue');
+  const rowBrief = document.getElementById('row-brief');
+  const inputBrief = document.getElementById('input-brief');
+  const btnBrief = document.getElementById('btn-brief');
+  const briefPanel = document.getElementById('brief-panel');
+
+  // pips are built once from steps.length so a new step needs no markup change
+  const stepNumEl = document.getElementById('step-num');
+  (function buildPips() {
+    const bar = document.getElementById('step-indicator');
+    for (let i = steps.length - 1; i >= 0; i--) {
+      const pip = document.createElement('div');
+      pip.className = 'step-pip';
+      pip.id = 'pip-' + i;
+      bar.insertBefore(pip, bar.firstChild);
+    }
+  })();
 
   function updatePips(s) {
     for (let i = 0; i < steps.length; i++) {
       const pip = document.getElementById('pip-' + i);
       pip.className = 'step-pip' + (i < s ? ' done' : i === s ? ' active' : '');
     }
-    document.getElementById('step-num').textContent = String(s + 1).padStart(2, '0') + ' / ' + String(steps.length).padStart(2, '0');
+    stepNumEl.textContent = String(s + 1).padStart(2, '0') + ' / ' + String(steps.length).padStart(2, '0');
   }
 
   function loadStep(i) {
@@ -881,12 +1283,39 @@
 
     rowNumber.style.display = 'none';
     rowFloors.style.display = 'none';
+    rowSite.style.display = 'none';
+    rowBrief.style.display = 'none';
+    briefPanel.style.display = 'none';
     btnActivities.style.display = 'none';
+    siteActions.style.display = 'none';
+    siteDemos.style.display = 'none';
+    sitePanel.style.display = 'none';
+    document.getElementById('site-forecast').style.display = 'none';
 
-    if (s.type === 'number') {
+    if (s.type === 'chips' && !LLM_OFF) {
+      rowBrief.style.display = 'flex';
+      btnBrief.disabled = !inputBrief.value.trim();
+      if (briefState) renderBrief();          // a revisit keeps what the model already read
+      setTimeout(() => inputBrief.focus(), 250);
+    }
+
+    if (s.type === 'site') {
+      rowSite.style.display = 'flex';
+      siteActions.style.display = 'flex';
+      siteDemos.style.display = 'flex';
+      inputSite.placeholder = s.placeholder || '';
+      // revisiting the step: show the address, the result and the forecast already found
+      inputSite.value = (wiz.site && wiz.site.query) || inputSite.value;
+      btnSite.disabled = !inputSite.value.trim();
+      if (wiz.site) renderSitePanel(wiz.site);
+      if (forecastState) renderForecast();
+      siteContinue.style.display = wiz.site ? 'inline-block' : 'none';
+      setTimeout(() => inputSite.focus(), 250);
+    } else if (s.type === 'number') {
       rowNumber.style.display = 'flex';
       // prefill on a revisit (coming back), so the previous answer is not retyped
-      inputNumber.value = answered[i] ? String(Math.round(wiz.gfa)) : '';
+      // a forecast "use this" prefills the GFA even though the step is not yet answered
+      inputNumber.value = answered[i] ? String(Math.round(wiz.gfa)) : (gfaPrefill ? String(gfaPrefill) : '');
       inputNumber.placeholder = s.placeholder || '';
       btnNumber.disabled = !inputNumber.value;
       setTimeout(() => inputNumber.focus(), 250);
@@ -920,19 +1349,23 @@
   }
   btnBack.addEventListener('click', goBack);
 
+  // Branches on the step's TYPE, not its index — inserting a step must not renumber this.
   function submit(value) {
-    if (step === 0) {
+    const type = steps[step].type;
+    if (type === 'site') {
+      value = wiz.site ? (wiz.site.shortLabel || wiz.site.query) : 'no site';
+    } else if (type === 'chips') {
       wiz.buildingType = value.toLowerCase().replace(/\s+/g, '-');
-    } else if (step === 1) {
+    } else if (type === 'number') {
       const n = parseFloat(String(value).replace(/[^\d.]/g, ''));
       wiz.gfa = isNaN(n) || n <= 0 ? 12000 : n;
       value = Math.round(wiz.gfa).toLocaleString() + ' m²';
-    } else if (step === 2) {
+    } else if (type === 'floors') {
       const a = Math.max(1, parseInt(floorsAboveEl.value, 10) || 8);
       const b = Math.max(0, parseInt(floorsBasementEl.value, 10) || 0);
       wiz.floorsAbove = a; wiz.basementLevels = b;
       value = a + ' above · ' + b + ' basement';
-    } else if (step === 3) {
+    } else if (type === 'multi') {
       wiz.activities = [...selectedActivities];
       value = selectedActivities.size === 0 ? 'no activities' : selectedActivities.size + ' activities';
     }
@@ -965,6 +1398,916 @@
   });
 
   btnActivities.addEventListener('click', () => submit('activities'));
+
+  // ══════════════════════════════════════════════════════════════════
+  // PROGRAM BRIEF (step 2) — one line of plain language, read by a model into
+  // the answers the chips and the next three steps collect one at a time.
+  //   It fills the wizard, it does not skip it: every value the model reads is
+  //   shown, and the remaining steps open prefilled so anything can be changed.
+  //   Values the brief does not state are left alone.
+  //
+  //   Two ways to reach the model, in this order:
+  //   1. `node nexa-llm.js`, then open this page over localhost. The page posts to
+  //      /llm and the server adds the key from the environment. Nothing to type,
+  //      and the key never enters the browser. This is the preferred path.
+  //   2. No proxy: the page calls Anthropic directly with a key kept in this
+  //      browser's localStorage, under the same name the massing view uses, so
+  //      setting it once covers both pages. That key is sent with each sentence.
+  //   Neither available means the brief row does nothing and the chips stay the
+  //   offline path. `?llm=0` parks the whole layer.
+  // ══════════════════════════════════════════════════════════════════
+  const LLM_MODEL = 'claude-opus-5';
+  const LLM_URL = 'https://api.anthropic.com/v1/messages';
+  const LLM_OFF = new URLSearchParams(location.search).get('llm') === '0';
+  let LLM_KEY = '';
+  try { LLM_KEY = localStorage.getItem('nexaApiKey') || ''; } catch (e) { LLM_KEY = ''; }
+  const llmSet = v => {
+    LLM_KEY = v;
+    try { v ? localStorage.setItem('nexaApiKey', v) : localStorage.removeItem('nexaApiKey'); } catch (e) { }
+  };
+
+  // Set once at load: is nexa-llm.js answering? A plain static server 404s /llm, and a
+  // file:// page has nowhere to ask, so both fall through to the localStorage key.
+  let LLM_PROXY = false;
+  (async function probeProxy() {
+    if (LLM_OFF || !/^https?:$/.test(location.protocol)) return;
+    try {
+      const r = await fetch('/llm', { method: 'GET' });
+      if (!r.ok) return;
+      const d = await r.json();
+      LLM_PROXY = !!(d && d.ok);
+      if (LLM_PROXY && briefState && briefState.phase === 'key') { briefState = null; renderBrief(); }
+    } catch (e) { /* no proxy; the key path stands */ }
+  })();
+
+  const ACTIVITY_KEYS = ACTIVITY_GROUPS.reduce((all, g) => all.concat(g[1]), []);
+
+  // Panel state: { raw, phase: 'busy'|'done'|'error'|'key', out, msg }
+  let briefState = null;
+
+  const BRIEF_SCHEMA = {
+    type: 'object',
+    properties: {
+      buildingType: { type: 'string', enum: ['mixed-use', 'office', 'housing'] },
+      gfa: { type: 'number', description: 'Total gross floor area in m2. 0 if the brief does not give one.' },
+      floorsAbove: { type: 'number', description: 'Storeys above grade. 0 if the brief does not give one.' },
+      basementLevels: { type: 'number', description: 'Basement levels. -1 if the brief does not say.' },
+      activities: {
+        type: 'array',
+        items: { type: 'string', enum: ACTIVITY_KEYS },
+        description: 'Plug-in activities the brief names or clearly implies. Empty if it names none.'
+      },
+      note: { type: 'string', description: 'One or two short sentences for the user, in the language they wrote in.' }
+    },
+    required: ['buildingType', 'gfa', 'floorsAbove', 'basementLevels', 'activities', 'note'],
+    additionalProperties: false
+  };
+
+  const briefSystem = () => [
+    'You read a one-line building brief and fill in a program wizard. You do nothing else.',
+    '',
+    'The wizard asks for: building type, total GFA in m2, floors above and below grade,',
+    'and which plug-in activities go into the building.',
+    '',
+    'Fill in only what the brief states or clearly implies. Never invent a number it does not give:',
+    'leave gfa and floorsAbove at 0, and basementLevels at -1, when they are not stated.',
+    'buildingType is one of mixed-use, office, housing. A brief that carries more than one use is mixed-use.',
+    'activities come from this list only, and only the ones the brief points at: ' + ACTIVITY_KEYS.join(', ') + '.',
+    'Convert other units to m2 (1 sq ft = 0.0929 m2). "8 floors" means floorsAbove 8.',
+    '',
+    'In the note, say what you read and what is still missing. Write it plainly and briefly,',
+    'in the language the user wrote in. No em dashes.'
+  ].join('\n');
+
+  async function briefRead(raw) {
+    const body = JSON.stringify({
+      model: LLM_MODEL,
+      max_tokens: 8192,   // thinking shares this budget, so leave room above the small answer
+      output_config: { effort: 'low', format: { type: 'json_schema', schema: BRIEF_SCHEMA } },
+      system: briefSystem(),
+      messages: [{ role: 'user', content: raw }]
+    });
+    // Same request either way; only who holds the key differs.
+    const res = LLM_PROXY
+      ? await fetch('/llm', { method: 'POST', headers: { 'content-type': 'application/json' }, body })
+      : await fetch(LLM_URL, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': LLM_KEY,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'   // opts a browser origin into the API
+        },
+        body
+      });
+    if (!res.ok) {
+      let msg = res.status + ' ' + res.statusText;
+      try { const e = await res.json(); if (e && e.error && e.error.message) msg = e.error.message; } catch (err) { }
+      throw new Error(msg);
+    }
+    const data = await res.json();
+    if (data.stop_reason === 'refusal') throw new Error('The model declined that one.');
+    if (data.stop_reason === 'max_tokens') throw new Error('The answer was cut off.');
+    const block = (data.content || []).find(b => b.type === 'text');
+    if (!block) throw new Error('Nothing came back.');
+    return JSON.parse(block.text);
+  }
+
+  function briefRows(out) {
+    const rows = [];
+    const label = { 'mixed-use': 'Mixed-Use', 'office': 'Office', 'housing': 'Housing' }[out.buildingType] || 'Mixed-Use';
+    rows.push(['Type', label]);
+    rows.push(['GFA', out.gfa > 0 ? Math.round(out.gfa).toLocaleString() + ' m²' : '<em>not stated</em>']);
+    rows.push(['Floors', out.floorsAbove > 0
+      ? Math.round(out.floorsAbove) + ' above' + (out.basementLevels >= 0 ? ' · ' + Math.round(out.basementLevels) + ' basement' : '')
+      : (out.basementLevels >= 0 ? Math.round(out.basementLevels) + ' basement' : '<em>not stated</em>')]);
+    const acts = (out.activities || []).filter(a => ACTIVITY_KEYS.includes(a));
+    rows.push(['Activities', acts.length ? escapeHtml(acts.join(', ')) : '<em>none named</em>']);
+    return rows.map(r => `<div class="bp-row"><span class="bp-k">${r[0]}</span><span class="bp-v">${r[1]}</span></div>`).join('');
+  }
+
+  function renderBrief() {
+    if (!briefState) { briefPanel.style.display = 'none'; return; }
+    const st = briefState;
+    briefPanel.style.display = 'block';
+    briefPanel.classList.toggle('busy', st.phase === 'busy');
+
+    if (st.phase === 'key') {
+      briefPanel.innerHTML =
+        '<div class="bp-note">Reading a brief needs an Anthropic API key.</div>' +
+        '<div class="bp-key"><input id="bp-key-input" type="password" autocomplete="off" placeholder="sk-ant-…" spellcheck="false">' +
+        '<button class="bp-go" id="bp-key-save">Save</button></div>' +
+        '<div class="bp-fine">The key is stored in this browser and sent to Anthropic with each sentence. ' +
+        'To keep it out of the browser instead, run <b>node nexa-llm.js</b> and open this page at localhost:8099. ' +
+        'The chips above work without either.</div>';
+      const keyInput = document.getElementById('bp-key-input');
+      const save = () => {
+        const v = keyInput.value.trim();
+        if (!v) return;
+        llmSet(v);
+        briefState = null;
+        renderBrief();
+        if (inputBrief.value.trim()) askBrief(inputBrief.value.trim());
+      };
+      document.getElementById('bp-key-save').onclick = save;
+      keyInput.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); save(); } };
+      setTimeout(() => keyInput.focus(), 60);
+      return;
+    }
+
+    let html = '<div class="bp-you">' + escapeHtml(st.raw) + '</div>';
+    if (st.phase === 'busy') {
+      html += '<div class="bp-note">Reading that…</div>';
+    } else if (st.phase === 'error') {
+      html += '<div class="bp-note bp-err">' + escapeHtml(st.msg) + '</div>' +
+        (LLM_PROXY ? '' : '<div class="bp-act"><button class="bp-link" id="bp-key-edit">change key</button></div>');
+    } else {
+      html += '<div class="bp-note">' + escapeHtml(st.out.note || '') + '</div>' + briefRows(st.out) +
+        '<div class="bp-act"><button class="bp-go" id="bp-apply">Use this →</button>' +
+        '<button class="bp-link" id="bp-drop">discard</button></div>' +
+        '<div class="bp-fine">The steps after this one open prefilled, so every value is still yours to change.</div>';
+    }
+    briefPanel.innerHTML = html;
+
+    const apply = document.getElementById('bp-apply');
+    if (apply) apply.onclick = () => applyBrief(st.out);
+    const drop = document.getElementById('bp-drop');
+    if (drop) drop.onclick = () => { briefState = null; renderBrief(); inputBrief.focus(); };
+    const edit = document.getElementById('bp-key-edit');
+    if (edit) edit.onclick = () => { briefState = { phase: 'key' }; renderBrief(); };
+  }
+
+  async function askBrief(raw) {
+    if (!LLM_PROXY && !LLM_KEY) { briefState = { phase: 'key' }; renderBrief(); return; }
+    briefState = { raw, phase: 'busy' };
+    renderBrief();
+    try {
+      const out = await briefRead(raw);
+      briefState = { raw, phase: 'done', out };
+    } catch (e) {
+      briefState = { raw, phase: 'error', msg: 'Could not reach the model. ' + e.message };
+    }
+    renderBrief();
+  }
+
+  // Writes the answers, then hands the step to submit() so the brief takes exactly the
+  // path a clicked chip takes. Untouched fields keep the wizard's own defaults.
+  function applyBrief(out) {
+    const type = ['mixed-use', 'office', 'housing'].includes(out.buildingType) ? out.buildingType : 'mixed-use';
+    if (out.gfa > 0) { wiz.gfa = Math.round(out.gfa); gfaPrefill = Math.round(out.gfa); }
+    if (out.floorsAbove > 0) wiz.floorsAbove = Math.max(1, Math.round(out.floorsAbove));
+    if (out.basementLevels >= 0) wiz.basementLevels = Math.round(out.basementLevels);
+    selectedActivities.clear();
+    for (const a of out.activities || []) if (ACTIVITY_KEYS.includes(a)) selectedActivities.add(a);
+    inputBrief.value = '';
+    briefState = null;
+    submit({ 'mixed-use': 'Mixed-Use', 'office': 'Office', 'housing': 'Housing' }[type]);
+  }
+
+  inputBrief.addEventListener('input', () => { btnBrief.disabled = !inputBrief.value.trim(); });
+  inputBrief.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && inputBrief.value.trim()) { e.preventDefault(); askBrief(inputBrief.value.trim()); }
+  });
+  btnBrief.addEventListener('click', () => { if (inputBrief.value.trim()) askBrief(inputBrief.value.trim()); });
+
+  // ══════════════════════════════════════════════════════════════════
+  // SITE LOOKUP (step 1) — address → point → LA parcel → LA zoning.
+  // Same endpoints and the same parcel-scoring rule as NEXA/intel/site-scout.html;
+  // this is the short version that answers "where is it", the scout page is the
+  // full dossier. Every leg degrades on its own: a failed parcel or zoning call
+  // still leaves a usable geocode, and the whole step is skippable.
+  // ══════════════════════════════════════════════════════════════════
+  const SITE_EP = {
+    census: 'https://geocoding.geo.census.gov/geocoder/locations/onelineaddress',
+    nominatim: 'https://nominatim.openstreetmap.org/search',
+    parcels: 'https://public.gis.lacounty.gov/public/rest/services/LACounty_Cache/LACounty_Parcel/MapServer/0',
+    zoning: 'https://services5.arcgis.com/7nsPwEMP38bSkCjy/arcgis/rest/services/Zoning/FeatureServer/15',
+  };
+  const SQFT_PER_M2 = 10.763910416709722;
+
+  // Every remote call gets a hard deadline. Without one a hung endpoint leaves siteBusy
+  // stuck true, which disables the arrow AND makes Enter a no-op, so the whole step dies.
+  function fetchT(url, opts, ms) {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), ms || 12000);
+    return fetch(url, Object.assign({}, opts, { signal: ctl.signal })).finally(() => clearTimeout(t));
+  }
+
+  async function geocodeAddress(addr) {
+    try {
+      const u = `${SITE_EP.census}?address=${encodeURIComponent(addr)}&benchmark=Public_AR_Current&format=json`;
+      const j = await (await fetchT(u)).json();
+      const m = j.result && j.result.addressMatches && j.result.addressMatches[0];
+      if (m) return { lat: m.coordinates.y, lng: m.coordinates.x, label: m.matchedAddress, source: 'US Census Geocoder' };
+    } catch (e) {}
+    const u2 = `${SITE_EP.nominatim}?q=${encodeURIComponent(addr)}&format=json&limit=1`;
+    const j2 = await (await fetchT(u2)).json();
+    if (j2 && j2[0]) return { lat: +j2[0].lat, lng: +j2[0].lon, label: j2[0].display_name, source: 'Nominatim / OSM' };
+    throw new Error('address not found by either geocoder');
+  }
+
+  const agsPointQuery = (base, pt, extra, ms) =>
+    fetchT(`${base}/query?f=json&geometry=${pt.lng},${pt.lat}&geometryType=esriGeometryPoint&inSR=4326` +
+      `&spatialRel=esriSpatialRelIntersects&outFields=*&outSR=4326${extra || ''}`, null, ms).then(r => r.json());
+
+  // ring area via the shoelace formula, in a local metres frame — good enough for a lot
+  function ringAreaM2(rings, lat) {
+    if (!rings || !rings.length) return null;
+    const mPerDegLat = 111320, mPerDegLng = 111320 * Math.cos(lat * Math.PI / 180);
+    let total = 0;
+    for (const rg of rings) {
+      let a = 0;
+      for (let i = 0, n = rg.length; i < n; i++) {
+        const [x1, y1] = rg[i], [x2, y2] = rg[(i + 1) % n];
+        a += (x1 * mPerDegLng) * (y2 * mPerDegLat) - (x2 * mPerDegLng) * (y1 * mPerDegLat);
+      }
+      total += a / 2;
+    }
+    return Math.abs(total) || null;
+  }
+
+  async function findParcel(pt, query) {
+    const j = await agsPointQuery(SITE_EP.parcels, pt, '&distance=45&units=esriSRUnit_Meter&returnGeometry=true');
+    if (j.error) throw new Error(j.error.message || 'parcel layer error');
+    const feats = (j.features || []).slice(0, 8);
+    if (!feats.length) return null;
+    // the geocoded point sits on the street centerline, so the nearest parcel is often
+    // across the road — house number beats street name beats proximity, as in site-scout
+    const houseNo = (query.match(/^\s*(\d+)/) || [])[1];
+    const streetTok = (query.replace(/^\s*\d+\s*/, '').split(',')[0] || '')
+      .toUpperCase().replace(/[^A-Z ]/g, ' ').split(/\s+/)
+      .filter(w => w.length > 2 && !/^(THE|AND)$/.test(w))
+      .sort((a, b) => b.length - a.length)[0];
+    const score = a =>
+      (houseNo && String(a.SitusHouseNo).trim() === houseNo ? 0 : 2) +
+      (streetTok && String(a.SitusFullAddress || '').toUpperCase().includes(streetTok) ? 0 : 1);
+    feats.sort((a, b) => score(a.attributes) - score(b.attributes));
+    const f = feats[0], a = f.attributes;
+    const geomArea = f.geometry && ringAreaM2(f.geometry.rings, pt.lat);
+    return {
+      apn: a.APN || null,
+      situs: a.SitusFullAddress || null,
+      useDesc: a.UseDescription || a.UseType || null,
+      lotAreaM2: geomArea ? Math.round(geomArea) : (a.SQFTmain1 ? Math.round(a.SQFTmain1 / SQFT_PER_M2) : null),
+      lotAreaSource: geomArea ? 'parcel polygon' : (a.SQFTmain1 ? 'assessor SQFTmain' : null),
+      centroid: f.geometry && f.geometry.rings ? ringCentroid(f.geometry.rings[0]) : null,
+      // outer ring only, 6dp — enough to draw the lot to scale in the massing view
+      ring: f.geometry && f.geometry.rings ? f.geometry.rings[0].map(p => [+p[0].toFixed(6), +p[1].toFixed(6)]) : null,
+    };
+  }
+
+  // ── surrounding buildings from OSM, for the 3D context ring around the parcel ──
+  // Primary source for the context ring: LARIAC 2020 countywide building outlines, on the
+  // same LA County ArcGIS server the parcel query already uses. Every outline carries a
+  // lidar-measured HEIGHT (in feet), so heights are real rather than guessed from tags —
+  // OSM tags them on a minority of buildings. Probed 260727: 7 buildings inside 100 m of
+  // the College St site against OSM's 5, heights agreeing to within ~0.4 m where both had one.
+  const LARIAC = 'https://public.gis.lacounty.gov/public/rest/services/LACounty_Dynamic/LARIAC_Buildings_2020/MapServer/0';
+  const FT_PER_M = 3.280839895;
+
+  async function findNeighboursGIS(pt) {
+    const j = await agsPointQuery(LARIAC, pt, '&distance=110&units=esriSRUnit_Meter&returnGeometry=true', 6000);
+    if (j.error) throw new Error(j.error.message || 'LARIAC layer error');
+    return (j.features || [])
+      .filter(f => f.geometry && f.geometry.rings && f.geometry.rings[0] && f.geometry.rings[0].length > 2)
+      .map(f => {
+        const hFt = f.attributes && f.attributes.HEIGHT;
+        return {
+          ring: f.geometry.rings[0].map(p => [+p[0].toFixed(6), +p[1].toFixed(6)]),
+          h: hFt ? +(hFt / FT_PER_M).toFixed(1) : null,
+          tagged: !!hFt,
+          src: 'LARIAC 2020',
+        };
+      });
+  }
+
+  // GET, not POST: the main Overpass instance answers GET reliably but returns 504 on POST
+  // often enough to matter (probed 260727). Mirrors are tried in order.
+  const OVERPASS = [
+    'https://overpass-api.de/api/interpreter',
+    'https://overpass.kumi.systems/api/interpreter',
+  ];
+  async function findNeighboursOSM(pt) {
+    const q = `[out:json][timeout:25];(way(around:100,${pt.lat},${pt.lng})["building"];);out geom;`;
+    let j = null;
+    for (const base of OVERPASS) {
+      try {
+        const r = await fetchT(base + '?data=' + encodeURIComponent(q), null, 9000);
+        if (!r.ok) continue;
+        j = await r.json();
+        break;
+      } catch (e) { /* try the next mirror */ }
+    }
+    if (!j) return null;                     // null = the call failed, [] = genuinely none
+    return (j.elements || [])
+      .filter(e => e.geometry && e.geometry.length > 2)
+      .slice(0, 90)
+      .map(e => {
+        const t = e.tags || {};
+        const lv = parseFloat(t['building:levels']);
+        const h = parseFloat(t.height);
+        return {
+          ring: e.geometry.map(g => [+g.lon.toFixed(6), +g.lat.toFixed(6)]),
+          // height in metres: tagged height wins, else levels × 3.5, else null (the viewer
+          // substitutes a default and says so)
+          h: !isNaN(h) ? h : (!isNaN(lv) ? lv * 3.5 : null),
+          tagged: !isNaN(h) || !isNaN(lv),
+          src: 'OSM',
+        };
+      });
+  }
+
+  // ── linework for the drawing mode: neighbouring lot boundaries + road centrelines ──
+  // Lot lines come from the same county parcel layer as the site parcel, so they are
+  // CORS-safe everywhere the parcel lookup already works. Roads come from LA City's
+  // street centreline layer, which needs an http origin; OSM covers the fallback.
+  const CITY_STREETS = 'https://maps.lacity.org/lahub/rest/services/Street_Information/MapServer/36';
+  const CITY_PARCELS = 'https://maps.lacity.org/lahub/rest/services/Landbase_Information/MapServer/4';
+  const r6 = p => [+p[0].toFixed(6), +p[1].toFixed(6)];
+
+  const ringsOf = j => (j.features || [])
+    .filter(f => f.geometry && f.geometry.rings && f.geometry.rings[0] && f.geometry.rings[0].length > 2)
+    .map(f => f.geometry.rings[0].map(r6));
+
+  // City parcel outlines first: at 150 m the city layer returned 69 lots against the
+  // county layer's 22 for the same point (probed 260727), and "the lot lines around it"
+  // is the whole point of the drawing. County is the fallback since it is CORS-safe
+  // from any origin, where the city server is not.
+  async function findLotLines(pt) {
+    try {
+      const j = await agsPointQuery(CITY_PARCELS, pt, '&distance=150&units=esriSRUnit_Meter&returnGeometry=true', 8000);
+      if (!j.error) {
+        const r = ringsOf(j);
+        if (r.length) return r;
+      }
+    } catch (e) { /* fall through to the county layer */ }
+    const j2 = await agsPointQuery(SITE_EP.parcels, pt, '&distance=150&units=esriSRUnit_Meter&returnGeometry=true', 8000);
+    if (j2.error) throw new Error(j2.error.message || 'parcel layer error');
+    return ringsOf(j2);
+  }
+
+  // ── street class ──────────────────────────────────────────────────────────────────────
+  // Rank is 1 (most major) to 9 (alley/path); it is what the massing page ranks frontages by,
+  // so primary/secondary/service entries follow the city's own hierarchy rather than a guess.
+  // LA City's centreline layer carries the real designation (Mobility Plan 2035 names, with
+  // the pre-2035 "Major Highway Class II" style in OLD_STREET_DESIGNATION). OSM's `highway`
+  // tag is the fallback outside LA and is coarser.
+  const LA_DESIG_RANK = [
+    [/boulevard\s*i\b|major highway.*class\s*i\b/i, 1, 'Boulevard I'],
+    [/boulevard\s*ii/i,                             2, 'Boulevard II'],
+    [/avenue\s*i\b/i,                               3, 'Avenue I'],
+    [/avenue\s*ii\b/i,                              4, 'Avenue II'],
+    [/avenue\s*iii/i,                               5, 'Avenue III'],
+    [/secondary highway/i,                          4, 'Secondary Highway'],
+    [/collector/i,                                  6, 'Collector'],
+    [/local/i,                                      7, 'Local Street'],
+    [/alley/i,                                      8, 'Alley'],
+  ];
+  const OSM_HW_RANK = {
+    motorway: 1, trunk: 1, motorway_link: 2, trunk_link: 2, primary: 2, primary_link: 3,
+    secondary: 3, secondary_link: 4, tertiary: 4, tertiary_link: 5, unclassified: 6,
+    residential: 6, living_street: 7, service: 8, pedestrian: 5, footway: 9, path: 9, cycleway: 9,
+  };
+  const rankLA = a => {
+    const s = [a.Street_Designation, a.Street_Designation_WO_Mod, a.OLD_STREET_DESIGNATION].filter(Boolean).join(' | ');
+    for (const [re, rank, label] of LA_DESIG_RANK) if (re.test(s)) return { rank, label };
+    return { rank: 7, label: a.Street_Designation || 'unclassified' };   // unnamed class reads as local, not as a highway
+  };
+  const nameLA = a => [a.TDIR, a.STNAME, a.STSFX].filter(v => v && String(v).trim()).join(' ').trim() || null;
+
+  async function findRoadsGIS(pt) {
+    const j = await agsPointQuery(CITY_STREETS, pt, '&distance=150&units=esriSRUnit_Meter&returnGeometry=true', 8000);
+    if (j.error) throw new Error(j.error.message || 'street layer error');
+    return (j.features || [])
+      .filter(f => f.geometry && f.geometry.paths)
+      .flatMap(f => {
+        const a = f.attributes || {}, { rank, label } = rankLA(a);
+        return f.geometry.paths.filter(p => p.length > 1)
+          .map(p => ({ path: p.map(r6), name: nameLA(a), cls: label, rank, src: 'LACity' }));
+      });
+  }
+
+  async function findRoadsOSM(pt) {
+    // `out geom` carries the tags too, so class costs nothing extra here
+    const q = `[out:json][timeout:25];(way(around:150,${pt.lat},${pt.lng})["highway"];);out geom;`;
+    for (const base of OVERPASS) {
+      try {
+        const r = await fetchT(base + '?data=' + encodeURIComponent(q), null, 8000);
+        if (!r.ok) continue;
+        const j = await r.json();
+        return (j.elements || [])
+          .filter(e => e.geometry && e.geometry.length > 1)
+          .map(e => {
+            const t = e.tags || {}, hw = t.highway || '';
+            return {
+              path: e.geometry.map(g => [+g.lon.toFixed(6), +g.lat.toFixed(6)]),
+              name: t.name || null,
+              cls: hw === 'service' && t.service === 'alley' ? 'alley' : (hw || 'road'),
+              rank: hw === 'service' && t.service === 'alley' ? 8 : (OSM_HW_RANK[hw] ?? 7),
+              src: 'OSM',
+            };
+          });
+      } catch (e) { /* next mirror */ }
+    }
+    return null;
+  }
+
+  // ── movement generators (M6b) ────────────────────────────────────────────────────────────
+  // The things that put people on one side of a parcel rather than another: rail and bus
+  // stops, marked crossings, and the ground-floor uses that draw a trip. This is a PROXY for
+  // where arrival comes from, not a count of anyone. No free source gives footfall for a
+  // parcel, so nothing derived from this may be described as pedestrian volume.
+  const GEN_RADIUS = 500;
+  async function findGenerators(pt) {
+    const r = GEN_RADIUS, ll = `${pt.lat},${pt.lng}`;
+    const q = `[out:json][timeout:25];(` +
+      `node(around:${r},${ll})[railway~"^(station|halt|tram_stop)$"];` +
+      `node(around:${r},${ll})[station];` +
+      `node(around:${r},${ll})[highway=bus_stop];` +
+      `node(around:${r},${ll})[highway=crossing];` +
+      `node(around:${r},${ll})[amenity~"^(restaurant|cafe|bar|fast_food|cinema|theatre|marketplace|college|university|school)$"];` +
+      `node(around:${r},${ll})[shop];` +
+      `);out tags center;`;
+    for (const base of OVERPASS) {
+      try {
+        const res = await fetchT(base + '?data=' + encodeURIComponent(q), null, 9000);
+        if (!res.ok) continue;
+        const j = await res.json();
+        const out = [];
+        for (const e of j.elements || []) {
+          const t = e.tags || {}, lat = e.lat ?? (e.center && e.center.lat), lng = e.lon ?? (e.center && e.center.lon);
+          if (typeof lat !== 'number' || typeof lng !== 'number') continue;
+          let kind = null;
+          if (/^(station|halt|tram_stop)$/.test(t.railway || '') || t.station) kind = 'rail';
+          else if (t.highway === 'bus_stop') kind = 'bus';
+          else if (t.highway === 'crossing') kind = 'crossing';
+          else if (t.shop) kind = 'retail';
+          else if (/college|university|school/.test(t.amenity || '')) kind = 'institution';
+          else if (t.amenity) kind = 'food';
+          if (!kind) continue;
+          // `kind` is M6's vocabulary and must not gain values: its weights and caps are
+          // tuned per kind, and a new bucket would change the frontage scores. The raw tag
+          // rides alongside so the program forecast can read composition more finely
+          // (cinema and theatre both land in `food` above, which is too coarse for that).
+          out.push({ ll: [+lng.toFixed(6), +lat.toFixed(6)], kind, name: t.name || null,
+            tag: t.amenity || (t.shop ? 'shop:' + t.shop : null) || t.railway || t.highway || null });
+        }
+        return out;
+      } catch (e) { /* next mirror */ }
+    }
+    return null;                              // null = the call failed, [] = genuinely nothing
+  }
+
+  async function findRoads(pt) {
+    try {
+      const g = await findRoadsGIS(pt);
+      if (g && g.length) return g;
+    } catch (e) { /* city layer is origin-sensitive; fall through */ }
+    try { return await findRoadsOSM(pt); } catch (e) { return null; }
+  }
+
+  // GIS first, OSM only where the county layer has nothing to say (outside LA County).
+  // Both legs are already deadline-bounded by fetchT, so this cannot hang the step.
+  async function findNeighbours(pt) {
+    try {
+      const gis = await findNeighboursGIS(pt);
+      if (gis && gis.length) return gis;
+    } catch (e) { /* fall through to OSM */ }
+    try { return await findNeighboursOSM(pt); } catch (e) { return null; }
+  }
+
+  function ringCentroid(ring) {
+    if (!ring || !ring.length) return null;
+    let sx = 0, sy = 0;
+    for (const p of ring) { sx += p[0]; sy += p[1]; }
+    return { lng: sx / ring.length, lat: sy / ring.length };
+  }
+
+  async function findZoning(pt) {
+    const z = await agsPointQuery(SITE_EP.zoning, pt, '&returnGeometry=false');
+    const zf = (z.features || [])[0];
+    if (!zf) return null;
+    return { code: zf.attributes.Zoning || null, category: zf.attributes.CATEGORY || null };
+  }
+
+  function renderSitePanel(site) {
+    if (!site) { sitePanel.style.display = 'none'; return; }
+    const row = (k, v) => `<div class="sp-row"><span class="sp-k">${escapeHtml(k)}</span><span class="sp-v">${v}</span></div>`;
+    const rows = [];
+    rows.push(row('located', escapeHtml(site.label)));
+    rows.push(row('coords', `${site.lat.toFixed(5)}, ${site.lng.toFixed(5)} <em>· ${escapeHtml(site.source)}</em>`));
+    if (site.parcel) {
+      const p = site.parcel;
+      rows.push(row('parcel', (p.apn ? '<b>' + escapeHtml(p.apn) + '</b>' : '<em>no APN</em>') +
+        (p.situs ? ' · ' + escapeHtml(p.situs) : '')));
+      if (p.lotAreaM2) rows.push(row('lot area', `${p.lotAreaM2.toLocaleString()} m² <em>· ${escapeHtml(p.lotAreaSource)}</em>`));
+      if (p.useDesc) rows.push(row('current use', escapeHtml(p.useDesc)));
+    } else if (site.parcelNote) {
+      rows.push(row('parcel', `<em>${escapeHtml(site.parcelNote)}</em>`));
+    }
+    if (site.zoning) {
+      rows.push(row('zoning', (site.zoning.code ? '<b>' + escapeHtml(site.zoning.code) + '</b>' : '') +
+        (site.zoning.category ? '<br><em>' + escapeHtml(site.zoning.category) + '</em>' : '')));
+    } else if (site.zoningNote) {
+      rows.push(row('zoning', `<em>${escapeHtml(site.zoningNote)}</em>`));
+    }
+    sitePanel.className = '';
+    sitePanel.innerHTML = rows.join('') +
+      '<div class="sp-note">Reported tier. Verify against ZIMAS before citing. Carried as context only: it does not size the massing.</div>';
+    sitePanel.style.display = 'block';
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // SITE FORECAST — rule-based, offline, no API.
+  // Two independent halves, so one failing does not silence the other:
+  //   capacity  — zoning code → FAR/height → buildable GFA from the measured lot
+  //   direction — the parcel's current use → NEXA_INTEL.transitions (M3 DB), each
+  //               match rendered with the DB's own likelihood tier and stated basis
+  // Nothing here invents a number: where the code's standards are not encoded (the
+  // DTLA 2040 bracket format), FAR becomes a labelled user assumption, not a claim.
+  // ══════════════════════════════════════════════════════════════════
+  const USE_ZONES = { R1: 'single-family residential', R2: 'two-family residential', RD: 'restricted-density multiple residential', R3: 'multiple dwelling · medium density', R4: 'multiple dwelling · high density', R5: 'multiple dwelling · highest density', RAS3: 'residential/accessory services', RAS4: 'residential/accessory services', C1: 'limited commercial', C2: 'commercial (broad retail/office; R4 residential uses allowed)', C4: 'commercial', C5: 'commercial (central area)', CM: 'commercial manufacturing', M1: 'limited industrial', M2: 'light industrial', M3: 'heavy industrial', P: 'automobile parking', PF: 'public facilities', OS: 'open space', A1: 'agricultural', A2: 'agricultural' };
+  const HEIGHT_DISTRICTS = { '1': { far: 3, h: 'no fixed height cap (zone/overlay rules govern)' }, '1L': { far: 3, h: '75 ft / 6 stories' }, '1VL': { far: 3, h: '45 ft / 3 stories' }, '1XL': { far: 3, h: '30 ft / 2 stories' }, '2': { far: 6, h: 'no fixed height cap' }, '3': { far: 10, h: 'no fixed height cap' }, '4': { far: 13, h: 'no fixed height cap' } };
+
+  // DTLA 2040 FORM DISTRICTS — read from the adopted New Zoning Code, Art. 2 (Form),
+  // zoning.lacity.gov/browse/2, on 260729. Only the districts actually read are listed: an
+  // unlisted form district still falls through to "no FAR encoded" rather than being guessed.
+  // Naming convention (Sec. 2A.1.4): FAR category letter + width category letter + variation.
+  // Base is what the district gives outright; bonus is the ceiling reachable through the
+  // Public Benefit System, so the honest planning figure is BASE unless a bonus is pursued.
+  const DTLA_FORM = {
+    DM1: { base: 3.0, bonus: 8.0, width: 210, cover: 90, name: 'Moderate-Rise Medium 1' },
+    DM2: { base: 3.0, bonus: 8.5, width: 160, cover: 90, name: 'Moderate-Rise Medium 2' },
+    DM3: { base: 3.0, bonus: 8.5, width: 160, cover: 100, name: 'Moderate-Rise Medium 3' },
+    DM4: { base: 6.0, bonus: 8.5, width: 160, cover: 100, name: 'Moderate-Rise Medium 4' },
+    DM5: { base: 6.0, bonus: 13.0, width: 160, cover: 100, name: 'Moderate-Rise Medium 5' },
+  };
+  // Use districts, same source (Art. 5). `dwelling` is the permission level for Dwelling.
+  const DTLA_USE = {
+    CX2: { name: 'Commercial-Mixed 2', dwelling: 'S', note: 'Housing permitted through the Inclusionary Housing Program. Commercial generally up to 50,000 sq ft establishments on the ground story. No manufacturing pairing.' },
+    IX3: { name: 'Industrial-Mixed 3', dwelling: 'S*', note: 'Housing permitted ONLY in conjunction with Light Manufacturing (General / Artistic & Artisanal / Garment & Accessory) at a minimum 1.0 FAR, plus the Inclusionary Housing Program. Campus Unified Development exempt. 50 ft separation from heavy industrial.' },
+  };
+  const DTLA_DENSITY = {
+    FA: 'Floor Area: floor area is the only practical density cap, minimum lot area per dwelling unit is zero.',
+    N: 'Not Permitted: no dwelling units allowed in this density district.',
+  };
+
+  function interpretZone(z) {
+    if (!z) return null;
+    if (z.trim().startsWith('[')) {
+      const parts = (z.match(/\[([^\]]+)\]/g) || []).map(s => s.slice(1, -1));
+      // form district is the first token of the first bracket, e.g. [DM1-SH1-5] -> DM1
+      const form = DTLA_FORM[(parts[0] || '').split('-')[0]] || null;
+      // use + density live in the second bracket, e.g. [IX3-FA] -> IX3 + FA
+      const useSeg = (parts[1] || '').split('-');
+      const use = DTLA_USE[useSeg[0]] || null;
+      const density = DTLA_DENSITY[useSeg[1]] || null;
+      return {
+        format: 'dtla2040', parts, form, use, density,
+        far: form ? form.base : null,
+        farBonus: form ? form.bonus : null,
+        height: form ? `no maximum height; governed by FAR, building width (${form.width} ft max) and coverage (${form.cover}% max)` : null,
+        note: form
+          ? `FAR read from the adopted DTLA 2040 code (Art. 2, ${form.name}). Base ${form.base} is what the district gives outright; ${form.bonus} is the ceiling through the Public Benefit System, not an entitlement.`
+          : 'DTLA 2040 new-format code. This form district is not among the ones read from the code, so the figure below is your assumption, not a zoning claim.',
+      };
+    }
+    const seg = z.replace(/[()\s]/g, '').split('-');
+    const use = seg[0], hdRaw = seg[1] || '';
+    const hdKey = (hdRaw.match(/^(1XL|1VL|1L|[1-4])/) || [])[1] || null;
+    const hd = hdKey && HEIGHT_DISTRICTS[hdKey];
+    return { format: 'legacy', useCode: use, use: USE_ZONES[use] || null,
+      far: hd ? hd.far : null, height: hd ? hd.h : null, dLimit: /D/.test(hdRaw),
+      note: 'FAR from the LAMC 12.21.1 height-district table. Estimated: a "D" limitation, specific plan or CPIO can override. Verify in ZIMAS.' };
+  }
+
+  // LA County Assessor use text → the transition DB's `from` vocabulary. Deliberately
+  // conservative: no confident keyword means no match, and the user picks instead.
+  const USE_TO_FROM = [
+    [/wholesale|produce market|market/i, 'wholesale market'],
+    [/warehous|distribution|storage/i, 'warehouse'],
+    [/manuf|factory|refiner/i, 'factory'],
+    // the assessor also returns coarse UseType values, not only the fine UseDescription
+    [/industrial/i, 'factory'],
+    [/office|bank/i, 'office'],
+    [/department store/i, 'department store'],
+    [/shopping (center|centre|mall)|mall/i, 'shopping mall'],
+    [/parking struct|garage/i, 'parking structure'],
+    [/hotel|motel/i, 'hotel / motel'],
+    [/church|religio|temple|synagog|worship/i, 'church / religious'],
+    [/theat|cinema|auditorium/i, 'theater / cinema'],
+    [/depot|rail|transit station/i, 'train station'],
+    [/power plant|substation|refinery/i, 'power plant'],
+    [/jail|prison|correctional|institution/i, 'jail / institutional'],
+  ];
+  const detectFrom = txt => {
+    if (!txt) return null;
+    for (const [re, key] of USE_TO_FROM) if (re.test(txt)) return key;
+    return null;
+  };
+
+  const TIER_RANK = { high: 0, medium: 1, low: 2 };
+  let forecastState = null; // { site, far, farAssumed, fromKey }
+  let gfaPrefill = null;    // set by "use this", read by loadStep's number prefill
+
+  function renderForecast() {
+    const fc = document.getElementById('site-forecast');
+    const st = forecastState;
+    if (!st) { fc.style.display = 'none'; return; }
+    const DB = (window.NEXA_INTEL && window.NEXA_INTEL.transitions) || [];
+    const lot = st.site.parcel && st.site.parcel.lotAreaM2;
+    const zi = st.zoneInfo;
+    const esc = escapeHtml;
+    const out = ['<div class="sf-head">Development potential</div>'];
+
+    // ── capacity ──
+    const cap = [];
+    if (zi && zi.format === 'legacy') {
+      cap.push(`<b>${esc(zi.useCode)}</b>${zi.use ? ' · ' + esc(zi.use) : ''}`);
+      if (zi.height) cap.push('<br>height limit: ' + esc(zi.height));
+      if (zi.dLimit) cap.push('<br>a "D" limitation is present, so a lower site-specific FAR governs');
+    } else if (zi && zi.format === 'dtla2040') {
+      cap.push('<b>' + zi.parts.map(esc).join('</b> · <b>') + '</b><br>form district · use district · overlay');
+    } else {
+      cap.push('<em>no zoning polygon at this parcel</em>');
+    }
+    if (lot) {
+      const gfa = Math.round(lot * st.far);
+      const floors = Math.max(1, Math.round(gfa / (lot * 0.7)));
+      cap.push(`<br><br>lot <b>${lot.toLocaleString()} m²</b> × FAR <b>${st.far}</b> = buildable <b>${gfa.toLocaleString()} m²</b>` +
+        `<br>about <b>${floors}</b> floors at 70% lot coverage`);
+    } else {
+      cap.push('<br><br><em>no measured lot area, so no buildable figure</em>');
+    }
+    cap.push(`<div class="sf-far"><label>FAR</label><input id="sf-far-input" type="number" min="0.5" max="20" step="0.5" value="${st.far}">` +
+      `<span class="sf-src">${st.farAssumed ? 'your assumption, not from the code' : 'LAMC height-district table'}</span></div>`);
+    out.push('<div class="sf-cap">' + cap.join('') + '</div>');
+
+    // ── direction ──
+    const froms = [...new Set(DB.map(t => t.from))].sort();
+    out.push('<div class="sf-from"><label>Current use</label><select id="sf-from-select">' +
+      '<option value="">not in the transition DB</option>' +
+      froms.map(f => `<option value="${esc(f)}"${f === st.fromKey ? ' selected' : ''}>${esc(f)}</option>`).join('') +
+      '</select></div>');
+
+    // the DB spells some origins as compounds ("factory / refinery", "office / bank hall"),
+    // so match on the slash-separated parts rather than the whole string
+    const parts = s => String(s).toLowerCase().split('/').map(x => x.trim()).filter(Boolean);
+    const want = st.fromKey ? parts(st.fromKey) : [];
+    const matches = (st.fromKey ? DB.filter(t => parts(t.from).some(p => want.includes(p))) : [])
+      .sort((a, b) => TIER_RANK[a.likelihood] - TIER_RANK[b.likelihood]);
+    if (!st.fromKey) {
+      out.push('<div class="sf-note">The assessor use' + (st.site.parcel && st.site.parcel.useDesc ? ' (' + esc(st.site.parcel.useDesc) + ')' : '') +
+        ' does not map to an entry in the program-transition DB. Pick the closest current use above to see where this building type usually goes next.</div>');
+    } else if (!matches.length) {
+      out.push('<div class="sf-note">No transitions recorded from this use.</div>');
+    } else {
+      const gfa = lot ? Math.round(lot * st.far) : null;
+      const sig = signalsFor(st.site);
+      const dyn = dynamicsFor(st.site);
+      matches.forEach((t, i) => {
+        const blockers = (t.blockers || []).length ? 'blockers: ' + t.blockers.map(esc).join(' · ') : '';
+        // the signal read is one line here, not the full block: this step is about picking a
+        // direction, and the cited detail waits for the program forecast
+        const ss = signalSupport(t, sig);
+        // the moving read gets the same one-line treatment, and only the metrics that actually
+        // rank are named here: a single-observation metric on a picker card would read as
+        // evidence for a direction it is not allowed to argue
+        const ds = dynamicSupport(t, dyn);
+        const dsRank = ds ? [...ds.for, ...ds.against] : [];
+        out.push(
+          '<div class="sf-card">' +
+            '<div>' +
+              `<span class="sf-tier ${esc(t.likelihood)}">${esc(t.likelihood)} likelihood</span>` +
+              (ss && ss.standing ? `<span class="sf-sig ${esc(ss.standing)}">${esc(ss.standing)} by district signals</span>` : '') +
+              (ds && ds.standing ? `<span class="sf-sig ${esc(ds.standing)}">${esc(ds.standing)} by market movement</span>` : '') +
+              `<div class="sf-name">${esc(t.to)}</div>` +
+              `<div class="sf-basis">${esc(t.basis)}</div>` +
+              (ss && (ss.for.length || ss.against.length)
+                ? `<div class="sf-sigline">${[...ss.for, ...ss.against].slice(0, 3).map(it => esc(it.label) + ' (' + esc(it.date) + ')').join(' · ')}</div>` : '') +
+              (dsRank.length
+                ? `<div class="sf-sigline">${dsRank.slice(0, 3).map(m => esc(m.label) + ' (' + esc(m.change || m.trend) + ')').join(' · ')}</div>` : '') +
+              (blockers ? `<div class="sf-block">${blockers}</div>` : '') +
+            '</div>' +
+            `<button class="sf-use" data-i="${i}">use this${gfa ? ' →' : ' →'}</button>` +
+          '</div>');
+      });
+      out.push('<div class="sf-note">Likelihood tiers and their basis come from the NEXA Intel program-transition DB (M3), not from this parcel. They describe how this building type usually changes, not what is entitled here.</div>');
+      if (sig) out.push('<div class="sf-note">District signals come from a hand-compiled set for ' +
+        esc(sig.set.meta.district || sig.key) + ', ' + (sig.set.items || []).length + ' items, ' +
+        (sig.age == null ? 'compile date unreadable' : 'compiled ' + sig.age + ' days ago') + '. ' +
+        'Policy, press and published district reporting. Not a measurement of attention or footfall, and no social-media data is in it. ' +
+        (sig.stale ? 'This set is over ' + SIG_STALE_DAYS + ' days old. ' : '') +
+        'Full citations sit in the program forecast at the end of the wizard.</div>');
+      if (dyn) {
+        const mets = dyn.set.metrics || [], ranks = mets.filter(dynRanks).length;
+        out.push('<div class="sf-note">Market movement comes from a hand-compiled set for ' +
+          esc(dyn.set.meta.district || dyn.key) + ': ' + mets.length + ' metrics covering footfall, events, ' +
+          'leasing, demography and the market cycle, of which ' + ranks + ' carry the two dated ' +
+          'observations it takes to argue a direction. The rest are printed but rank nothing. ' +
+          'Every figure was measured at district scale or larger, never at this parcel, and no ' +
+          'social-media data is in it. ' +
+          (dyn.stale ? 'This set is over ' + DYN_STALE_DAYS + ' days old. ' : '') +
+          'Full series and citations sit in the program forecast at the end of the wizard.</div>');
+      }
+    }
+    if (zi && zi.note) out.push('<div class="sf-note" style="margin-top:6px;">' + esc(zi.note) + '</div>');
+
+    fc.innerHTML = out.join('');
+    fc.style.display = 'block';
+
+    const farEl = document.getElementById('sf-far-input');
+    if (farEl) farEl.addEventListener('change', () => {
+      const v = parseFloat(farEl.value);
+      if (!isNaN(v) && v > 0) { st.far = v; st.farAssumed = true; renderForecast(); }
+    });
+    const selEl = document.getElementById('sf-from-select');
+    if (selEl) selEl.addEventListener('change', () => { st.fromKey = selEl.value || null; renderForecast(); });
+    fc.querySelectorAll('.sf-use').forEach(b => b.addEventListener('click', () => applyDirection(matches[+b.dataset.i])));
+  }
+
+  // "use this" prefills the later wizard steps rather than jumping to review, so the
+  // architect still answers type, floors and activities themselves.
+  function applyDirection(t) {
+    if (!t) return;
+    const st = forecastState;
+    const lot = st.site.parcel && st.site.parcel.lotAreaM2;
+    if (lot) {
+      gfaPrefill = Math.round(lot * st.far);
+      wiz.gfa = gfaPrefill;
+      wiz.floorsAbove = Math.max(1, Math.round(gfaPrefill / (lot * 0.7)));
+    }
+    // the transition's target vocabulary → wizard activity chips, where they overlap
+    const tmap = (window.NEXA_INTEL && window.NEXA_INTEL.typeMap) || {};
+    const known = new Set(Object.values(ACTIVITY_GROUPS ? Object.fromEntries(ACTIVITY_GROUPS) : {}).flat());
+    selectedActivities.clear();
+    for (const [vocab, types] of Object.entries(tmap)) {
+      if (!t.to.toLowerCase().includes(vocab.split('/')[0].trim().toLowerCase())) continue;
+      for (const ty of types) if (known.has(ty)) selectedActivities.add(ty);
+    }
+    wiz.activities = [...selectedActivities];
+    wiz.siteDirection = { from: t.from, to: t.to, likelihood: t.likelihood };
+    if (wiz.site) wiz.site.direction = wiz.siteDirection;
+    submit('site');
+  }
+
+  let siteBusy = false;
+  async function lookupSite() {
+    const q = inputSite.value.trim();
+    if (!q || siteBusy) return;
+    siteBusy = true;
+    btnSite.disabled = true;
+    sitePanel.className = 'busy';
+    sitePanel.style.display = 'block';
+    sitePanel.textContent = 'locating…';
+
+    try {
+      const g = await geocodeAddress(q);
+      const site = {
+        query: q, label: g.label, lat: g.lat, lng: g.lng, source: g.source,
+        shortLabel: g.label.split(',').slice(0, 2).join(',').trim(),
+        parcel: null, zoning: null, parcelNote: null, zoningNote: null,
+      };
+      renderSitePanel(site);
+
+      // parcel first — its centroid is a better probe for the zoning polygon than the
+      // street-centerline geocode point
+      try {
+        site.parcel = await findParcel({ lat: g.lat, lng: g.lng }, q);
+        if (!site.parcel) site.parcelNote = 'no LA County parcel within 45 m. Outside LA County, or unparcelled.';
+      } catch (e) {
+        site.parcelNote = 'county parcel layer unreachable from this origin';
+      }
+      renderSitePanel(site);
+
+      const zPt = (site.parcel && site.parcel.centroid) || { lat: g.lat, lng: g.lng };
+      try {
+        site.zoning = await findZoning(zPt);
+        if (!site.zoning) site.zoningNote = 'no LA City zoning polygon at this point';
+      } catch (e) {
+        site.zoningNote = 'zoning layer unreachable';
+      }
+
+      // Context ring is fetched BEFORE the site is committed, so what reaches the massing
+      // view is never missing it. Safe to do inline now that it is a fast county GIS call
+      // with its own 6 s deadline; the earlier version awaited Overpass with no deadline
+      // and could freeze the whole step.
+      // volumes + linework for the two massing-view context modes. Independent: whichever
+      // resolves is available, and the viewer says which mode has no data.
+      const [nb, lots, roads, gens] = await Promise.all([
+        findNeighbours(zPt).catch(() => null),
+        findLotLines(zPt).catch(() => null),
+        findRoads(zPt).catch(() => null),
+        findGenerators(zPt).catch(() => null),
+      ]);
+      site.neighbours = nb;
+      site.lots = lots;
+      site.roads = roads;
+      site.generators = gens;                 // M6b: rail/bus/crossing/retail/food/institution
+
+      wiz.site = site;
+      renderSitePanel(site);
+      siteContinue.style.display = 'inline-block';
+
+      const zoneInfo = interpretZone(site.zoning && site.zoning.code);
+      // carried into the massing view so it can state the drawn GFA against what the lot
+      // permits. farAssumed = the code gave no FAR and 3 is a placeholder, which the viewer
+      // must say out loud rather than present as a limit.
+      site.far = (zoneInfo && zoneInfo.far) || null;
+      site.farAssumed = !(zoneInfo && zoneInfo.far);
+      forecastState = {
+        site, zoneInfo,
+        far: (zoneInfo && zoneInfo.far) || 3,
+        farAssumed: !(zoneInfo && zoneInfo.far),
+        fromKey: detectFrom((site.parcel && (site.parcel.useDesc || '')) + ' ' + site.label),
+      };
+      renderForecast();
+      btnSite.disabled = false;
+      siteBusy = false;
+    } catch (e) {
+      wiz.site = null;
+      forecastState = null;
+      siteContinue.style.display = 'none';
+      document.getElementById('site-forecast').style.display = 'none';
+      sitePanel.className = '';
+      sitePanel.innerHTML = `<div class="sp-row"><span class="sp-k">error</span><span class="sp-v">${escapeHtml(e.message || 'lookup failed')}</span></div>` +
+        '<div class="sp-note">Check the spelling, or skip this step. The site is optional.</div>';
+      btnSite.disabled = false;
+    } finally {
+      siteBusy = false;
+    }
+  }
+
+  inputSite.addEventListener('input', () => { btnSite.disabled = !inputSite.value.trim() || siteBusy; });
+  inputSite.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    // first Enter looks the address up; a second Enter on a resolved site moves on
+    if (wiz.site && wiz.site.query === inputSite.value.trim()) submit('site');
+    else lookupSite();
+  });
+  btnSite.addEventListener('click', () => {
+    if (wiz.site && wiz.site.query === inputSite.value.trim()) submit('site');
+    else lookupSite();
+  });
+  // demo chip = type the address for the user, then run the same lookup
+  siteDemos.querySelectorAll('.sd-chip').forEach(b => b.addEventListener('click', () => {
+    if (siteBusy) return;
+    inputSite.value = b.dataset.addr;
+    btnSite.disabled = false;
+    lookupSite();
+  }));
+
+  siteContinue.addEventListener('click', () => submit('site'));
+
+  document.getElementById('site-skip').addEventListener('click', () => {
+    wiz.site = null;
+    forecastState = null;
+    siteContinue.style.display = 'none';
+    sitePanel.style.display = 'none';
+    document.getElementById('site-forecast').style.display = 'none';
+    submit('site');
+  });
 
   loadStep(0);
 
@@ -1059,7 +2402,11 @@
     // then Wellness, then lounge bar last. Result: SHORT raw area AND share both
     // strictly decrease up the band and every used level collapses in the massing.
     const upperCount = Math.max(0, floorsAbove - 1);
-    const ANCHORS = 180 + 220 + 80; // ground LONG anchors at preset (lobby+sales+toilets), used for band placement
+    // Ground anchors at preset, split by span since 260805: sales and display is retail, so it
+    // is SHORT and counts toward the ground's plug-in share instead of diluting it. What is left
+    // holding the ground down is the lobby and the toilets.
+    const ANCHORS = 180 + 80;          // ground LONG anchors (lobby + toilets)
+    const GROUND_SHORT = 220;          // sales and display: SHORT, and on the ground either way
 
     // affinity rank per activity key, derived from ACTIVITY_GROUPS (no type strings):
     // coffee → 0 (ground social), the four groups → 1..4, lounge bar → 5 (top social).
@@ -1146,7 +2493,8 @@
       if (bins0) {
         let bins = bins0.map(b => ({ area: b.area, lines: b.lines.slice() }));
         let nLev = nLev0;
-        const b0 = bins[0].area;
+        // the ground's plug-in area is its bin PLUS the retail anchor that sits there anyway
+        const b0 = bins[0].area + GROUND_SHORT;
         // ground leads the band only if its SHORT bin clears the anchors with enough
         // headroom to keep every upper SHORT level strictly below it and above 0.5.
         let includeGround = b0 > ANCHORS;
@@ -1433,6 +2781,988 @@
     </div>`;
   }
 
+  // ══════════════════════════════════════════════════════════════════
+  // PROGRAM FORECAST — the manual input path's timeline
+  // ══════════════════════════════════════════════════════════════════
+  // Site Forecast answers "what happens on this parcel". This answers "what happens to
+  // this program", so the wizard path arrives at the massing view with a timeline too
+  // instead of an empty slider. Same discipline as the site half: rule-based, offline,
+  // and nothing here invents a number.
+  //
+  //   SHORT rows  are plug-in tenancies. They recompose on a churn interval, which is a
+  //               stated user assumption, editable, and never presented as measured.
+  //   LONG rows   are the permanent use. Where the program's dominant use maps into the
+  //               M3 transition DB, each recorded transition becomes a dated event, and
+  //               the date is the median duration of that transition's OWN cited
+  //               conversions — the only figure the data actually carries.
+  //
+  // Two outputs from one prediction, because they answer different questions:
+  //   evolution — one building over time, as conversion rules (Tier 1/2/3 in the massing)
+  //   futures   — the same transitions as parallel whole-program alternatives, on the
+  //               Site Forecast track the massing view already scrubs
+  // ══════════════════════════════════════════════════════════════════
+
+  // copied from program-massing-shortfloor.html — keep in sync
+  const isFixedUse = t => /toilet|restroom|wc\b|mechanical|electrical|storage|loading|parking|\bplant\b|laundry|package room|it support/i.test(t);
+
+  // Program type → use family. Order matters: the specific activity families are tested
+  // before office/housing so "recovery lounge" reads as wellness, not as a residence.
+  const USE_FAMILY = [
+    { key: 'wellness',  re: /yoga|pilates|fitness|meditation|recovery|therapy|\bgym\b/i,        label: 'wellness' },
+    { key: 'learning',  re: /classroom|seminar|computer lab|project review|library|training/i,  label: 'learning' },
+    { key: 'culture',   re: /exhibition|gallery|museum|event hall|\bdemo\b/i,                   label: 'culture and events' },
+    { key: 'food',      re: /coffee|lounge bar|restaurant|dining|community kitchen/i,           label: 'food and drink' },
+    { key: 'retail',    re: /pop[- ]?up|showroom|sales and display|\bretail\b|\bshop\b/i,       label: 'retail' },
+    { key: 'hotel',     re: /hotel/i,                                                           label: 'hotel' },
+    { key: 'office',    re: /office|co[- ]?working|workplace/i,                                 label: 'office' },
+    { key: 'housing',   re: /apartment|dwelling|housing|residential/i,                          label: 'housing' },
+    { key: 'logistics', re: /storage|loading dock|warehouse/i,                                  label: 'logistics' },
+    { key: 'parking',   re: /parking/i,                                                         label: 'parking' },
+  ];
+  const familyOf = t => USE_FAMILY.find(f => f.re.test(t)) || null;
+
+  // A whole BUILDING of this family, in the transition DB's own `from` vocabulary. Only
+  // families the DB actually records transitions out of are mapped; everything else falls
+  // through to "not in the DB" and the user picks the closest entry by hand. Housing is
+  // deliberately absent: the DB has no `from: housing`, and guessing one would be a claim.
+  const FAMILY_TO_FROM = {
+    office: 'office', logistics: 'warehouse', parking: 'parking structure',
+    hotel: 'hotel / motel', retail: 'department store',
+  };
+
+  // The SHORT rotation. A plug-in tenancy is replaced first by a sibling in its own
+  // activity group (a wellness floor stays wellness, the studio changes), and only then by
+  // the lead activity of another group.
+  const SHORT_RING = ACTIVITY_GROUPS.map(([g, keys]) => ({
+    group: g, types: [...new Set(keys.flatMap(k => (ACTIVITY_DEFS[k] || []).map(d => d[0])))],
+  }));
+  function nextShortType(cur, taken) {
+    const gi = SHORT_RING.findIndex(r => r.types.includes(cur));
+    let order;
+    if (gi < 0) order = SHORT_RING.flatMap(r => r.types);
+    else {
+      const ts = SHORT_RING[gi].types, at = ts.indexOf(cur);
+      order = [...ts.slice(at + 1), ...ts.slice(0, at), ...SHORT_RING.filter((_, i) => i !== gi).map(r => r.types[0])];
+    }
+    return order.find(t => t !== cur && !taken.has(t)) || order.find(t => t !== cur) || cur;
+  }
+
+  // The DB's `to` vocabulary → one program type the massing view already draws. Compound
+  // targets ("museum / education / creative office") are read left to right, so the first
+  // named use wins.
+  const TO_TARGET = [
+    [/artist studio|\bloft\b/i,                     { type: 'studio apartment', category: 'private' }],
+    [/supportive|affordable|housing|residential/i,  { type: '1b1b apartment', category: 'private' }],
+    [/creative office|innovation|office/i,          { type: 'office', category: 'private' }],
+    [/food hall/i,                                  { type: 'coffee shop', category: 'public' }],
+    [/museum|gallery/i,                             { type: 'exhibition gallery', category: 'public' }],
+    [/event|music|venue/i,                          { type: 'event hall', category: 'public' }],
+    [/education|campus|school/i,                    { type: 'classroom', category: 'public' }],
+    [/retail|market/i,                              { type: 'pop-up retail', category: 'public' }],
+    [/medical|clinic|health/i,                      { type: 'physical therapy suite', category: 'private' }],
+    [/hotel|amenity/i,                              { type: 'hotel room', category: 'private' }],
+    [/logistics|fulfillment|warehous/i,             { type: 'storage', category: 'private' }],
+    [/church|religio/i,                             { type: 'event hall', category: 'public' }],
+  ];
+  function targetOf(to) {
+    for (const part of String(to).split('/').map(s => s.trim()).filter(Boolean))
+      for (const [re, v] of TO_TARGET) if (re.test(part)) return v;
+    return null;
+  }
+
+  const pfMedian = a => { const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+  const exDurations = t => (t.examples || []).filter(e => e.yearFrom && e.yearTo).map(e => e.yearTo - e.yearFrom);
+  let _dbYears = undefined;
+  function dbMedianYears() {
+    if (_dbYears === undefined) {
+      const all = ((window.NEXA_INTEL && window.NEXA_INTEL.transitions) || []).flatMap(exDurations);
+      _dbYears = all.length ? { yr: Math.max(1, Math.round(pfMedian(all))), n: all.length } : null;
+    }
+    return _dbYears;
+  }
+  // How long this kind of conversion has taken, from the transition's own cited examples.
+  // Where it has none dated, the DB-wide median stands in and says so.
+  function transitionYears(t) {
+    const own = exDurations(t);
+    if (own.length) return { yr: Math.max(1, Math.round(pfMedian(own))), n: own.length, own: true };
+    const db = dbMedianYears();
+    return db ? { yr: db.yr, n: db.n, own: false } : null;
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // SITE CONTEXT (M7-lite) — what the surroundings say about the futures
+  // ══════════════════════════════════════════════════════════════════
+  // The M3 transition DB describes how a building type usually changes. It says nothing
+  // about THIS site. Every transition, though, states its own preconditions and blockers in
+  // prose, and several of them are about the district: "district amenity mass (food,
+  // transit)", "district foot traffic below threshold", "window access for deep plates".
+  // Those are the hook. This reads the site payload the address lookup already fetched and
+  // answers, per transition, whether the surroundings supply what it asks for.
+  //
+  // Every number below is counted, not modelled. Hard limits, and they are printed on screen
+  // rather than kept here:
+  //   · OSM POI composition is WHAT IS MAPPED. It is not a census of what exists, and it is
+  //     certainly not demand. Categories are mapped at very different rates.
+  //   · 500 m is the same ring `findGenerators` fetches. It is a radius, not a catchment.
+  //   · Nothing here becomes a percentage, a score shown to the user, or a likelihood. The
+  //     tier stays the DB's; context is reported beside it, never folded into it.
+  // The T-10y comparison M7 calls for is not here: it needs Overpass attic queries and a
+  // control ring, and without them nothing may be described as growth or decline.
+  const CTX_RADIUS = 500;   // must match GEN_RADIUS in findGenerators()
+
+  // raw OSM tag → the composition bucket the forecast reasons about. `kind` is too coarse:
+  // a cinema and a taco stand are both `food` to M6.
+  const CTX_BUCKET = [
+    [/^(cinema|theatre|arts_centre|nightclub|marketplace)$/, 'culture'],
+    [/^(college|university|school|library|kindergarten)$/, 'learning'],
+    [/^(restaurant|cafe|bar|fast_food|pub|food_court|ice_cream)$/, 'food'],
+    [/^shop:/, 'retail'],
+    [/^(clinic|doctors|hospital|pharmacy|dentist)$/, 'medical'],
+  ];
+  const ctxBucket = g => {
+    const t = String(g.tag || '');
+    for (const [re, b] of CTX_BUCKET) if (re.test(t)) return b;
+    return g.kind === 'retail' ? 'retail' : g.kind === 'institution' ? 'learning' : g.kind === 'food' ? 'food' : null;
+  };
+
+  function readContext(site, drawnGfa) {
+    if (!site) return null;
+    const c = { radius: CTX_RADIUS, label: site.shortLabel || site.label || null, notes: [] };
+
+    // ── what is around ──
+    const gens = site.generators;                 // null = the call failed, [] = nothing mapped
+    if (gens) {
+      const kind = {}, mix = {};
+      for (const g of gens) {
+        kind[g.kind] = (kind[g.kind] || 0) + 1;
+        const b = ctxBucket(g); if (b) mix[b] = (mix[b] || 0) + 1;
+      }
+      c.kinds = kind; c.mix = mix; c.gens = gens.length;
+      const rail = kind.rail || 0, bus = kind.bus || 0;
+      // A tier with a stated rule, not a score. Presence of a mapped stop, never frequency:
+      // no free source in this pipeline carries service level.
+      c.transit = rail ? { tier: 'high', basis: `${rail} rail or tram stop${rail === 1 ? '' : 's'} mapped within ${CTX_RADIUS} m` }
+        : bus >= 5 ? { tier: 'medium', basis: `${bus} bus stops mapped within ${CTX_RADIUS} m, no rail` }
+        : { tier: 'low', basis: bus ? `${bus} bus stop${bus === 1 ? '' : 's'} and no rail within ${CTX_RADIUS} m` : `no transit stop mapped within ${CTX_RADIUS} m` };
+      c.amenity = (mix.food || 0) + (mix.retail || 0);
+    } else {
+      c.notes.push('The surroundings query did not return, so nothing here is weighed by context.');
+    }
+
+    // ── how it is reached ──
+    if (site.roads && site.roads.length) {
+      const best = [...site.roads].sort((a, b) => a.rank - b.rank)[0];
+      c.street = { cls: best.cls, rank: best.rank, name: best.name, src: best.src };
+    }
+
+    // ── what is already built around it ──
+    if (site.neighbours && site.neighbours.length) {
+      const hs = site.neighbours.map(n => n.h || n.height || 0).filter(h => h > 0).sort((a, b) => a - b);
+      c.neighbours = { n: site.neighbours.length, tallestM: hs.length ? Math.round(hs[hs.length - 1]) : null,
+        medianM: hs.length ? Math.round(hs[hs.length >> 1]) : null };
+    }
+
+    // ── what the parcel is zoned for ──
+    // Class only, from the legacy LAMC use code. The DTLA 2040 bracket format is not decoded
+    // here, so those parcels abstain rather than being guessed at.
+    const zi = interpretZone(site.zoning && site.zoning.code);
+    if (zi && zi.format === 'legacy' && zi.useCode) {
+      const u = zi.useCode;
+      const cls = /^(CM|M\d)/.test(u) ? 'industrial' : /^(C\d|C|RAS)/.test(u) ? 'commercial'
+        : /^R/.test(u) ? 'residential' : /^(PF|OS|A\d)/.test(u) ? 'civic or open' : null;
+      c.zone = { code: u, cls, use: zi.use || null, height: zi.height || null, dLimit: !!zi.dLimit };
+    } else if (zi && zi.format === 'dtla2040') {
+      c.zone = { code: zi.parts.join(' · '), cls: null, use: null };
+      c.notes.push('The parcel carries a DTLA 2040 code, whose use and form tables are not decoded here, so no transition is judged against its zoning.');
+    }
+
+    // ── what the code still allows ──
+    const lot = site.parcel && site.parcel.lotAreaM2, far = site.far;
+    if (lot && far) {
+      const allowed = Math.round(lot * far);
+      // "assumed" is decided here from the zone itself rather than trusting the flag on the
+      // payload: only a legacy code with a height district yields a FAR from the LAMC table,
+      // and a placeholder shown as a limit is exactly the fake precision C5 forbids.
+      const farFromCode = !!(zi && zi.format === 'legacy' && zi.far);
+      c.capacity = { lotM2: lot, far, farAssumed: !farFromCode, allowedM2: allowed,
+        drawnM2: Math.round(drawnGfa || 0), headroomM2: Math.round(allowed - (drawnGfa || 0)) };
+    }
+    return c;
+  }
+
+  // Each rule reads one recurring phrase in the DB's own preconditions and blockers and
+  // answers it from the measured ring. Unmatched prose stays unanswered rather than being
+  // guessed at, which is why `contextSupport` can return an empty verdict.
+  // Written against the DB's actual vocabulary (dumped from transitions.js, not guessed).
+  // A rule fires only where the site payload measures the thing the phrase is about;
+  // everything else abstains, which is why a transition can come back with no verdict.
+  const CTX_RULES = [
+    // ── "other" preconditions ──
+    { re: /amenity mass|food, transit/i,
+      ok: c => c.amenity >= 20,
+      yes: c => `${c.amenity} food and retail points mapped within ${c.radius} m`,
+      no: c => `only ${c.amenity} food and retail points mapped within ${c.radius} m` },
+    { re: /tourism|nightlife/i,
+      ok: c => (c.mix.food || 0) + (c.mix.culture || 0) >= 12,
+      yes: c => `${(c.mix.food || 0) + (c.mix.culture || 0)} food and culture points within ${c.radius} m`,
+      no: c => `only ${(c.mix.food || 0) + (c.mix.culture || 0)} food and culture points within ${c.radius} m` },
+    { re: /institutional anchor|institutional buyer/i,
+      ok: c => (c.mix.learning || 0) >= 2,
+      yes: c => `${c.mix.learning} education points within ${c.radius} m`,
+      no: c => `${c.mix.learning || 0} education points within ${c.radius} m, so no anchor is visible from here` },
+    { re: /health-system tenant/i,
+      ok: c => (c.mix.medical || 0) >= 3,
+      yes: c => `${c.mix.medical} health points within ${c.radius} m`,
+      no: c => `${c.mix.medical || 0} health points within ${c.radius} m` },
+    { re: /highway access/i,
+      ok: c => c.street && c.street.rank <= 3,
+      yes: c => `the best frontage is a ${c.street.cls}`,
+      no: c => c.street ? `the best frontage is a ${c.street.cls}, not an arterial` : null },
+    // ── blockers (inverted by the caller: a blocker the site answers counts FOR) ──
+    { re: /district foot traffic below threshold/i,
+      ok: c => c.amenity >= 20,
+      yes: c => `${c.amenity} food and retail points within ${c.radius} m`,
+      no: c => `only ${c.amenity} food and retail points within ${c.radius} m, which is what this blocker is about` },
+    { re: /industrial adjacency|noise, trucks/i,
+      ok: c => !!(c.zone && c.zone.cls && c.zone.cls !== 'industrial'),
+      yes: c => `the parcel is zoned ${c.zone.code}, not industrial`,
+      no: c => c.zone && c.zone.cls ? `the parcel is zoned ${c.zone.code} (${c.zone.cls})` : null },
+    { re: /office demand cycle|hospitality demand cycle|district cycle|low rent phase/i, skip: true },
+  ];
+
+  // zoningClass is its own test: it names a class, and the parcel has one.
+  function zoneVerdict(want, c) {
+    if (!c.zone || !c.zone.cls) return null;
+    const w = String(want).toLowerCase();
+    if (/rezone|ordinance|specific-plan|master-plan|conditional|by-right under/.test(w))
+      return { note: `this transition assumes ${want}; the parcel is zoned ${c.zone.code}, so it is an entitlement step rather than a by-right one` };
+    const wants = /industrial/.test(w) ? 'industrial' : /commercial|civic/.test(w) ? 'commercial' : /any|flexible/.test(w) ? null : null;
+    if (!wants) return null;
+    const good = c.zone.cls === wants || (wants === 'commercial' && c.zone.cls === 'civic or open');
+    return { good, line: good ? `the parcel is zoned ${c.zone.code}, which is the ${wants} class this assumes`
+      : `the parcel is zoned ${c.zone.code} (${c.zone.cls}); this assumes ${wants} zoning` };
+  }
+
+  // Reads a transition's stated preconditions and blockers against the measured ring.
+  // Blockers invert: a blocker the site answers is a point FOR, one it does not is against.
+  function contextSupport(t, c) {
+    if (!c || c.amenity == null) return null;
+    const For = [], against = [], notes = [];
+    const p = t.preconditions || {};
+    const texts = [p.other, ...(t.blockers || [])].filter(Boolean);
+    const push = (good, line) => {
+      if (!line) return;
+      const list = good ? For : against;
+      if (!list.includes(line)) list.push(line);
+    };
+    // preconditions read straight; a blocker counts FOR when the site does not have it
+    if (p.other) for (const r of CTX_RULES) {
+      if (r.skip || !r.re.test(p.other)) continue;
+      let good; try { good = !!r.ok(c); } catch (e) { break; }
+      push(good, (good ? r.yes : r.no)(c));
+      break;
+    }
+    for (const b of t.blockers || []) for (const r of CTX_RULES) {
+      if (r.skip || !r.re.test(b)) continue;
+      let good; try { good = !!r.ok(c); } catch (e) { break; }
+      push(good, (good ? r.yes : r.no)(c));
+      break;
+    }
+    if (p.zoningClass) {
+      const z = zoneVerdict(p.zoningClass, c);
+      if (z && z.note) notes.push(z.note);
+      else if (z) push(z.good, z.line);
+    }
+    if (!For.length && !against.length && !notes.length) return null;
+    // A standing, not a score: the DB's tier is the only ranking the user is shown as such.
+    // A transition with only a zoning note has no standing — nothing was weighed either way,
+    // and labelling that "mixed" would read as a judgement the site did not make.
+    const standing = !For.length && !against.length ? null
+      : !against.length ? 'supported' : !For.length ? 'unsupported' : 'mixed';
+    return { for: For, against, notes, standing };
+  }
+  const CTX_RANK = { supported: 0, mixed: 1, unsupported: 2 };
+
+  // ── M9 SITE-SIGNALS ─────────────────────────────────────────────────────────────────
+  // contextSupport above reads what is measurably AROUND the site. This reads what is being
+  // SAID and DECIDED about it: ordinances, press, landmarks, district trend. Schema and the
+  // rules it lives under: NEXA/intel/INTEL-DATA.md §6.
+  //
+  // Nothing in this layer is a measurement. No free source sells social-media attention,
+  // footfall or trade area at parcel resolution, so a `trend` item is a claim somebody
+  // published about a district. A signal therefore never changes a DB tier and never becomes
+  // a number: it orders futures INSIDE a tier, beside the measured read, and the panel prints
+  // the two standings separately so it stays visible which one carried the ordering.
+  const SIG_STALE_DAYS = 180;
+
+  // the same local-metres approximation the parcel maths uses; exact enough at ring scale
+  function metresBetween(aLat, aLng, bLat, bLng) {
+    const mLat = 111320, mLng = 111320 * Math.cos(aLat * Math.PI / 180);
+    return Math.hypot((aLat - bLat) * mLat, (aLng - bLng) * mLng);
+  }
+
+  // "YYMMDD" → days since. Unparseable returns null rather than a guessed age.
+  function daysSinceStamp(s) {
+    if (!/^\d{6}$/.test(String(s || ''))) return null;
+    const d = new Date(2000 + +String(s).slice(0, 2), +String(s).slice(2, 4) - 1, +String(s).slice(4, 6));
+    return isNaN(d.getTime()) ? null : Math.round((Date.now() - d.getTime()) / 86400000);
+  }
+
+  // Which compiled signal set covers a geocoded address. Nearest containing circle wins, so
+  // two overlapping districts never both claim one address. No circle contains it = no
+  // signal read, which is the honest answer for every site nobody has researched.
+  function signalsFor(site) {
+    const ALL = (window.NEXA_INTEL && window.NEXA_INTEL.signals) || {};
+    if (!site || site.lat == null || site.lng == null) return null;
+    let best = null;
+    for (const key of Object.keys(ALL)) {
+      const set = ALL[key], w = set && set.meta && set.meta.where;
+      if (!w || !(set.items || []).length) continue;
+      const dist = metresBetween(site.lat, site.lng, w.lat, w.lon);
+      if (dist <= (w.radiusM || 800) && (!best || dist < best.dist)) {
+        const age = daysSinceStamp(set.meta.compiled);
+        best = { key, set, dist: Math.round(dist), age, stale: age != null && age > SIG_STALE_DAYS };
+      }
+    }
+    return best;
+  }
+
+  // Does this signal bear on this transition? Matched on the DB's own slash-separated parts,
+  // the way the `from` lookups already are, so "food hall / creative retail" answers to either.
+  function signalHits(item, t) {
+    const parts = s => String(s || '').toLowerCase().split('/').map(x => x.trim()).filter(Boolean);
+    const a = item.affects || {};
+    const to = (a.to || []).map(x => String(x).toLowerCase());
+    const from = (a.from || []).map(x => String(x).toLowerCase());
+    return parts(t.to).some(p => to.includes(p)) ||
+      (!!from.length && parts(t.from).some(p => from.includes(p)));
+  }
+
+  // A standing from the discourse layer, in the shape contextSupport returns, so the sort and
+  // the renderer treat the two reads identically.
+  function signalSupport(t, sig) {
+    if (!sig) return null;
+    const For = [], against = [], context = [];
+    for (const it of sig.set.items || []) {
+      if (!signalHits(it, t)) continue;
+      (it.direction === 'for' ? For : it.direction === 'against' ? against : context).push(it);
+    }
+    if (!For.length && !against.length && !context.length) return null;
+    // A rule change settles a split against a market mood — the weighting stated in
+    // INTEL-DATA §6, not one invented here. Structural on both sides, or on neither,
+    // leaves the standing mixed rather than picking a winner.
+    const hard = list => list.filter(r => r.strength === 'structural').length;
+    const standing = For.length && !against.length ? 'supported'
+      : against.length && !For.length ? 'unsupported'
+      : !For.length && !against.length ? null
+      : hard(For) > hard(against) ? 'supported'
+      : hard(against) > hard(For) ? 'unsupported' : 'mixed';
+    return { for: For, against, context, standing, set: sig };
+  }
+
+  // A signal is printed in three parts so the caller can put the long detail between the
+  // claim and its citation. Always dated and always tagged: an undated claim about a
+  // district is worth less than a dated one and the panel has to show which it is.
+  function signalHead(it) {
+    return '<b>' + escapeHtml(it.label) + '</b> <span class="pf-sig-tag">' +
+      escapeHtml(it.date || 'undated') + ' · ' + escapeHtml(it.channel) + ' · ' +
+      escapeHtml(it.strength) + ' · ' + escapeHtml(it.confidence || 'unknown') + '</span>' +
+      (it.basis ? '<div class="pf-sig-basis">' + escapeHtml(it.basis) + '</div>' : '');
+  }
+  function signalCite(it) {
+    if (!it.source && !it.url) return '';
+    const t = escapeHtml(it.source || it.url);
+    return '<div class="pf-cite">' + (it.url
+      ? '<a href="' + escapeHtml(it.url) + '" target="_blank" rel="noopener">' + t + '</a>' : t) + '</div>';
+  }
+  function signalLine(it) { return signalHead(it) + signalCite(it); }
+
+  // The signal read for one transition. `context` items are printed even though they rank
+  // nothing — they carry the caveats (a boundary that was never verified, an ordinance that
+  // does not reach this parcel), and dropping them would drop the honest part.
+  function sigBlock(s) {
+    const rows = [];
+    if (s.standing) rows.push('<span class="pf-stand ' + escapeHtml(s.standing) + '">' +
+      escapeHtml(s.standing) + ' by what is being said and decided</span>');
+    // grouped and labelled: four items for and one against read as five identical items
+    // otherwise, which is exactly the reading the standing above is a summary of
+    const group = (list, cls, label) => list.length
+      ? '<div class="pf-sig-gh">' + label + '</div>' +
+        list.map(it => '<div class="' + cls + '">' + signalLine(it) + '</div>').join('') : '';
+    rows.push(group(s.for, 'pf-for', 'for'));
+    rows.push(group(s.against, 'pf-agn', 'against'));
+    rows.push(group(s.context, 'pf-ctxrow', 'context, takes no side'));
+    return '<div class="pf-sup pf-sig">' + rows.join('') + '</div>';
+  }
+
+  // ── M10 SITE-DYNAMICS ───────────────────────────────────────────────────────────────
+  // M7-lite reads what is measurably AROUND the site. M9 reads what is being SAID about it.
+  // Neither of those moves. This one does: every observation carries a date, so where there
+  // are two of them there is a direction of travel. Schema: NEXA/intel/INTEL-DATA.md §7.
+  //
+  // THE TWO-OBSERVATION RULE is enforced here, not just documented. A metric with fewer than
+  // two dated observations cannot rank anything, whatever its data file claims: one dated
+  // number is a fact about today, which M1 and M9 already carry. Enforcing it in code rather
+  // than trusting the file means a future compile cannot quietly promote a snapshot.
+  //
+  // Nothing here was measured at the parcel. A district visitation panel covers a hundred
+  // blocks, a submarket vacancy rate covers all of Downtown, a boarding count is one station.
+  // The scale is printed beside every number for that reason.
+  const DYN_STALE_DAYS = 180;
+
+  function dynamicsFor(site) {
+    const ALL = (window.NEXA_INTEL && window.NEXA_INTEL.dynamics) || {};
+    if (!site || site.lat == null || site.lng == null) return null;
+    let best = null;
+    for (const key of Object.keys(ALL)) {
+      const set = ALL[key], w = set && set.meta && set.meta.where;
+      if (!w || !(set.metrics || []).length) continue;
+      const dist = metresBetween(site.lat, site.lng, w.lat, w.lon);
+      if (dist <= (w.radiusM || 800) && (!best || dist < best.dist)) {
+        const age = daysSinceStamp(set.meta.compiled);
+        best = { key, set, dist: Math.round(dist), age, stale: age != null && age > DYN_STALE_DAYS };
+      }
+    }
+    return best;
+  }
+
+  // Does this metric rank anything? Two dated observations, a direction that takes a side, and
+  // at least one program type it bears on. Everything else is printed and counted as context.
+  function dynRanks(m) {
+    return (m.series || []).length >= 2 &&
+      (m.direction === 'for' || m.direction === 'against') &&
+      !!((m.affects && m.affects.to) || []).length;
+  }
+
+  // Same slash-part matching the DB's `from` lookups and M9 use, so "food hall / creative
+  // retail" answers to either half.
+  function dynHits(m, t) {
+    const parts = s => String(s || '').toLowerCase().split('/').map(x => x.trim()).filter(Boolean);
+    const a = m.affects || {};
+    const to = (a.to || []).map(x => String(x).toLowerCase());
+    const from = (a.from || []).map(x => String(x).toLowerCase());
+    return parts(t.to).some(p => to.includes(p)) ||
+      (!!from.length && parts(t.from).some(p => from.includes(p)));
+  }
+
+  // A standing from the moving layer, in the shape contextSupport returns, so the sort and the
+  // renderer treat all three reads identically.
+  function dynamicSupport(t, dyn) {
+    if (!dyn) return null;
+    const For = [], against = [], context = [];
+    for (const m of dyn.set.metrics || []) {
+      if (!dynHits(m, t)) continue;
+      if (!dynRanks(m)) { context.push(m); continue; }
+      (m.direction === 'for' ? For : against).push(m);
+    }
+    if (!For.length && !against.length && !context.length) return null;
+    // Same weighting M9 lives under and for the same reason: a structural movement settles a
+    // split against a cyclical one. A market cycle turns; a population that has grown for
+    // fourteen years is a different kind of claim.
+    const hard = list => list.filter(m => m.strength === 'structural').length;
+    const standing = For.length && !against.length ? 'supported'
+      : against.length && !For.length ? 'unsupported'
+      : !For.length && !against.length ? null
+      : hard(For) > hard(against) ? 'supported'
+      : hard(against) > hard(For) ? 'unsupported' : 'mixed';
+    return { for: For, against, context, standing, set: dyn };
+  }
+
+  // The series, printed as dated values with a bar each. Bars are scaled against the series'
+  // own range, never a shared one: two metrics in different units share nothing, and a common
+  // axis across them would invent a comparison. A single-point series draws no bars at all —
+  // one bar with nothing to compare it to is a decoration pretending to be a chart.
+  function dynSeries(m) {
+    const pts = (m.series || []).filter(p => typeof p.v === 'number');
+    if (pts.length < 2) return '';
+    const vs = pts.map(p => p.v), lo = Math.min(...vs, 0), hi = Math.max(...vs, 0);
+    const span = (hi - lo) || 1;
+    const fmt = v => Math.abs(v) >= 1000000 ? (v / 1000000).toFixed(1) + 'm'
+      : Math.abs(v) >= 10000 ? Math.round(v / 1000) + 'k'
+      : String(v);
+    return '<div class="pf-series">' + pts.map(p => {
+      const h = Math.max(3, Math.round(Math.abs(p.v - Math.min(lo, 0)) / span * 34));
+      return '<div class="pf-sp"><span class="pf-sp-v">' + escapeHtml(fmt(p.v)) + '</span>' +
+        '<div class="pf-sp-bar' + (p.v < 0 ? ' neg' : '') + '" style="height:' + h + 'px"></div>' +
+        '<span class="pf-sp-t">' + escapeHtml(p.t) + '</span></div>';
+    }).join('') + '</div>';
+  }
+
+  function dynHead(m) {
+    const n = (m.series || []).length;
+    return '<b>' + escapeHtml(m.label) + '</b>' +
+      '<span class="pf-tr ' + escapeHtml(m.trend || 'unknown') + '">' + escapeHtml(m.trend || 'unknown') + '</span>' +
+      '<span class="pf-geo">' + escapeHtml(m.geography || 'scale unstated') + '</span>' +
+      '<span class="pf-dyn-tag">' + escapeHtml(m.stream) + ' · ' + escapeHtml(m.strength || 'unknown') + ' · ' +
+      (n === 0 ? 'no observation' : n === 1 ? '1 observation' : n + ' observations') + '</span>' +
+      (m.change ? '<div class="pf-sig-basis">' + escapeHtml(m.change) + '</div>' : '');
+  }
+
+  // One line naming what the number counts. This is not decoration: a metric called
+  // "pedestrian movement" that counts rail boardings has to say so where it is read.
+  function dynMeasures(m) {
+    return m.measures ? '<div class="pf-dyn-cav">counts: ' + escapeHtml(m.measures) + '</div>' : '';
+  }
+  function dynCite(m) {
+    const seen = [], rows = [];
+    for (const p of m.series || []) {
+      const key = (p.source || '') + '|' + (p.url || '');
+      if (!p.source && !p.url) continue;
+      if (seen.includes(key)) continue;
+      seen.push(key);
+      const t = escapeHtml(p.source || p.url);
+      rows.push(p.url ? '<a href="' + escapeHtml(p.url) + '" target="_blank" rel="noopener">' + t + '</a>' : t);
+    }
+    return rows.length ? '<div class="pf-cite">' + rows.join('<br>') + '</div>' : '';
+  }
+  function dynLine(m) {
+    return dynHead(m) + dynSeries(m) +
+      (m.reading ? '<div class="pf-dyn-read">' + escapeHtml(m.reading) + '</div>' : '') +
+      dynMeasures(m) +
+      (m.caveat ? '<div class="pf-dyn-cav">' + escapeHtml(m.caveat) + '</div>' : '') +
+      dynCite(m);
+  }
+
+  // The dynamic read for one transition. Context metrics are printed even though they rank
+  // nothing: the single-observation ones are often the most relevant thing in the set, and
+  // dropping them would hide exactly what the two-observation rule is holding back.
+  function dynBlock(d) {
+    const rows = [];
+    if (d.standing) rows.push('<span class="pf-stand ' + escapeHtml(d.standing) + '">' +
+      escapeHtml(d.standing) + ' by which way the district is moving</span>');
+    const group = (list, cls, label) => list.length
+      ? '<div class="pf-sig-gh">' + label + '</div>' +
+        list.map(m => '<div class="' + cls + '">' + dynLine(m) + '</div>').join('') : '';
+    rows.push(group(d.for, 'pf-for', 'moving toward it'));
+    rows.push(group(d.against, 'pf-agn', 'moving away from it'));
+    rows.push(group(d.context, 'pf-ctxrow', 'related, but ranks nothing: fewer than two dated observations'));
+    return '<div class="pf-sup pf-dyn">' + rows.join('') + '</div>';
+  }
+
+  // What the ring is thin on, and which plug-in programs would answer it. Stated as
+  // composition, never as demand: OSM maps categories at very different rates, and an
+  // unmapped category is not an absent one.
+  const DEMAND_MAP = [
+    { key: 'learning', label: 'learning', acts: ['classroom', 'seminar room', 'computer lab'] },
+    { key: 'culture', label: 'culture and events', acts: ['exhibition gallery', 'event hall'] },
+    { key: 'food', label: 'food and drink', acts: ['coffee shop', 'lounge bar'] },
+    { key: 'retail', label: 'retail', acts: ['pop-up retail', 'showroom'] },
+    { key: 'medical', label: 'health', acts: ['recovery lounge', 'meditation room'] },
+  ];
+  function demandRead(c) {
+    if (!c || !c.mix) return null;
+    const rows = DEMAND_MAP.map(d => ({ ...d, n: c.mix[d.key] || 0 })).sort((a, b) => a.n - b.n);
+    const present = rows.filter(r => r.n > 0);
+    const thin = rows.filter(r => r.n <= Math.max(1, Math.round((present.reduce((s, r) => s + r.n, 0) / Math.max(1, present.length)) * 0.25)));
+    return { rows, thin: thin.slice(0, 3) };
+  }
+
+  let pfChurn = 3;        // years between SHORT re-plugs — the one assumption, user-editable
+  let pfFromKey = null;   // DB `from` chosen by hand; null = use the auto-detected one
+  let pfFromAuto = true;
+
+  function predictEvolution() {
+    const DB = (window.NEXA_INTEL && window.NEXA_INTEL.transitions) || [];
+    const rows = entries
+      .map((e, i) => ({ i, type: e.type, level: e.level, area: e.area }))
+      .filter(r => !isCore(r.type) && !isCorridor(r.type) && !isFixedUse(r.type));
+    const ctx = readContext(wiz.site, entries.reduce((s, e) => s + e.area, 0));
+    const demand = demandRead(ctx);
+    const sig = signalsFor(wiz.site);
+    const dyn = dynamicsFor(wiz.site);
+
+    // ── the permanent half: which use the building mostly is ──
+    const byFam = new Map();
+    for (const r of rows) {
+      if (isShort(r.type)) continue;
+      const f = familyOf(r.type); if (!f) continue;
+      const g = byFam.get(f.key) || { fam: f, area: 0, types: new Set(), levels: new Set() };
+      g.area += r.area; g.types.add(r.type); g.levels.add(r.level);
+      byFam.set(f.key, g);
+    }
+    const dom = [...byFam.values()].sort((a, b) => b.area - a.area)[0] || null;
+    const autoFrom = dom ? (FAMILY_TO_FROM[dom.fam.key] || null) : null;
+    const fromKey = pfFromAuto ? autoFrom : pfFromKey;
+
+    // slash-separated origins ("factory / refinery") match on their parts, same as the
+    // site-side forecast does
+    const parts = s => String(s).toLowerCase().split('/').map(x => x.trim()).filter(Boolean);
+    const want = fromKey ? parts(fromKey) : [];
+    const matches = (fromKey ? DB.filter(t => parts(t.from).some(p => want.includes(p))) : [])
+      .sort((a, b) => TIER_RANK[a.likelihood] - TIER_RANK[b.likelihood]);
+
+    const futures = [], usedYear = new Set(), unmapped = [];
+    for (const t of matches) {
+      const tgt = targetOf(t.to), dur = transitionYears(t);
+      if (!tgt || !dur || !dom) { if (!tgt) unmapped.push(t.to); continue; }
+      let y = dur.yr;
+      while (usedYear.has(y)) y++;   // two transitions must not land on the same year
+      usedYear.add(y);
+      futures.push({ t, tgt, dur, year: y, support: contextSupport(t, ctx),
+        signals: signalSupport(t, sig), dynamics: dynamicSupport(t, dyn) });
+    }
+    // Which future LEADS is where the site earns its keep. The DB's tier still ranks first,
+    // because it is the only evidence-backed ordering; within a tier, the site decides. The
+    // standing never becomes a tier and never becomes a number.
+    //
+    // Three site reads now share that job and they are added, not nested: what is measurably
+    // around the parcel (M7-lite), what is being said and decided about it (M9), and which way
+    // it is moving (M10). Adding them means a future that policy argues for and the market is
+    // moving toward can lead one the ring merely tolerates, which is the whole point of the
+    // layers. A missing read counts as neutral, so a site with no signals and no dynamics ranks
+    // exactly as it did before either module.
+    const siteRank = f => CTX_RANK[(f.support && f.support.standing) || 'mixed'] +
+                          CTX_RANK[(f.signals && f.signals.standing) || 'mixed'] +
+                          CTX_RANK[(f.dynamics && f.dynamics.standing) || 'mixed'];
+    futures.sort((a, b) =>
+      TIER_RANK[a.t.likelihood] - TIER_RANK[b.t.likelihood] ||
+      siteRank(a) - siteRank(b) ||
+      a.year - b.year);
+
+    // ── the plug-in half: SHORT tenancies, grouped by type ──
+    const byType = new Map();
+    for (const r of rows) {
+      if (!isShort(r.type)) continue;
+      const g = byType.get(r.type) || { type: r.type, area: 0, levels: new Set() };
+      g.area += r.area; g.levels.add(r.level);
+      byType.set(r.type, g);
+    }
+    const pool = [...byType.values()].sort((a, b) => b.area - a.area);
+
+    // ── the sequential story: one building, one permanent change, many re-plugs ──
+    // Only the highest-tier transition becomes an event: a building converts once. The
+    // rest are alternatives, not a sequence, so they go to the futures track instead.
+    const primary = futures[0] || null;
+    const churnSpan = pool.length ? pfChurn * Math.max(3, Math.min(6, pool.length * 2)) : 0;
+    const horizon = Math.max(10, Math.min(30, Math.max(primary ? primary.year + 3 : 0, churnSpan)));
+
+    const events = [];
+    if (pool.length && pfChurn > 0) {
+      const taken = new Set(pool.map(g => g.type));
+      const cur = new Map(pool.map(g => [g, g.type]));
+      // The whole plug-in stock turns over once across the horizon. Re-plugging strictly one
+      // tenancy per interval only ever reached the first few, and the pool is sorted by area, so
+      // "the first few" meant the big ground-floor tenancies: a small one on a top floor was
+      // never reached and that part of the massing never moved (user 260729). Covering them one
+      // at a time is not an option either — 17 tenancies at 3 years each is 51 years. So the pool
+      // is DEALT into SLOTS by rank: the interval stays the beat of the timeline, a third of the
+      // stock re-plugs on each beat, and a given tenancy's turn comes round every third beat. Not
+      // sliced into contiguous blocks: the pool is sorted by area, and blocks would still put the
+      // big ground-floor tenancies first and the small upper-floor ones last. The interval is
+      // unchanged and it is still the same single assumption; what changed is that it now reaches
+      // every tenancy instead of a queue that runs out of horizon.
+      const beats = Math.max(1, Math.floor(horizon / pfChurn)), SLOTS = Math.min(3, beats);
+      for (let k = 1; k * pfChurn <= horizon; k++) {
+        for (let n = (k - 1) % SLOTS; n < pool.length; n += SLOTS) {
+          const g = pool[n];
+          const from = cur.get(g), to = nextShortType(from, taken);
+          if (to === from) continue;
+          taken.add(to); cur.set(g, to);
+          events.push({
+            year: k * pfChurn, kind: 'short',
+            levels: [...g.levels].sort((a, b) => a - b),
+            fromTypes: [from], fromLabel: from,
+            toType: to, toCategory: 'public',
+          });
+        }
+      }
+    }
+    // Ground-floor rule: a conversion may not land dwellings on level 0. The ground is the
+    // street face, and the wizard's own stack starts housing at level 1 for the same reason
+    // (useHousingAt). The massing view holds the matching rule for chat-written conversions.
+    const dwelling = /apartment|dwelling|residential/i;
+    const convLevels = [...dom.levels].sort((a, b) => a - b)
+      .filter(lv => !(lv === 0 && primary && dwelling.test(primary.tgt.type)));
+    if (primary && convLevels.length) events.push({
+      year: primary.year, kind: 'long',
+      levels: convLevels,
+      fromTypes: [...dom.types], fromLabel: dom.fam.label,
+      toType: primary.tgt.type, toCategory: primary.tgt.category,
+      likelihood: primary.t.likelihood, basis: primary.t.basis,
+      dbFrom: primary.t.from, dbTo: primary.t.to,
+      dur: primary.dur,
+      support: primary.support,
+      signals: primary.signals,
+      dynamics: primary.dynamics,
+      examples: (primary.t.examples || []).slice(0, 2).map(e =>
+        e.project + (e.yearFrom ? ' (' + e.yearFrom + (e.yearTo ? '–' + e.yearTo : '') + ')' : '')),
+      blockers: primary.t.blockers || [],
+    });
+    events.sort((a, b) => a.year - b.year || (a.kind === 'long' ? 1 : -1));
+
+    // the slider runs two years past the last event, so the settled building is reachable
+    // instead of the timeline ending on the frame of its own final conversion
+    const span = Math.min(35, Math.max(horizon, ...events.map(e => e.year), 0) + 2);
+
+    return { events, horizon: span, dom, fromKey, autoFrom, futures, pool, matches, unmapped, churn: pfChurn, ctx, demand, sig, dyn };
+  }
+
+  // The same transitions as parallel whole-program alternatives. Year 0 is the program as
+  // designed; each future retypes the dominant permanent use and leaves everything else,
+  // so the massing view's frame logic sees one site with several outcomes.
+  function futuresTrack(pred) {
+    if (!pred.dom || !pred.futures.length) return null;
+    const domKey = pred.dom.fam.key;
+    const list = [{ year: 0, id: 'now', name: 'as designed', horizon: null, text: serialize(entries) }];
+    for (const f of pred.futures) {
+      const swapped = entries.map(e => {
+        if (isCore(e.type) || isCorridor(e.type) || isFixedUse(e.type) || isShort(e.type)) return e;
+        const fam = familyOf(e.type);
+        if (!fam || fam.key !== domKey) return e;
+        return { ...e, type: f.tgt.type, category: f.tgt.category, wh: null };
+      });
+      // the track renders as "id · name", so the name says what the id does not:
+      // the tier it is filed under and the program type it actually lands as
+      list.push({
+        year: f.year, id: String(f.t.to).split('/')[0].trim(), horizon: null,
+        name: f.t.likelihood + ' likelihood · lands as ' + f.tgt.type,
+        text: serialize(swapped),
+      });
+    }
+    return { baseYear: null, entries: list };
+  }
+
+  // Why a program produces no timeline. Travels with the handover so the massing view can
+  // say it too: a slider that does nothing and explains nothing is the same bug twice.
+  function emptyReason(p) {
+    const head = 'Nothing changes on this timeline. ';
+    const noShort = p.pool.length ? '' : 'There is no short-duration program to re-plug, and ';
+    if (!p.dom) return head + noShort + 'no permanent use dominates the program.';
+    if (!p.fromKey) return head + noShort + 'the permanent use reads as ' + p.dom.fam.label +
+      ', which the transition DB records no transitions out of. Pick the closest recorded use in the wizard to see one.';
+    return head + noShort + 'the recorded transitions from ' + p.fromKey + ' have no target this massing can draw.';
+  }
+
+  function renderProgramForecast() {
+    const host = document.getElementById('prog-forecast');
+    if (!host) return;
+    if (!entries.length) { host.style.display = 'none'; return; }
+    const p = predictEvolution();
+    const esc = escapeHtml;
+    const DB = (window.NEXA_INTEL && window.NEXA_INTEL.transitions) || [];
+    const froms = [...new Set(DB.map(t => t.from))].sort();
+
+    const out = ['<div class="pf-head"><span class="pf-t">Program forecast</span>' +
+      '<span class="pf-sub">what this program does over the next ' + p.horizon + ' years' +
+      // only claim the surroundings were read when the ring actually came back; Overpass
+      // fails often enough that this would otherwise be a routine lie (live run, 260729)
+      (p.ctx && p.ctx.mix ? ', read against ' + esc(p.ctx.label || 'the site') + ' and its surroundings'
+        : p.ctx ? ', read against ' + esc(p.ctx.label || 'the site') : '') +
+      (p.sig ? ' and against what is being said about ' + esc(p.sig.set.meta.district || 'the district') : '') +
+      '</span></div>'];
+
+    const ctl = ['<div class="pf-ctl">' +
+      '<div><label>Re-plug every</label><input id="pf-churn" type="number" min="1" max="12" step="1" value="' + p.churn + '">' +
+      '<span class="pf-src">years · your assumption, not a measured figure</span></div>'];
+    if (froms.length) {
+      ctl.push('<div><label>Reads as</label><select id="pf-from">' +
+        '<option value="">not in the transition DB</option>' +
+        froms.map(f => '<option value="' + esc(f) + '"' + (f === p.fromKey ? ' selected' : '') + '>' + esc(f) + '</option>').join('') +
+        '</select><span class="pf-src">' + (p.fromKey && pfFromAuto ? 'from the program' : p.fromKey ? 'your choice' : '—') + '</span></div>');
+    }
+    ctl.push('</div>');
+
+    const body = [ctl.join('')];
+
+    // ── what the surroundings actually are, before anything is concluded from them ──
+    const c = p.ctx;
+    if (c) {
+      // Every leg of the lookup fails on its own, so the block renders whatever came back and
+      // says plainly which half is missing. A failed ring must read as missing, not as zero.
+      const cells = [];
+      if (c.mix) {
+        const mixRow = DEMAND_MAP.map(d => '<span class="ctx-n"><b>' + (c.mix[d.key] || 0) + '</b> ' + esc(d.label) + '</span>').join('');
+        cells.push('<div class="ctx-cell"><label>Within ' + c.radius + ' m</label><div class="ctx-mix">' + mixRow + '</div></div>',
+          '<div class="ctx-cell"><label>Transit</label><div class="ctx-v">' + esc(c.transit.tier) + '</div><div class="ctx-b">' + esc(c.transit.basis) + '</div></div>');
+      } else {
+        cells.push('<div class="ctx-cell"><label>Within ' + c.radius + ' m</label><div class="ctx-v">not returned</div>' +
+          '<div class="ctx-b">the OpenStreetMap surroundings query did not answer, so no future below is weighed by what is around it</div></div>');
+      }
+      if (c.zone) cells.push('<div class="ctx-cell"><label>Zoning</label><div class="ctx-v">' + esc(c.zone.code) + '</div>' +
+        '<div class="ctx-b">' + esc(c.zone.cls ? c.zone.cls + (c.zone.use ? ' · ' + c.zone.use : '') : 'DTLA 2040 format, not decoded here') + '</div></div>');
+      if (c.street) cells.push('<div class="ctx-cell"><label>Best frontage</label><div class="ctx-v">' + esc(c.street.cls) + '</div><div class="ctx-b">' + esc(c.street.name || 'unnamed') + ' · ' + esc(c.street.src) + '</div></div>');
+      if (c.capacity) {
+        const cap = c.capacity, over = cap.headroomM2 < 0;
+        cells.push('<div class="ctx-cell"><label>Code capacity</label><div class="ctx-v">' + cap.allowedM2.toLocaleString() + ' m²</div>' +
+          '<div class="ctx-b">' + cap.lotM2.toLocaleString() + ' m² lot × FAR ' + cap.far + (cap.farAssumed ? ' (your assumption)' : '') +
+          ' · you drew ' + cap.drawnM2.toLocaleString() + ', ' + (over ? Math.abs(cap.headroomM2).toLocaleString() + ' over' : cap.headroomM2.toLocaleString() + ' left') + '</div></div>');
+      }
+      if (c.neighbours) cells.push('<div class="ctx-cell"><label>Neighbours</label><div class="ctx-v">' + c.neighbours.n + ' buildings</div>' +
+        '<div class="ctx-b">' + (c.neighbours.medianM ? 'median ' + c.neighbours.medianM + ' m, tallest ' + c.neighbours.tallestM + ' m (lidar)' : 'no measured heights') + '</div></div>');
+      body.push('<div class="pf-ctx"><div class="pf-b-head">Site and surroundings</div><div class="ctx-grid">' + cells.join('') + '</div></div>');
+    } else if (!wiz.site) {
+      body.push('<div class="pf-ctx"><div class="pf-nosite">No site was given, so the futures below are read from the program alone. Go back and enter an address to weigh them against the surroundings.</div></div>');
+    }
+
+    if (!p.events.length) body.push('<div class="pf-empty">' + esc(emptyReason(p)) + '</div>');
+    // Measured 260729: with no plug-in program, scrubbing the whole timeline moves 0 of 127
+    // rects and changes 0% of the rendered pixels. Every event is a Tier 1 conversion, which
+    // keeps the room exactly where it is, so there is nothing for the massing to show. Say it
+    // here rather than let it be discovered by staring at an unchanging model.
+    else if (!p.pool.length) body.push('<div class="pf-flat">This program has no plug-in (SHORT) program, so the timeline below changes what the rooms <b>are</b>, never where they are. The massing will look identical at every year; the change reads in the Change colour mode and in the counts. Add activities in the wizard to get program that actually re-plugs.</div>');
+
+    for (const e of p.events) {
+      const where = e.levels.length ? e.levels.map(levelLabel).join(', ') : 'all floors';
+      const tier = e.kind === 'long'
+        ? '<span class="pf-tier ' + esc(e.likelihood) + '">' + esc(e.likelihood) + ' likelihood</span>'
+        : '<span class="pf-tier short">re-plug</span>';
+      const rows = ['<div class="pf-what">' + tier + '<b>' + esc(e.fromLabel) + '</b> → <b>' + esc(e.toType) + '</b></div>',
+        '<div class="pf-where">' + esc(where) + ' · ' + (e.kind === 'long' ? 'permanent use, same rooms' : 'plug-in modules, re-placed') + '</div>'];
+      if (e.basis) rows.push('<div class="pf-basis">' + esc(e.basis) + '</div>');
+      if (e.dur) rows.push('<div class="pf-cite">filed at year ' + e.year + ': ' +
+        (e.dur.own ? 'the ' + e.dur.n + ' dated conversion' + (e.dur.n === 1 ? '' : 's') + ' cited for ' + esc(e.dbFrom) + ' → ' + esc(e.dbTo) + ' took a median of ' + e.dur.yr + ' years'
+          : 'no dated example for this transition, so the DB-wide median of ' + e.dur.yr + ' years across ' + e.dur.n + ' conversions stands in') + '</div>');
+      if (e.support) rows.push('<div class="pf-sup">' +
+        (e.support.standing ? '<span class="pf-stand ' + esc(e.support.standing) + '">' + esc(e.support.standing) + ' by what is around it</span>' : '') +
+        (e.support.for.length ? '<div class="pf-for">for: ' + e.support.for.map(esc).join(' · ') + '</div>' : '') +
+        (e.support.against.length ? '<div class="pf-agn">against: ' + e.support.against.map(esc).join(' · ') + '</div>' : '') +
+        ((e.support.notes || []).length ? '<div class="pf-cite">' + e.support.notes.map(esc).join('<br>') + '</div>' : '') + '</div>');
+      // The signal read is printed as its OWN row, never merged into the one above: one is
+      // measured composition, the other is published opinion, and folding them together
+      // would let a travel guide read as a count.
+      if (e.signals) rows.push(sigBlock(e.signals));
+      // and the moving read as a third row, again its own. Measured composition, published
+      // opinion and a direction of travel are three different kinds of claim, and the panel
+      // only stays honest while they are printed apart.
+      if (e.dynamics) rows.push(dynBlock(e.dynamics));
+      if (e.examples && e.examples.length) rows.push('<div class="pf-cite">' + e.examples.map(esc).join(' · ') + '</div>');
+      if (e.blockers && e.blockers.length) rows.push('<div class="pf-cite">blockers: ' + e.blockers.map(esc).join(' · ') + '</div>');
+      body.push('<div class="pf-ev"><div class="pf-yr">Y+' + e.year + '<span>' + (e.kind === 'long' ? 'long' : 'short') + '</span></div>' +
+        '<div>' + rows.join('') + '</div></div>');
+    }
+
+    if (p.futures.length > 1) {
+      body.push('<div class="pf-branch"><div class="pf-b-head">Other recorded futures for ' + esc(p.fromKey) +
+        ' · scrub these as parallel alternatives in the massing view</div>' +
+        [...p.futures.slice(1)].sort((a, b) => a.year - b.year).map(f =>
+          '<div class="pf-b-row"><span class="pf-b-yr">Y+' + f.year + '</span>' +
+          '<span><b>' + esc(f.t.to) + '</b> · ' + esc(f.t.likelihood) + ' likelihood · lands as ' + esc(f.tgt.type) +
+          (f.support && f.support.standing ? ' · <span class="pf-stand ' + esc(f.support.standing) + '">' + esc(f.support.standing) + ' by what is around it</span>' : '') +
+          (f.signals && f.signals.standing ? ' · <span class="pf-stand ' + esc(f.signals.standing) + '">' + esc(f.signals.standing) + ' by what is said</span>' : '') +
+          (f.dynamics && f.dynamics.standing ? ' · <span class="pf-stand ' + esc(f.dynamics.standing) + '">' + esc(f.dynamics.standing) + ' by which way it is moving</span>' : '') +
+          '</span></div>').join('') +
+        '</div>');
+    }
+
+    // ── what is being said and decided about this district ──────────────────────────────
+    // The whole compiled set, not only the items that matched a transition: the ones that
+    // matched nothing are still what the architect is walking into.
+    if (p.sig) {
+      const S = p.sig, meta = S.set.meta;
+      const byChannel = new Map();
+      for (const it of S.set.items || []) {
+        if (!byChannel.has(it.channel)) byChannel.set(it.channel, []);
+        byChannel.get(it.channel).push(it);
+      }
+      const order = ['policy', 'civic', 'market', 'news', 'landmark', 'trend'];
+      const chans = [...byChannel.keys()].sort((a, b) => order.indexOf(a) - order.indexOf(b));
+      body.push('<div class="pf-branch pf-signals">' +
+        '<div class="pf-b-head">What is being said and decided · ' + esc(meta.district || S.key) + '</div>' +
+        '<div class="pf-basis" style="margin:0 0 9px">' + (S.set.items || []).length + ' compiled items, ' +
+        (S.age == null ? 'compile date unreadable' : 'compiled ' + S.age + ' days ago') +
+        ', matched to this address at ' + S.dist + ' m from the set centre.' +
+        (S.stale ? ' <b>This set is over ' + SIG_STALE_DAYS + ' days old, so treat every item as a lead to re-check.</b>' : '') +
+        '</div>' +
+        chans.map(ch => '<div class="pf-sig-ch"><div class="pf-sig-chname">' + esc(ch) + '</div>' +
+          // claim, then why it points where it does, then the detail, then the citation —
+          // the citation reads as the end of the item rather than an interruption
+          byChannel.get(ch).map(it => '<div class="pf-sig-item pf-dir-' + esc(it.direction) + '">' +
+            signalHead(it) +
+            (it.detail ? '<div class="pf-sig-detail">' + esc(it.detail) + '</div>' : '') +
+            signalCite(it) +
+            '</div>').join('') + '</div>').join('') +
+        '<div class="pf-cite" style="margin-top:9px">' + esc(meta.limits || '') + '</div>' +
+        '</div>');
+    } else if (wiz.site) {
+      body.push('<div class="pf-branch pf-signals"><div class="pf-b-head">What is being said and decided</div>' +
+        '<div class="pf-basis" style="margin:0">No signal set has been compiled for this address, so nothing below was weighed against policy, press or district trend. Signals are researched by hand per site and live in <code>NEXA/intel/data/signals-*.js</code>.</div></div>');
+    }
+
+    // ── which way the district is moving ───────────────────────────────────────────────
+    // The whole compiled set, grouped by stream, gaps last. A compile date is not enough for
+    // this layer: a market series is only as good as its newest point, so the newest OBSERVATION
+    // is printed too. A set compiled yesterday out of year-old readings is a year-old set.
+    if (p.dyn) {
+      const D = p.dyn, meta = D.set.meta, mets = D.set.metrics || [];
+      const yearOf = t => { const m = String(t || '').match(/(\d{4})/); return m ? +m[1] : 0; };
+      let newest = null;
+      for (const m of mets) for (const s of m.series || [])
+        if (!newest || yearOf(s.t) > yearOf(newest) || (yearOf(s.t) === yearOf(newest) && String(s.t) > String(newest))) newest = s.t;
+      const ranks = mets.filter(dynRanks).length, gaps = mets.filter(m => !(m.series || []).length).length;
+      const STREAMS = ['pedestrian', 'events', 'retail-turnover', 'leasing', 'demographic',
+        'gentrification', 'social', 'market', 'business-mix'];
+      const byStream = new Map();
+      for (const m of mets) {
+        if (!byStream.has(m.stream)) byStream.set(m.stream, []);
+        byStream.get(m.stream).push(m);
+      }
+      const order = [...byStream.keys()].sort((a, b) => STREAMS.indexOf(a) - STREAMS.indexOf(b));
+      body.push('<div class="pf-branch pf-signals">' +
+        '<div class="pf-b-head">Which way the district is moving · ' + esc(meta.district || D.key) + '</div>' +
+        '<div class="pf-basis" style="margin:0 0 9px">' + mets.length + ' compiled metrics across ' +
+        byStream.size + ' streams, matched to this address at ' + D.dist + ' m from the set centre. ' +
+        (newest ? 'Newest observation ' + esc(newest) + '. ' : '') +
+        (D.age == null ? 'Compile date unreadable. ' : 'Compiled ' + D.age + ' days ago. ') +
+        '<b>' + ranks + '</b> of them rank a future: the rest carry fewer than two dated ' +
+        'observations, and ' + gaps + ' are declared gaps with no number at all. One dated ' +
+        'number is a fact about today, not a direction of travel.' +
+        (D.stale ? ' <b>This set is over ' + DYN_STALE_DAYS + ' days old, so treat every series as a lead to re-check.</b>' : '') +
+        '</div>' +
+        order.map(st => '<div class="pf-sig-ch"><div class="pf-sig-chname">' + esc(st) + '</div>' +
+          byStream.get(st).map(m => '<div class="pf-dyn-item' + ((m.series || []).length ? '' : ' pf-gap') + '">' +
+            dynLine(m) +
+            (m.outlook ? '<div class="pf-dyn-cav">outlook, not an observation, and it never enters the trend: ' +
+              esc(m.outlook.text) + (m.outlook.horizon ? ' (' + esc(m.outlook.horizon) + ')' : '') + '</div>' +
+              (m.outlook.url ? '<div class="pf-cite"><a href="' + esc(m.outlook.url) + '" target="_blank" rel="noopener">' +
+                esc(m.outlook.source || m.outlook.url) + '</a></div>' : '') : '') +
+            '</div>').join('') + '</div>').join('') +
+        '<div class="pf-cite" style="margin-top:9px">' + esc(meta.limits || '') + '</div>' +
+        '</div>');
+    } else if (wiz.site) {
+      body.push('<div class="pf-branch pf-signals"><div class="pf-b-head">Which way the district is moving</div>' +
+        '<div class="pf-basis" style="margin:0">No dynamics set has been compiled for this address, so nothing below was weighed against footfall, leasing, demography or the market cycle. Dynamics are researched by hand per site and live in <code>NEXA/intel/data/dynamics-*.js</code>.</div></div>');
+    }
+
+    // ── what the ring is thin on ──
+    if (p.demand && p.demand.thin.length) {
+      const d = p.demand;
+      body.push('<div class="pf-branch pf-demand"><div class="pf-b-head">What the surroundings do not already carry</div>' +
+        '<div class="pf-basis" style="margin:0 0 7px">Composition of the ' + c.radius + ' m ring as OpenStreetMap maps it: ' +
+        d.rows.slice().sort((a, b) => b.n - a.n).map(r => esc(r.label) + ' ' + r.n).join(' · ') + '.</div>' +
+        d.thin.map(r => '<div class="pf-b-row"><span class="pf-b-yr">' + r.n + '</span>' +
+          '<span>thinnest: <b>' + esc(r.label) + '</b> · the plug-in programs that would serve it are ' + r.acts.map(esc).join(', ') + '</span></div>').join('') +
+        '<div class="pf-cite" style="margin-top:7px">This is what is mapped, not a count of what exists and not a measure of demand. OSM maps these categories at very different rates, and no free source in this pipeline carries footfall or trade area. Treat it as a prompt to check, not a finding.</div>' +
+        '</div>');
+    }
+
+    const notes = [];
+    if (p.dom) notes.push('Permanent use read from the program: ' + p.dom.fam.label + ', ' + Math.round(p.dom.area).toLocaleString() + ' m² over ' + p.dom.levels.size + ' level' + (p.dom.levels.size === 1 ? '' : 's') + '.');
+    if (p.pool.length) {
+      const nRe = p.events.filter(e => e.kind === 'short').length;
+      notes.push(p.pool.length + ' plug-in program type' + (p.pool.length === 1 ? '' : 's') + ' in the building. About a third re-plug on each interval and every one gets a turn, so the top of the building changes as often as the base: ' +
+        nRe + ' re-plug' + (nRe === 1 ? '' : 's') + ' over ' + p.horizon + ' years. The interval is an assumption; the transition years are not.');
+    }
+    if (p.unmapped.length) notes.push('Not shown, no program type in this massing draws them: ' + [...new Set(p.unmapped)].join(' · ') + '.');
+    notes.push('Likelihood tiers and their basis come from the NEXA Intel program-transition DB (M3). They describe how this building type usually changes, not what happens here.');
+    if (p.ctx && p.ctx.mix) notes.push('The site reading orders futures WITHIN a tier; it never changes the tier. It answers each transition\'s own stated preconditions and blockers from a 500 m ring of mapped points, which is a radius, not a catchment.');
+    if (p.dyn) notes.push('Three site reads order futures inside a tier and they are added, never merged: what is measurably around the parcel, what is being said and decided about it, and which way it is moving. A metric needs two dated observations before it may argue a direction at all.');
+    if (p.ctx) p.ctx.notes.forEach(n => notes.push(n));
+    body.push('<div class="pf-note">' + notes.map(esc).join('<br>') + '</div>');
+
+    host.innerHTML = out.join('') + '<div class="pf-body">' + body.join('') + '</div>';
+    host.style.display = 'block';
+
+    const churnEl = document.getElementById('pf-churn');
+    if (churnEl) churnEl.addEventListener('change', () => {
+      const v = parseInt(churnEl.value, 10);
+      if (v > 0) { pfChurn = Math.min(12, v); renderProgramForecast(); }
+    });
+    const fromEl = document.getElementById('pf-from');
+    if (fromEl) fromEl.addEventListener('change', () => {
+      pfFromAuto = false; pfFromKey = fromEl.value || null; renderProgramForecast();
+    });
+  }
+
   function renderReview() {
     const st = computeStats();
     const levels = [...new Set(entries.map(e => e.level))].sort((a, b) => b - a); // top floor first
@@ -1510,6 +3840,7 @@
       };
       document.getElementById('add-cancel').onclick = () => { addingLevel = null; renderReview(); };
     }
+    renderProgramForecast();   // the timeline follows the program, so it re-reads on every edit
     saveDraft();
   }
 
@@ -1599,6 +3930,44 @@
     if (rawDirty && !applyRaw()) { renderReview(); return; } // bad raw text blocks Build, errors shown
     renderReview(); syncRaw();
     localStorage.setItem('programInputText', serialize(entries));
+    // The timeline travels with the program: the sequential evolution as conversion rules,
+    // and the same transitions as parallel futures on the track the massing already scrubs.
+    // Both keys are rewritten (or cleared) on every Build, so a past run never leaks in.
+    try {
+      const pred = predictEvolution();
+      // written even when empty: the massing view needs the reason, not silence
+      const cx = pred.ctx;
+      localStorage.setItem('programEvolution', JSON.stringify({
+        horizon: pred.events.length ? pred.horizon : 0, churn: pred.churn, source: 'wizard',
+        dominant: pred.dom ? pred.dom.fam.label : null, from: pred.fromKey || null,
+        reason: pred.events.length ? null : emptyReason(pred),
+        // no plug-in program means every event is a Tier 1 repaint: the massing cannot move
+        flat: !!(pred.events.length && !pred.pool.length),
+        // the site reading travels too, so the massing view can say why this future leads
+        context: cx && cx.mix ? {
+          label: cx.label, radius: cx.radius, mix: cx.mix, transit: cx.transit,
+          street: cx.street ? cx.street.cls : null,
+          capacity: cx.capacity || null,
+          thin: pred.demand ? pred.demand.thin.map(r => ({ label: r.label, n: r.n, acts: r.acts })) : [],
+        } : null,
+        events: pred.events,
+      }));
+      const track = futuresTrack(pred);
+      if (track) localStorage.setItem('programForecastTrack', JSON.stringify(track));
+      else localStorage.removeItem('programForecastTrack');
+    } catch (e) {
+      localStorage.removeItem('programEvolution');
+      localStorage.removeItem('programForecastTrack');
+    }
+    // site travels beside the program text as context for the massing view's info card.
+    // Cleared when absent, so a skipped site never shows a stale address from a past run.
+    if (wiz.site) localStorage.setItem('programInputSite', JSON.stringify(wiz.site));
+    else localStorage.removeItem('programInputSite');
+    // step 2's answer travels too: the massing view's chat asks the same question, and it
+    // should not ask twice. A forecast-sourced draft sets buildingType to a scenario id,
+    // which is not an answer, so only the three wizard values are passed on.
+    if (['mixed-use', 'office', 'housing'].includes(wiz.buildingType)) localStorage.setItem('programBuildingType', wiz.buildingType);
+    else localStorage.removeItem('programBuildingType');
     location.href = 'program-massing-shortfloor.html?src=input';
   });
 
@@ -1622,8 +3991,12 @@
   });
 
   // ── draft restore: reopening the page (typically Back from the massing view)
-  //    resumes the review stage instead of resetting to wizard step 1 ──
+  //    resumes the review stage instead of resetting to wizard step 1.
+  //    ?new=1 asks for the first question instead — that is what the massing view's mark
+  //    links to. The draft is left in storage rather than deleted: starting a new program is
+  //    not the same as discarding the old one, and "start over" already does that. ──
   (function restoreDraft() {
+    if (new URLSearchParams(location.search).get('new') === '1') return;
     let d = null;
     try { d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch (e) {}
     if (!d || !Array.isArray(d.entries) || !d.entries.length) return;
@@ -1755,12 +4128,57 @@
             '<div class="sc-right">' +
               '<div class="fc-mix">' + bar + '</div>' +
               '<div class="fc-mix-legend">' + legend + '</div>' +
-              '<button class="fc-apply" data-idx="' + i + '">apply → edit program</button>' +
+              '<span class="fc-when" data-idx="' + i + '">on the timeline at ' + escapeHtml(String(sc.horizon || '—')) + '</span>' +
             '</div>' +
           '</div></div>';
       }).join('');
-      optsEl.querySelectorAll('.fc-apply').forEach(btn =>
-        btn.addEventListener('click', () => applyScenario(scenarios[+btn.dataset.idx])));
+
+      // One entry point for the whole set instead of one apply per card: the scenarios are
+      // parallel futures of the SAME site, so they belong on one timeline in the 3D view
+      // rather than as four separate one-way trips into the program editor.
+      const withDraft = scenarios.filter(sc => (sc.programFormatDraft || '').trim());
+      const btn = document.getElementById('fc-timeline');
+      if (btn) {
+        btn.style.display = withDraft.length ? 'inline-block' : 'none';
+        btn.textContent = '▸ open timeline in 3D · ' + withDraft.length + ' scenarios';
+        btn.onclick = () => openTimeline(withDraft);
+      }
+    }
+
+    // Parses every scenario draft, packs them as a year-keyed track and hands the whole
+    // thing to the massing view, which scrubs it with the year slider it already has.
+    function openTimeline(list) {
+      const track = [], errs = [];
+      for (const sc of list) {
+        const parsed = [];
+        (sc.programFormatDraft || '').split('\n').forEach((raw, i) => {
+          const v = validateLine(raw);
+          if (v.skip) return;
+          if (v.error) { errs.push(sc.id + ' line ' + (i + 1) + ': ' + v.error); return; }
+          parsed.push({ type: v.type, area: v.area, level: v.level, category: v.category, wh: v.wh });
+        });
+        if (!parsed.length) { errs.push(sc.id + ': no valid program lines'); continue; }
+        parsed.sort((a, b) => a.level - b.level);
+        track.push({ id: sc.id, name: sc.name || '', horizon: sc.horizon || null, text: serialize(parsed) });
+      }
+      if (!track.length) { alert('No scenario draft could be parsed:\n' + errs.join('\n')); return; }
+      track.sort((a, b) => (a.horizon || 0) - (b.horizon || 0));
+
+      // year 0 is the earliest scenario; the rest sit at their offset from it, so the
+      // slider spans the real spread of the forecast rather than an arbitrary decade
+      const baseYear = track[0].horizon || new Date().getFullYear();
+      for (const t of track) t.year = Math.max(0, (t.horizon || baseYear) - baseYear);
+
+      localStorage.setItem('programForecastTrack', JSON.stringify({ baseYear, entries: track }));
+      // these are the site's dated scenarios, not one program evolving — a program-forecast
+      // payload left over from a wizard run must not ride along and offer a second reading
+      localStorage.removeItem('programEvolution');
+      localStorage.setItem('programInputText', track[0].text);
+      if (wiz.site) localStorage.setItem('programInputSite', JSON.stringify(wiz.site));
+      // the scenarios name their own uses, so no wizard building type applies here; a stale
+      // one left in storage would make the chat claim an answer nobody gave
+      localStorage.removeItem('programBuildingType');
+      location.href = 'program-massing-shortfloor.html?src=input&timeline=1';
     }
 
     function applyScenario(sc) {
@@ -1818,7 +4236,7 @@
   })();
 
   // test hook (read-only accessors for the headless verification pipeline)
-  window.__debug = { entries: () => entries, serialize: () => serialize(entries) };
+  window.__debug = { entries: () => entries, serialize: () => serialize(entries), site: () => wiz.site, interpretZone };
 </script>
 
 </body></html>

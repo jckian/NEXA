@@ -18,3 +18,21 @@ Core generation rules:
 - Distribution:
   - Must satisfy ≥ 1/2 floor diagonal separation
   - Evenly distributed across floor plate
+
+- SMALL-FLOORPLATE VARIANT (added 260729):
+  The areas above were calibrated on TPAC, whose floor plates run several thousand m2. On a
+  plate of roughly 1,000 m2 or less, three cores at 150 m2 each eat close to half the floor,
+  which is not a core, it is the building. So:
+
+    plate > 2,000 m2   use the areas above (150-250 service, 120-180 passenger)
+    plate 1,000-2,000  service 90-150, passenger 70-120
+    plate < 1,000 m2   service 45-70,  passenger 35-60
+
+  The exit-stair COUNT does not scale down: min 3 stays min 3 regardless of plate size,
+  because it comes from egress, not from area. Only the area per core scales.
+
+  This is a sizing convention for study models, not a code calculation. A real core is sized
+  from stair width, lift count and shaft services; these numbers exist so a generated program
+  reads at the right proportion on a small plate. The NEXA intel-layer scenarios use 40 m2
+  cores on ~1,000 m2 plates, which sits just under the small-plate band and is acceptable at
+  study scale.

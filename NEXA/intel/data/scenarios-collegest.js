@@ -87,7 +87,7 @@ window.NEXA_INTEL.sites = window.NEXA_INTEL.sites || {};
       "{2b2b apartment}/{134}/{4}/{private}/{12,11}\n{2b2b apartment}/{134}/{4}/{private}/{12,11}\n{2b2b apartment}/{134}/{4}/{private}/{12,11}\n{2b2b apartment}/{134}/{4}/{private}/{12,11}\n{2b2b apartment}/{134}/{4}/{private}/{12,11}\n{2b2b apartment}/{134}/{4}/{private}/{12,11}\n" + CORES(4) +
       "{2b2b apartment}/{134}/{5}/{private}/{12,11}\n{2b2b apartment}/{134}/{5}/{private}/{12,11}\n{2b2b apartment}/{134}/{5}/{private}/{12,11}\n{2b2b apartment}/{134}/{5}/{private}/{12,11}\n{studio apartment}/{67}/{5}/{private}/{8,8}\n{studio apartment}/{67}/{5}/{private}/{8,8}\n" + CORES(5) +
       "{2b2b apartment}/{134}/{6}/{private}/{12,11}\n{2b2b apartment}/{134}/{6}/{private}/{12,11}\n{2b2b apartment}/{134}/{6}/{private}/{12,11}\n{2b2b apartment}/{134}/{6}/{private}/{12,11}\n{2b2b apartment}/{134}/{6}/{private}/{12,11}\n{2b2b apartment}/{134}/{6}/{private}/{12,11}\n" + CORES(6) +
-      "{2b2b apartment}/{134}/{7}/{private}/{12,11}\n{2b2b apartment}/{134}/{7}/{private}/{12,11}\n{2b2b apartment}/{134}/{7}/{private}/{12,11}\n{studio apartment}/{67}/{7}/{private}/{8,8}\n{lounge bar}/{154}/{7}/{public}/{12,13}\n" + CORES(7),
+      "{2b2b apartment}/{134}/{7}/{private}/{12,11}\n{2b2b apartment}/{134}/{7}/{private}/{12,11}\n{2b2b apartment}/{134}/{7}/{private}/{12,11}\n{studio apartment}/{67}/{7}/{private}/{8,8}\n{lounge bar}/{154}/{7}/{public}/{12,13}\n{toilets}/{80}/{7}/{public}/{9,9}\n" + CORES(7),
     generation: GEN
   },
 
@@ -110,7 +110,7 @@ window.NEXA_INTEL.sites = window.NEXA_INTEL.sites || {};
       "{classroom}/{123}/{2}/{public}/{11,11}\n{classroom}/{123}/{2}/{public}/{11,11}\n{seminar room}/{123}/{2}/{public}/{11,11}\n{computer lab}/{123}/{2}/{public}/{11,11}\n{staff area}/{92}/{2}/{private}/{10,9}\n{toilets}/{80}/{2}/{public}/{9,9}\n" + CORES(2) +
       "{2b2b apartment}/{134}/{3}/{private}/{12,11}\n{2b2b apartment}/{134}/{3}/{private}/{12,11}\n{2b2b apartment}/{134}/{3}/{private}/{12,11}\n{studio apartment}/{67}/{3}/{private}/{8,8}\n{studio apartment}/{67}/{3}/{private}/{8,8}\n{studio apartment}/{67}/{3}/{private}/{8,8}\n" + CORES(3) +
       "{2b2b apartment}/{134}/{4}/{private}/{12,11}\n{2b2b apartment}/{134}/{4}/{private}/{12,11}\n{2b2b apartment}/{134}/{4}/{private}/{12,11}\n{2b2b apartment}/{134}/{4}/{private}/{12,11}\n{studio apartment}/{67}/{4}/{private}/{8,8}\n{studio apartment}/{67}/{4}/{private}/{8,8}\n" + CORES(4) +
-      "{2b2b apartment}/{134}/{5}/{private}/{12,11}\n{2b2b apartment}/{134}/{5}/{private}/{12,11}\n{2b2b apartment}/{134}/{5}/{private}/{12,11}\n{studio apartment}/{67}/{5}/{private}/{8,8}\n{meditation room}/{103}/{5}/{public}/{10,10}\n" + CORES(5),
+      "{2b2b apartment}/{134}/{5}/{private}/{12,11}\n{2b2b apartment}/{134}/{5}/{private}/{12,11}\n{2b2b apartment}/{134}/{5}/{private}/{12,11}\n{studio apartment}/{67}/{5}/{private}/{8,8}\n{meditation room}/{103}/{5}/{public}/{10,10}\n{toilets}/{80}/{5}/{public}/{9,9}\n" + CORES(5),
     generation: GEN
   }
 
