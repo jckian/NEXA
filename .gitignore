@@ -18,6 +18,7 @@ forVideo/
 # ...but let the two clips the site plays through
 !NEXA/assembly_animation_v5_lineart.mp4
 !NEXA/deck/scenario-260730.mp4
+!NEXA/deck/nexa-30s.mp4
 
 # RENDER is huge; keep only the one image the site needs. It lives in RENDER/VORO/ since
 # 260727, and git will not look inside an excluded directory, so VORO/ has to be un-ignored

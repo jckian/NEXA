@@ -128,7 +128,6 @@
     .panel.split .panel-copy .inner > p { max-width: 48ch; }
     /* a third of the frame takes one column, not two */
     .panel.split .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(10px, 1.2vw, 18px); }
-    .panel.split .mismatch { grid-template-columns: 1fr; gap: clamp(12px, 1.6vh, 20px); }
     .panel.split .specs { gap: clamp(10px, 1.4vh, 16px); }
     .panel.split .specs .grp { gap: clamp(10px, 1.4vw, 20px); }
     .panel.split .specs .grp > div { min-width: 96px; }
@@ -141,6 +140,21 @@
         order: 2; flex: 0 0 auto; align-items: flex-end;
         padding: clamp(20px, 3vh, 34px) clamp(20px, 5vw, 60px) clamp(40px, 7vh, 80px);
       }
+    }
+
+    /* a panel that is only a clip. No copy, so nothing has to be kept legible over it and
+       nothing has to be cropped for it: the video sits in the middle of the frame at its own
+       aspect, inset far enough that the black around it reads as a mat, corners taken off. */
+    .panel.video-only { align-items: center; justify-content: center; }
+    .panel.video-only .panel-media {
+      position: absolute; inset: 0; z-index: 1;
+      display: flex; align-items: center; justify-content: center;
+      padding: clamp(56px, 9vh, 110px) clamp(20px, 5vw, 60px) clamp(40px, 7vh, 80px);
+    }
+    .panel.video-only .panel-media video {
+      width: auto; height: auto; max-width: 100%; max-height: 100%;
+      object-fit: contain;
+      border-radius: clamp(12px, 1.4vw, 24px);
     }
 
     .panel-copy {
@@ -325,25 +339,6 @@
        PANEL EXTRAS — the few places a panel carries more than a line of copy
        ═══════════════════════════════════════════════════════════════════════ */
 
-    /* the mismatch: how long the fabric lasts against how long the use lasts.
-       This is the deck's opening argument and the only place two lists are set
-       side by side, because the gap between them IS the point. */
-    .mismatch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(20px, 4vw, 60px); margin-top: clamp(14px, 2.2vh, 26px); }
-    .mismatch h3 {
-      font-family: var(--mono); font-size: 10px; font-weight: 400;
-      letter-spacing: 0.24em; text-transform: uppercase; color: var(--text); line-height: 1.4;
-      padding-bottom: 8px; margin-bottom: 10px; border-bottom: 1px solid var(--line);
-    }
-    .mismatch dl { display: grid; grid-template-columns: 1fr auto; gap: 5px clamp(10px, 2vw, 26px); align-items: baseline; }
-    .mismatch dt { font-size: clamp(0.8rem, 0.95vw, 0.92rem); color: var(--text); }
-    .mismatch dd {
-      font-family: var(--mono); font-size: clamp(0.8rem, 0.95vw, 0.92rem);
-      font-weight: 600; color: var(--text); text-align: right; white-space: nowrap;
-    }
-    .mismatch .long dd { color: var(--blue-lite); }
-    .mismatch .short dd { color: var(--orange); }
-    @media (max-width: 720px) { .mismatch { grid-template-columns: 1fr; } }
-
     /* the lifecycle loop, redrawn from the deck's system diagram */
     /* The workflow owns the top half of its panel and the copy owns the bottom. They used to
        share the whole frame, which put the copy column straight over the Brief node and the
@@ -512,31 +507,11 @@
   </section>
 
   <!-- ═══ 02 · the argument ════════════════════════════════════════════════════════ -->
-  <section class="panel split" id="mismatch">
-    <div class="panel-media"><img src="NEXA/hero/concept.webp" alt="Section through a NEXA block: a permanent frame with plug-in units, media surfaces and shops" /></div>
-    <div class="panel-copy">
-      <div class="wide">
-        <h2 class="statement">The frame lasts a century. The program does not last five years.</h2>
-        <p>Structure, infill and skin run on three different clocks. None of them is the tenant's. Most demolition is a program problem solved with a wrecking ball.</p>
-        <div class="mismatch">
-          <div class="long">
-            <h3>Material lifespan</h3>
-            <dl>
-              <dt>Fixed structural frame</dt><dd>50&ndash;100 yrs</dd>
-              <dt>Infill</dt><dd>30&ndash;60 yrs</dd>
-              <dt>Skin</dt><dd>20&ndash;40 yrs</dd>
-            </dl>
-          </div>
-          <div class="short">
-            <h3>Program timespan &middot; conversion</h3>
-            <dl>
-              <dt>Multi-unit housing</dt><dd>50+ yrs</dd>
-              <dt>Retail</dt><dd>7&ndash;15 yrs</dd>
-              <dt>Food &amp; beverage</dt><dd>5&ndash;10 yrs</dd>
-            </dl>
-          </div>
-        </div>
-      </div>
+  <!-- The clip makes the argument on its own, so the panel carries no copy. -->
+  <section class="panel video-only" id="mismatch">
+    <div class="panel-media">
+      <video src="NEXA/deck/nexa-30s.mp4#t=2" poster="NEXA/deck/nexa-30s-poster.jpg"
+             autoplay muted loop playsinline preload="metadata"></video>
     </div>
   </section>
 
@@ -809,10 +784,10 @@
     })();
 
     // ── background clips play only while their own panel is on screen ──────────────
-    // Two of them now, and neither should burn frames behind eleven other panels.
-    // The assembly clip also runs at 2x; the scenario morph plays at its authored speed.
+    // Three of them now, and none should burn frames behind ten other panels.
+    // The assembly clip also runs at 2x; the 30s clip plays at its authored speed from 2s in.
     (function () {
-      function bind(panelId, rate) {
+      function bind(panelId, rate, start) {
         var panel = document.getElementById(panelId);
         var v = panel && panel.querySelector('video');
         if (!v) return;
@@ -822,12 +797,23 @@
           v.addEventListener('loadedmetadata', set);
           v.addEventListener('play', set);
         }
+        if (start) {
+          // the 30s clip opens on a logo card, which is a title, not the argument. It starts
+          // past it. `loop` would drop back to zero and replay the card every time round, so
+          // the loop is run by hand off `ended` instead.
+          v.loop = false;
+          var seek = function () { if (v.currentTime < start) v.currentTime = start; };
+          v.addEventListener('loadedmetadata', seek);
+          v.addEventListener('ended', function () { seek(); v.play().catch(function () {}); });
+          if (v.readyState >= 1) seek();
+        }
         if (!('IntersectionObserver' in window)) return;
         new IntersectionObserver(function (es) {
           if (es[0].isIntersecting) { v.play().catch(function () {}); } else { v.pause(); }
         }, { threshold: 0.25 }).observe(panel);
       }
       bind('hero', 1);
+      bind('mismatch', 1, 2);
       bind('system', 2);
     })();
 
