@@ -1778,6 +1778,7 @@
       //    is what keeps a "grounded" column from silently riding straight through a cantilever
       //    module (Step 4): the MAIN column stops at the split, a fresh hung sub-run + its own
       //    transfer entry starts above it. ──
+      const colPts = [];                                               // every column actually drawn, in world coords
       const colAt = new Map(levels.map(lv => [lv, new Set()]));        // lv → "gi,gj" with a column through it
       const groundedAtLv = new Map(levels.map(lv => [lv, new Set()])); // lv → "gi,gj" whose column reaches the ground
       const grounded = new Set();                                 // "gi,gj" reaching the base
@@ -1807,6 +1808,7 @@
             // untouched either way: it still knows exactly which runs are hung.
             const plain = isGround || RC;
             addStruct(wx(gi), (z0 + z1) / 2, wz(gj), sw, z1 - z0, sw, plain ? STRUCT.col : STRUCT.colT, 1, plain ? 'column' : 'cantilever column', levels[sa], plain ? matFrame : null);
+            colPts.push({ x: wx(gi), z: wz(gj), y0: z0, y1: z1 });   // read by the truss emit: a hanger inside a column is redundant
             if (isGround) grounded.add(key); else transfers.push({ gi, gj, zb: z0, ztop: z1, stack: sb - sa + 1, lv0: levels[sa], floorYs: Array.from({ length: sb - sa + 1 }, (_, n) => yBase(levels[sa + n])) });
             for (let k = sa; k <= sb; k++) { colAt.get(levels[k]).add(key); if (isGround) groundedAtLv.get(levels[k]).add(key); }
           }
@@ -1982,46 +1984,65 @@
           return;
         }
         const sec = trussSection(reachMods);   // R5 ladder (heavier — the hanger bar is the primary carrier)
-        // 1. TOP HANGER TRUSS — one storey deep, at the TOP of the group (the "衣架橫桿"). Depth =
-        //    the top hung floor's own storey height (ztop − floorYs[last]); for a single-floor
-        //    group (stack===1) that equals the whole zb..ztop range, so it degenerates to one deep
-        //    truss box with no hangers below — correct, nothing there to hang.
-        const topFloorY = floorYs.length ? floorYs[floorYs.length - 1] : zb;
-        const storeyH = Math.max(ztop - topFloorY, sec.chord * 1.5);
+        // 1. TOP HANGER TRUSS — one storey deep, at the TOP of the group (the "衣架橫桿"), sitting
+        //    ON the top hung floor. `botFloor` is that floor; the emit puts the bottom chord just
+        //    above it rather than straddling it.
+        const botFloor = floorYs.length ? floorYs[floorYs.length - 1] : zb;
         // Nothing is drawn here: the truss is RECORDED on its line and emitted once after the
         // transfer loop. Several hung columns routinely tie back along the SAME grid line at the
         // SAME height, and drawing one truss per column stacked them: 11 lines on SAMPLE carried
         // two trusses each, one pair overlapping over 15.5 m. Because the two spans differ their
         // panel nodes differ, so the two Warren webs crossed instead of coinciding, and 2 or 4
         // diagonals grew out of one node in the same direction. One line is one truss.
-        // The line is keyed on the GROUP TOP, not on the chord elevations it works out to. Those
-        // depend on the reach ladder and on how many floors hang, so two trusses on one line
-        // sitting at the same height still missed each other by a few centimetres and stayed
-        // separate. Depth takes the deepest of what merges, section the heaviest.
-        const key = `${axisIsX}|${fixedW.toFixed(2)}|${ztop.toFixed(2)}`;
-        let t = steelTrusses.get(key);
-        if (!t) steelTrusses.set(key, t = { axisIsX, fixedW, ztop, storeyH, zb, floorYs, sec, flagged, a: Infinity, b: -Infinity, reach: [], roots: new Map(), ifs: new Set() });
+        // Trusses on a line are matched by PROXIMITY of their group tops, not by an exact key.
+        // Keying on `ztop.toFixed(2)` still left a pair 1 cm apart as two separate trusses whose
+        // chord boxes then overlapped by 0.97 m³ — two hung runs ending at almost the same height
+        // are one truss, not two. Anything within 0.6 m (well under a storey) merges: deepest
+        // bottom floor, heaviest section, and any failing R3 flags the whole member.
+        const lineKey = `${axisIsX}|${fixedW.toFixed(2)}`;
+        let list = steelTrusses.get(lineKey); if (!list) steelTrusses.set(lineKey, list = []);
+        let t = list.find(e => Math.abs(e.ztop - ztop) < 0.6);
+        if (!t) list.push(t = { axisIsX, fixedW, ztop, botFloor, zb, floorYs, sec, flagged, a: Infinity, b: -Infinity, reach: [], roots: new Map() });
         t.a = Math.min(t.a, tipX, farX); t.b = Math.max(t.b, tipX, farX);
+        t.ztop = Math.max(t.ztop, ztop);
+        // HIGHEST bottom floor, not the lowest. Taking the lowest made a merged truss span several
+        // storeys, and its Warren web then cut straight through the girders of every floor in
+        // between. The hanger bar is one storey deep at the top of the group by definition; what
+        // hangs below hangs on hangers, not on a deeper web.
+        t.botFloor = Math.max(t.botFloor, botFloor);
         if (sec.chord > t.sec.chord) t.sec = sec;                       // heaviest reach on the line sizes it
-        t.storeyH = Math.max(t.storeyH, storeyH);
-        t.flagged = t.flagged || flagged;                               // any failing R3 flags the whole member
+        t.flagged = t.flagged || flagged;
         if (floorYs.length > t.floorYs.length) { t.floorYs = floorYs; t.zb = zb; }
         t.reach.push([Math.min(tipX, reachAnchorX), Math.max(tipX, reachAnchorX)]);   // hangers only over these
         t.roots.set(farX.toFixed(2), { far: farX, dir: Math.sign(tipX - farX) || 1 });
-        if (Math.abs(reachAnchorX - farX) > 1e-6) t.ifs.add(reachAnchorX.toFixed(2));
+        // No SYS3 interface tie is recorded. It was a vertical member at reachAnchorX running from
+        // the group's base up to the bottom chord — but reachAnchorX is by definition a GROUNDED
+        // anchor, so a main column already stands on exactly that line, and the tie was drawn 96%
+        // buried inside it. The column is the interface; drawing a second member inside it says
+        // nothing and reads as a clash.
       };
       // ── EMIT the merged steel trusses (RC records into rcBeams/rcHaunches instead; each system
       //    leaves the other's collector empty). Everything below is the 260722(b) coat-hanger
-      //    mechanism unchanged — chords, one Warren web, tension hangers, short root struts, the
-      //    SYS3 interface tie — only now over the merged span, once per line. ──
+      //    mechanism — chords, one Warren web, tension hangers, short root struts — over the
+      //    merged span, once per line. ──
       const emitSteelTrusses = () => {
-        for (const t of steelTrusses.values()) {
+        for (const list of steelTrusses.values()) for (const t of list) {
           const c = t.flagged ? STRUCT.flag : STRUCT.trans;
           const label = t.flagged ? 'cantilever long-span truss (R3 short)' : 'cantilever long-span truss';
           const posAt = (p, y) => t.axisIsX ? new THREE.Vector3(p, y, t.fixedW) : new THREE.Vector3(t.fixedW, y, p);
           const len = t.b - t.a, mid = (t.a + t.b) / 2, sec = t.sec;
           if (len < 1e-6) continue;
-          const yTopC = t.ztop - sec.chord / 2, yBotC = yTopC - t.storeyH;
+          // The truss occupies the TOP STOREY of the group: top chord under its ceiling, bottom
+          // chord sitting ON the top hung floor. It used to straddle that floor line (yBotC =
+          // botFloor − chord/2), which put the bottom chord exactly where that floor's girders
+          // run — the chord and the girder were the same member drawn twice, 0.68 m³ of overlap on
+          // the worst line. Sitting the chord above the line leaves the girders their own zone
+          // below it. A minimum depth is still enforced for a shallow storey.
+          // The top chord clears the GIRDER ZONE of the floor above. `ztop` is a floor line, and
+          // that floor's girders hang PRI_H below it, so a top chord placed just under ztop landed
+          // inside them — 0.68 m³ on the worst line, the largest clash left in the model.
+          const yTopC = t.ztop - PRI_H - sec.chord / 2;
+          const yBotC = Math.min(t.botFloor + sec.chord / 2, yTopC - sec.chord * 1.5);
           if (t.axisIsX) {
             addStruct(mid, yBotC, t.fixedW, len, sec.chord, sec.chord, c, 1, label + ' bottom chord', null, null);
             addStruct(mid, yTopC, t.fixedW, len, sec.chord, sec.chord, c, 1, label + ' top chord', null, null);
@@ -2043,10 +2064,17 @@
           //    the span rides on already-grounded structure and has nothing to hang. R5 web ×0.5,
           //    per the source schedule's CAN_V 14×14 against TR_CHORD 30×30. The top hung floor
           //    sits at the bottom chord already, so hangers serve floorYs[0..length-2].
+          //    A panel node that lands on a COLUMN gets no hanger. Panel nodes step by COLSTEP and
+          //    the columns sit on the same grid, so they coincide often, and the hung column there
+          //    already carries those floors — the hanger was drawn inside it, holding up what was
+          //    holding it up. Redundant, and it read as a clash.
           const hangSec = sec.web * 0.5;
+          const lowest = t.floorYs.length ? t.floorYs[0] : t.zb;
           for (let n = 0; n <= segs; n++) {
             const p = nodeCoord(n);
             if (!t.reach.some(r => p >= r[0] - 1e-6 && p <= r[1] + 1e-6)) continue;
+            const px = t.axisIsX ? p : t.fixedW, pz = t.axisIsX ? t.fixedW : p;
+            if (colPts.some(cp => Math.abs(cp.x - px) < 0.35 && Math.abs(cp.z - pz) < 0.35 && cp.y1 > lowest + 0.05 && cp.y0 < yBotC - 0.05)) continue;
             let yCur = yBotC;
             for (let k = t.floorYs.length - 2; k >= 0; k--) {
               const yNext = t.floorYs[k], h = Math.abs(yCur - yNext);
@@ -2062,18 +2090,21 @@
           //    column grid or core), per the source schedule's STRUT_200: short, root-only, never a
           //    full-depth web. Keyed by position, so two transfers rooting at the same node give
           //    one pair of struts rather than two pairs on top of each other.
+          //    They now live IN THE TRUSS PLANE, cross-bracing the end panel at the root: one
+          //    strut per root, the diagonal opposite to the Warren one in that panel, so it can
+          //    never coincide with it. Before, they ran from the group's BASE up to the chords,
+          //    which for a single-floor group came out horizontal and lay along the bottom chord
+          //    (96% buried in the member it was meant to brace) and for a multi-floor group cut
+          //    down through the girders of every storey it passed. STRUT_200 in the source
+          //    schedule is short and root-only; a member crossing three floors is neither.
+          const panels = len / segs, braced = new Set();
           for (const { far, dir } of t.roots.values()) {
-            const rootReach = dir * Math.min(Math.max(Math.abs(t.b - far), Math.abs(far - t.a)), M * 1.5);
-            const rootAnchor = posAt(far, t.zb);
-            addStrut(rootAnchor, posAt(far + rootReach, yBotC), sec.web * 0.7, c, label + ' root strut', null, null);
-            addStrut(rootAnchor, posAt(far + rootReach, yTopC), sec.web * 0.7, c, label + ' root strut', null, null);
-          }
-          // 4. SYS3 INTERFACE TIE — the column-grid node where SYS3's own back-span/floor girders
-          //    meet the main frame, distinct from the deep SYS1 root above. Also deduped.
-          const ifLabel = t.flagged ? 'cantilever interface tie (R3 short)' : 'cantilever interface tie';
-          for (const s of t.ifs) {
-            const ax = parseFloat(s);
-            addStrut(posAt(ax, t.zb), posAt(ax, yBotC), sec.web * 0.5, c, ifLabel, null, null);
+            const n0 = Math.max(0, Math.min(segs, Math.round((far - t.a) / panels)));
+            const nLo = Math.max(0, Math.min(segs - 1, dir > 0 ? n0 : n0 - 1));
+            if (braced.has(nLo)) continue;   // two roots can land in one panel; brace it once
+            braced.add(nLo);
+            const warrenUp = nLo % 2 === 0;   // the web already runs bottom→top across this panel when true
+            addStrut(posAt(nodeCoord(nLo), warrenUp ? yTopC : yBotC), posAt(nodeCoord(nLo + 1), warrenUp ? yBotC : yTopC), sec.web * 0.7, c, label + ' root strut', null, null);
           }
         }
       };
@@ -2358,6 +2389,59 @@
         const z0 = yBase(c.minL), z1 = zTopOf(c.maxL), cy = (z0 + z1) / 2, hh = z1 - z0;
         const x0 = wx(c.xMod), x1 = wx(c.xMod + c.wMod), zz0 = wz(c.zMod), zz1 = wz(c.zMod + c.dMod);
         addStruct((x0 + x1) / 2, cy, (zz0 + zz1) / 2, x1 - x0, hh, zz1 - zz0, STRUCT.core, 1, c.type + ' (RC core)', c.minL, concreteRC());
+      }
+
+      // ── ALIGNED VOLUME + BRACED CORE (260807) ──
+      // Re-read of references/cantilever_truss_whole_building.py: SYS1 主要量體 is "兩支核心 +
+      // 梁柱結構" — the cores are single continuous volumes running the building's whole height
+      // (CORE_H spans it), not something reassembled floor by floor. This file already draws each
+      // core that way, but nothing above it ever treated the MASSING as one vertical volume: every
+      // other pass works per level or per occupancy run, so the vertical circulation had no
+      // lateral system holding it as a whole.
+      // An ALIGNED VOLUME is a maximal run of consecutive levels whose LONG footprints stack on
+      // each other. Its lateral system is the cores that run through it, braced ACROSS THE WHOLE
+      // RUN in one panel rather than storey by storey — HYBRID-STRUCTURE-RULES §4, which for a
+      // building this size (not slender, under 20 floors) selects `CORE + MEGA frame`: "core walls
+      // braced by mega-frame". One X per core face per volume is exactly that mega panel.
+      // STEEL only. RC's lateral system is the shear wall already drawn above, and RC draws no
+      // diagonal anywhere in this file — bracing a concrete core would contradict both.
+      if (!RC) {
+        const ALIGN_MIN = 4;                      // modules that must stack for it to be one volume
+        const BRACE = 0.30;                       // mega-brace section (m), square
+        const runsAligned = []; let cur = [levels[0]];
+        for (let k = 1; k < levels.length; k++) {
+          const below = occ.get(levels[k - 1]), here = occ.get(levels[k]);
+          let shared = 0; for (const key of here) if (below.has(key)) shared++;
+          if (shared >= ALIGN_MIN) cur.push(levels[k]); else { runsAligned.push(cur); cur = [levels[k]]; }
+        }
+        runsAligned.push(cur);
+        for (const vol of runsAligned) {
+          if (vol.length < 2) continue;           // a single floor is not a volume to brace
+          const vLo = vol[0], vHi = vol[vol.length - 1];
+          for (const c of L.coreShafts) {
+            // the braced segment is where this core and this volume actually overlap
+            const lo = Math.max(c.minL, vLo), hi = Math.min(c.maxL, vHi);
+            if (hi <= lo) continue;
+            const y0 = yBase(lo), y1 = zTopOf(hi);
+            if (y1 - y0 < M) continue;
+            const x0 = wx(c.xMod), x1 = wx(c.xMod + c.wMod), z0 = wz(c.zMod), z1 = wz(c.zMod + c.dMod);
+            // Brace the two LONGER faces only. Both pairs would read as a cage and would cross
+            // every beam framing into the core from both directions; the long faces carry the
+            // stiffness that matters and leave the short ones free for the girders.
+            const alongX = (x1 - x0) >= (z1 - z0);
+            const faces = alongX ? [[z0, -1], [z1, 1]] : [[x0, -1], [x1, 1]];
+            const a0 = alongX ? x0 : z0, a1 = alongX ? x1 : z1;
+            for (const [plane, sgn] of faces) {
+              // Clear of the core face AND of any column standing on it. Half a brace was enough
+              // to escape the core, but the brace is near vertical, so where a column sits on that
+              // face it ran 4 m up the inside of it. Half a column plus half a brace clears both.
+              const off = plane + sgn * (COL_MAIN / 2 + BRACE / 2 + 0.02);
+              const p = (u, y) => alongX ? new THREE.Vector3(u, y, off) : new THREE.Vector3(off, y, u);
+              addStrut(p(a0, y0), p(a1, y1), BRACE, STRUCT.core, 'core mega-brace', lo, null);
+              addStrut(p(a0, y1), p(a1, y0), BRACE, STRUCT.core, 'core mega-brace', lo, null);
+            }
+          }
+        }
       }
     }
 
@@ -2646,9 +2730,16 @@
           const [si, sj] = key.split(',').map(Number);
           const ks = []; for (let k = 0; k < K; k++) if (raw(si, sj, k)) ks.push(k);
           if (!ks.length) return null;
-          const k0 = ks[0], k1 = ks[ks.length - 1], frames = [];
-          for (let k = k0; k <= k1; k += 2) frames.push(k);
-          return { si, sj, k0, k1, frames, top: frames[frames.length - 1] + 2 };
+          const k0 = ks[0], frames = [];
+          // A vertical module occupies TWO courses, so it may only start where both are inside the
+          // K budget. Rounding the shaft up instead — letting the top frame carry one course past
+          // the stack as a stair head — cost a whole storey: SHORT_STACK_TOP rose a course, and
+          // buildStructure shifts every LONG floor above by that, which opened a 5.8 m storey with
+          // nothing in most of it. A module that does not fit in the budget does not get built.
+          for (let k = k0; k + 2 <= K; k += 2) if (raw(si, sj, k)) frames.push(k);
+          if (!frames.length) return null;                       // no room for even one frame → no shaft
+          const k1 = frames[frames.length - 1] + 1;              // stair only reaches as far as its frame
+          return { si, sj, k0, k1, frames, top: k1 + 1 };
         };
         // MAIN STRUCTURE (vertical frames) prefers the core; INFILL on the facade skin is oriented
         // PERPENDICULAR to the facade (long axis along the facade normal → radial toward the core).
@@ -2670,7 +2761,12 @@
         // has to be general: pruning only the verticals would leave their infill still hanging.
         const bricks = (() => {
           const cellsOf = b => b[3] === 0 ? [[b[0], b[1]], [b[0] + 1, b[1]]] : b[3] === 1 ? [[b[0], b[1]], [b[0], b[1] + 1]] : [[b[0], b[1]]];
-          const live = new Set(packed);
+          // Same budget rule as the stair shaft: a VERTICAL module spans courses k and k+1, so it
+          // only belongs where both are inside K. The packer was placing one at the top course,
+          // which put its upper half above the allotted height — and since SHORT_STACK_TOP reads
+          // the highest course anything reaches, one such module pushed every LONG floor above the
+          // stack up by a full course. That is where the over-tall storey came from.
+          const live = new Set(packed.filter(b => b[3] !== 2 || b[2] + 2 <= K));
           const occAt = new Map();   // "i,j,k" → brick occupying that cell (vertical fills two)
           for (const b of packed) {
             const ks = b[3] === 2 ? [b[2], b[2] + 1] : [b[2]];
@@ -6236,7 +6332,7 @@
       { key: 'roof', label: 'Roof', match: t => t === 'roof slab' || t === 'roof beam' },
       { key: 'cw', label: 'Curtain wall', match: t => t === 'curtain wall' },
       { key: 'fin', label: 'Fins', match: t => t.startsWith('timber frame') },
-      { key: 'core', label: 'Core', match: t => t.endsWith(' (RC core)') },
+      { key: 'core', label: 'Core', match: t => t.endsWith(' (RC core)') || t === 'core mega-brace' },
     ];
     // All / None toggle every structure checkbox — both the permanent-structure and relocatable-unit groups.
     document.getElementById('struct-chk-all').addEventListener('click', () => document.querySelectorAll('.struct-chk, .reloc-chk').forEach(c => c.checked = true));
