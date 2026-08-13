@@ -157,6 +157,17 @@
     #seg-core button svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
     #seg-core button:hover { color: var(--text-hi); background: rgba(23, 47, 199, 0.07); }
     #seg-core button.active { color: #fff; background: var(--blue); }
+    /* The caption under the three options: which one the wizard handoff picked, and the score
+       every option got. Hidden unless a pick actually ran, so the sample path looks unchanged. */
+    #core-pick { display: none; width: 100%; flex: none; padding: 0 10px; }
+    #core-pick.on { display: block; }
+    #core-pick .cp-head { font-size: 7px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-lo); margin-bottom: 5px; }
+    #core-pick .cp-row { display: flex; align-items: baseline; gap: 6px; font-size: 8.5px; letter-spacing: 0.04em; color: var(--text-lo); line-height: 1.75; }
+    #core-pick .cp-row .nm { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #core-pick .cp-row b { flex: 0 0 auto; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--text-mid); }
+    #core-pick .cp-row.on { color: var(--blue); }
+    #core-pick .cp-row.on b { color: var(--blue); }
+    #core-pick .cp-note { font-size: 7.5px; letter-spacing: 0.05em; color: var(--text-lo); line-height: 1.6; margin-top: 4px; opacity: 0.75; }
     /* ── Adaptive-use chat + timeline ── */
     /* Program and Adaptive use are two separate tabs of the left column, same as Layout: one
        header each, one body each, and only one of the three open at a time. */
@@ -425,6 +436,10 @@
       </button>
     </div>
 
+    <!-- Why that option is lit. Filled by renderCorePick() when the wizard handoff ranked the
+         three schemes; empty and hidden on every other path. -->
+    <div id="core-pick"></div>
+
   </div>
 
   <!-- The chat itself, under the model: one line to type in and an arrow to send. The reply and
@@ -552,6 +567,10 @@
       'exhibition|event hall|\\bdemo\\b',                                           // show + event
       'classroom|seminar|computer lab|project review',                              // learning
       'yoga|pilates|fitness|\\bgym\\b|recovery lounge|physical therapy|meditation|health coaching',   // wellness
+      // Residents' amenities that turn over. Short tenancies like the rest, but the door is
+      // the lift lobby upstairs, not the street, so they may sit above the housing boundary
+      // where an outward-facing tenancy may not. See SHORT_TARGETS.
+      'guest suite|screening room|hobby room|music room',                                    // residents
     ].join('|'), 'i');
     const isShort = t => SHORT_RE.test(t);
     // CIRCULATION = generated corridor (8'-6" wide) from core to every space — not a packed block.
@@ -705,6 +724,22 @@
 
     // Balance rooms across the two long sides of the corridor by total width
     // (largest-first → add to whichever side is currently shorter).
+    // ── BAND SPLIT ───────────────────────────────────────────────────────────────────────
+    // Greedy: sort by width, drop each room on whichever side is currently narrower.
+    // An EXACT split was tried and reverted, 260810. Whatever width the two bands do not
+    // share shows up as a one-sided tail, and subset-sum says every SAMPLE floor could be
+    // divided dead even (38 modules of tail across eight floors, level 2 carrying ten of
+    // them, all of it avoidable on paper). Solving it exactly made the building WORSE:
+    //   tail   12 -> 6 modules
+    //   FW     32 -> 35, coreN x25 -> x28, total corridor 194 -> 218 modules
+    // because P2 (below) normalises each band to ITS OWN modal depth AFTER this runs. Change
+    // which rooms share a band and both modal depths change, every room is re-proportioned to
+    // a new width, and the totals inflate — which feeds `agBandMax`, `coreNx` and the envelope.
+    // Balancing the bands and normalising their depths pull against each other, and the
+    // envelope is worth more than the tail: in PINWHEEL the corridor spans coreS to coreN by
+    // construction, so a shorter tail cannot shorten it, only a narrower envelope can.
+    // Fixing this properly means solving the split and the depth normalisation together, or
+    // making P2 take one modal depth per floor instead of one per band. Not attempted here.
     function splitSides(rooms) {
       const north = [], south = []; let nW = 0, sW = 0;
       for (const r of [...rooms].sort((a, b) => b.wMod - a.wMod)) {
@@ -760,6 +795,31 @@
       const moves = [];
       const movable = p => !p.isCore && !isCorridor(p.type) && !isShort(p.type) && !/toilet|foyer|lobby|entrance/i.test(p.type);
       const roomsAt = lv => prog.filter(p => p.level === lv && !p.isCore && !isCorridor(p.type));
+      // ── USE GUARD (260810) ──────────────────────────────────────────────────────────────
+      // Rebalance only ever asked "does this move even out the widths". It would take a flat
+      // off level 9 and drop it on the ground next to the lobby, which is how a cleanly stacked
+      // mixed-use building came back with dwellings in the activity band and on the street face.
+      // Two limits, both of them things the wizard already refuses to do (program-input.html
+      // :3470, the same rule for chat-written conversions):
+      //   · a room may only land on a floor that is already its own kind, so a move can shuffle
+      //     area inside the office band or inside the housing band but never across the boundary
+      //   · dwellings never reach the ground or below, whatever it does for the widths
+      // Toilets, foyer, lobby and entrance are service, not a use: they do not make a floor
+      // "office" and do not block a flat from landing there.
+      // A DWELLING here means a unit someone lives in, nothing else. Narrower than the
+      // program-input.html:3470 conversion test on purpose: that one also reads "residential",
+      // which would catch the SAMPLE's {residential lounge} — a shared amenity that belongs
+      // with the amenities and has no business being pinned above the ground. Widening the
+      // other way, to bare "studio" or "loft", catches {yoga studio} and {office loft}. Both
+      // are in the SAMPLE and neither is a home. Programs that name units {one bedroom} rather
+      // than {... apartment} fall outside it, as they already do for conversions.
+      const isDwelling = p => /apartment|dwelling/i.test(p.type);
+      const useRooms = lv => roomsAt(lv).filter(p => !/toilet|foyer|lobby|entrance/i.test(p.type));
+      const canLand = (p, lv) => {
+        const rooms = useRooms(lv);
+        if (!rooms.length) return !(isDwelling(p) && lv < 1);
+        return isDwelling(p) ? lv >= 1 && rooms.every(isDwelling) : !rooms.some(isDwelling);
+      };
       const wOf = lv => {
         const items = roomsAt(lv).map(p => { const d = rectDims(p.area, p.h); return { ...p, wMod: d.w, dMod: d.d }; });
         if (!items.length) return 0;
@@ -779,6 +839,7 @@
           const cands = prog.filter(p => p.level === donor && movable(p)).sort((a, b) => (a.area - b.area) || (a.type < b.type ? -1 : 1));
           let done = false;
           for (const c of cands) {   // smallest room whose move strictly lowers the crowded floor's width
+            if (!canLand(c, rec)) continue;
             c.level = rec;
             if (Math.max(wOf(donor), wOf(rec)) < ws.get(donor)) { moves.push({ type: c.type, from: donor, to: rec }); done = true; break; }
             c.level = donor;
@@ -922,10 +983,15 @@
         }
         for (const s of floorSplit.values()) for (const r of [...s.north, ...s.south]) delete r.p2orig;
       }
-      for (const s of floorSplit.values()) {
+      // Band depths take every floor, basements included: FD has to cover the deepest band
+      // anywhere or a basement room would not fit. The WIDTHS are tracked twice, because the
+      // two readings answer different questions — see agBandMax below.
+      let agMaxNW = 0, agMaxSW = 0;
+      for (const [lv, s] of floorSplit) {
         northDepth = Math.max(northDepth, 1, coreN ? coreN.dMod : 1, ...s.north.map(r => r.dMod));
         southDepth = Math.max(southDepth, 1, coreS ? coreS.dMod : 1, ...s.south.map(r => r.dMod));
         maxNW = Math.max(maxNW, s.nW); maxSW = Math.max(maxSW, s.sW);
+        if (lv >= 0) { agMaxNW = Math.max(agMaxNW, s.nW); agMaxSW = Math.max(agMaxSW, s.sW); }
       }
       for (const ce of coreX) southDepth = Math.max(southDepth, ce.dMod);   // extra shafts live on the south band
       // ── AUTO-TOILET (user 260710): one occupant-load-sized restroom cluster flush against EACH core
@@ -956,6 +1022,17 @@
       if (lock && lock.northDepth) northDepth = Math.max(northDepth, lock.northDepth);
       FD = southDepth + 1 + northDepth; zMid = southDepth;   // corridor at z = zMid
       const bandMax = Math.max(maxNW, maxSW), minSep = cwS + cwN + 1;
+      // ── ABOVE-GRADE BAND WIDTH (260810) ────────────────────────────────────────────────
+      // Where a core STANDS is an above-grade question. A basement is back of house: it does
+      // not decide the corner a tower's core turns on, and letting it do so drags the core
+      // east for all eight floors because two parking levels happened to be wide.
+      // COMPACT has always known this — its coreN float scan reads only `l >= 0` floors
+      // (agNW below). PINWHEEL was reading every floor through bandMax, which is the bug this
+      // pairs up. bandMax itself is left alone: it also feeds the E-3 remoteness bound, and
+      // remoteness is a per-floor life-safety rule that basements are absolutely part of.
+      // Falls back to bandMax when nothing is above grade (a basement-only program still
+      // needs a window to pack into).
+      const agBandMax = Math.max(agMaxNW, agMaxSW) || bandMax;
 
       const shortLvl = new Set(levels.filter(l => program.some(p => p.level === l && !p.isCore && !isCorridor(p.type) && isShort(p.type))));
       const lvIdx = new Map(levels.map((l, i) => [l, i]));
@@ -1068,12 +1145,34 @@
         //   the dense/sparse split are RETIRED: every non-plate floor packs both bands over ONE common
         //   window (unified scan below), hugging coreS by tie-break.
         coreSx = 0;
-        let winMax = bandMax;                 // bandMax (:415) already = max(maxNW,maxSW) = winMax for non-plate floors
+        let winMax = agBandMax;               // above-grade non-plate floors only; the plate fold-in below is already gated the same way
         for (const [lv, info] of plateInfo) {
           if (lv < 0) continue;               // above-grade only
           winMax = Math.max(winMax, Math.ceil(info.cells / (southDepth + northDepth)));
         }
         coreNx = Math.max(cwS + 1, cwS + winMax);   // right end of the widest window = true NE corner
+        // ── E-3 FLOOR FOR PINWHEEL (260810 · CBC 1007.1.1) ────────────────────────────────
+        // COMPACT runs a fixed-point loop that pushes coreN out until the two shafts are ⅓ of
+        // the plate diagonal apart (:1070). PINWHEEL was exempted on the grounds that its cores
+        // "sit at opposite corners" and so clear remoteness by construction. That held only
+        // while coreNx was the widest floor's east edge. Now that the window is above-grade
+        // only, a tower over a big podium can pull both shafts against the tower and leave the
+        // podium with two exits side by side, so pinwheel needs the same floor.
+        //
+        // Separation is 2-D and FW moves with coreNx, hence the loop. The plate the diagonal is
+        // measured on is the WIDEST one, basement included: an over-wide floor runs east past
+        // coreN, and it is that floor's occupants the rule protects.
+        if (CODE_ENFORCE && coreS && coreN) {
+          const dz = (zMid + 1 + coreN.dMod / 2) - (zMid - coreS.dMod / 2);
+          for (let it = 0; it < 24; it++) {
+            const fw = Math.max(coreNx + cwN, cwS + bandMax + cwN);
+            const third = Math.hypot(fw, FD) / 3;
+            const dxNeed = Math.sqrt(Math.max(0, third * third - dz * dz));
+            const needNx = Math.ceil(dxNeed + cwS / 2 - cwN / 2);
+            if (needNx <= coreNx) break;
+            coreNx = needNx;
+          }
+        }
         FW = coreNx + cwN;                          // fixed envelope
         if (coreS) coreShafts.push({ ...coreS, xMod: coreSx, zMod: zMid - coreS.dMod });
         if (coreN) coreShafts.push({ ...coreN, xMod: coreNx, zMod: zMid + 1 });
@@ -1087,7 +1186,29 @@
           if (clusterFloor(lv)) { const longs = list.filter(p => !isShort(p.type)), shorts = list.filter(p => isShort(p.type)); list = anchorRight ? [...longs, ...shorts] : [...shorts, ...longs]; }
           return list;
         };
-        const layLR = (list, x0, side) => { let x = x0; const out = []; for (const p of list) { out.push({ ...p, xMod: x, zMod: side === 'north' ? zMid + 1 : zMid - p.dMod, side }); x += p.wMod; } return out; };
+        // Shafts standing in this band on this floor. Normally the window sits strictly between
+        // the cores and this list never bites, but a floor wider than the above-grade window is
+        // now allowed to run east past coreN (see the scan clamp below), and rooms laid straight
+        // through a shaft would be drawn inside it. Same wrap COMPACT does in packLegacy.
+        const bandIvs = (lv, side) => coreShafts
+          .filter(c => lv >= c.minL && lv <= c.maxL && (c.zMod > zMid ? 'north' : 'south') === side)
+          .map(c => ({ lo: c.xMod, hi: c.xMod + c.wMod }))
+          .sort((a, b) => a.lo - b.lo);
+        const layLR = (list, x0, side, ivs) => {
+          let x = x0; const out = [];
+          const zOf = p => side === 'north' ? zMid + 1 : zMid - p.dMod;
+          const emit = (p, x0e, w) => out.push({ ...p, xMod: x0e, wMod: w, area: w === p.wMod ? p.area : p.area * w / p.wMod, zMod: zOf(p), side });
+          for (const p of list) {
+            let w = p.wMod;
+            while (w > 0) {
+              const iv = (ivs || []).find(i => x < i.hi && x + w > i.lo);
+              if (!iv) { emit(p, x, w); x += w; break; }
+              if (x < iv.lo) { const pre = iv.lo - x; emit(p, x, pre); w -= pre; }
+              x = iv.hi;
+            }
+          }
+          return out;
+        };
         // PLATE slab: pack into a window [w0, w0+wPlate) chosen by the SAME overlap-with-floor-below
         //   objective + hug-coreS tie-break as the unified scan below; grows RIGHTWARD from w0, skipping
         //   the corridor row (excluded from `rows`) + active core cells. If the plate is the widest floor
@@ -1112,6 +1233,12 @@
         const agLevels = levels.filter(l => l >= 0);
         const agIdx = new Map(agLevels.map((l, i) => [l, i]));
         const hugN = lv => lv >= 0 && (agIdx.get(lv) % 2 === 1);
+        // The window now runs to the ABOVE-GRADE core, so a basement wider than the tower no
+        // longer has a legal w0 and the scan would run zero times, leaving that floor with no
+        // rects at all — the level would silently vanish. The scan is therefore given at least
+        // one position: such a floor starts at coreS and is allowed to run east past coreN,
+        // which is what a podium or a parking level does anyway. FW is regrown from the rects
+        // below so the envelope still contains it.
         let prevCols = null, prevShort = null;
         for (const lv of levels) {          // bottom-up so every window/plate stacks on the floor below
           if (plateInfo.has(lv)) {
@@ -1119,7 +1246,8 @@
             const info = plateInfo.get(lv);
             const wPlate = Math.max(1, Math.min(winMax, Math.ceil(info.cells / (southDepth + northDepth))));
             let bw0 = coreSx + cwS, bScore = -Infinity, bTie = Infinity;
-            for (let w0 = coreSx + cwS; w0 <= coreNx - wPlate; w0++) {
+            const hiW0 = Math.max(coreSx + cwS, coreNx - wPlate);
+            for (let w0 = coreSx + cwS; w0 <= hiW0; w0++) {
               const cols = new Set(); for (let i = w0; i < w0 + wPlate; i++) cols.add(i);
               const score = overlapCount(cols, prevCols);
               const tie = w0 - (coreSx + cwS);
@@ -1139,16 +1267,21 @@
           const sList = orderList(south, lv, anchorR), nList = orderList(north, lv, anchorR);
           const useShort = clusterFloor(lv) && prevShort && prevShort.size;
           let best = null, bScore = -Infinity, bTie = Infinity;
-          for (let w0 = coreSx + cwS; w0 <= coreNx - Wwin; w0++) {
-            const cand = [...layLR(sList, w0, 'south'), ...layLR(nList, w0, 'north')];
+          const hiW0 = Math.max(coreSx + cwS, coreNx - Wwin);
+          const sIvs = bandIvs(lv, 'south'), nIvs = bandIvs(lv, 'north');
+          for (let w0 = coreSx + cwS; w0 <= hiW0; w0++) {
+            const cand = [...layLR(sList, w0, 'south', sIvs), ...layLR(nList, w0, 'north', nIvs)];
             const score = useShort ? [...shortCellsOf(cand)].filter(k => prevShort.has(k)).length : overlapCount(progColsOf(cand), prevCols);
-            const tie = anchorR ? ((coreNx - Wwin) - w0) : (w0 - (coreSx + cwS));
+            const tie = anchorR ? (hiW0 - w0) : (w0 - (coreSx + cwS));
             if (score > bScore || (score === bScore && tie < bTie)) { bScore = score; bTie = tie; best = cand; }
           }
           const rects = best || [];
           floorRects.set(lv, rects);
           prevCols = progColsOf(rects); prevShort = shortCellsOf(rects);
         }
+        // The envelope was fixed off the cores. A floor allowed to run past coreN above has to
+        // be inside it too, or the plate would be drawn clipped.
+        for (const rs of floorRects.values()) for (const r of rs) FW = Math.max(FW, r.xMod + r.wMod);
       }
       // ── corridor = single SHORTEST connector per floor (§0.6.2): minimal interval over all program
       //    columns, extended to reach the nearest active core. A floor drops its corridor ONLY if EVERY
@@ -4768,6 +4901,20 @@
       { type: 'residential lounge', category: 'public', re: /residential lounge/i, keys: ['residential lounge', 'resident lounge', '交誼廳', '住戶交誼'] },
       { type: 'community kitchen', category: 'public', re: /community kitchen/i, keys: ['community kitchen', 'shared kitchen', '共享廚房', '共同廚房'] },
       { type: 'shared amenity', category: 'public', re: /shared amenity|amenity/i, keys: ['amenity', 'shared amenity', '共享空間', '公共設施'] },
+      // ── RESIDENTS-ONLY SHORT TENANCIES (260810) ──────────────────────────────────────
+      // A short tenancy above the housing boundary used to mean a public one, because every
+      // SHORT type in this list bar the therapy suite is `public`. So the two things asked
+      // for could not both hold: "the top has to change over time" wants a tenancy up there,
+      // "no outward-facing program over the homes" says it cannot be any of these.
+      // These four are the missing half — short-life rooms whose door is the residents' lift
+      // lobby. `resident: true` is what SHORT_TARGETS splits on, so a re-plug on a housing
+      // floor cycles through these and a re-plug in the outward band cycles through the rest.
+      // Listed after the outward vocabulary on purpose: chat keyword matching walks this array
+      // in order, so plain words already spoken for keep meaning what they meant.
+      { type: 'guest suite', category: 'private', resident: true, re: /guest suite|guest room/i, keys: ['guest suite', 'guest room', '客房', '訪客套房'] },
+      { type: 'screening room', category: 'private', resident: true, re: /screening room|home cinema/i, keys: ['screening room', 'cinema', '放映室', '視聽室'] },
+      { type: 'hobby room', category: 'private', resident: true, re: /hobby room|maker room/i, keys: ['hobby room', 'maker room', '興趣室', '工藝室'] },
+      { type: 'music room', category: 'private', resident: true, re: /music room|practice room/i, keys: ['music room', 'practice room', '音樂室', '琴房'] },
       { type: 'foyer', category: 'public', re: /foyer|lobby/i, keys: ['foyer', 'lobby', '大廳', '門廳'] },
       { type: 'storage', category: 'private', re: /storage/i, keys: ['storage', 'warehouse', '倉庫', '儲藏'] },
       { type: 'parking bay group', category: 'private', re: /parking/i, keys: ['parking', 'car park', '停車', '車位'] },
@@ -5051,7 +5198,13 @@
     // numbers chosen to make the mechanism legible. Never present them as a forecast.
     let TL_DEMO = false;
     const DEMO_ON = (new URLSearchParams(location.search)).get('demo') !== '0';
-    const SHORT_TARGETS = () => USE_VOCAB.filter(v => isShort(v.type) && !isFixedUse(v.type));
+    // What a short tenancy may become. Split by domain: a tenancy on a housing floor re-plugs
+    // through the residents' rooms, one in the outward band through the street-facing ones.
+    // Without the split every re-plug drew from the outward list, so a rooftop tenancy turned
+    // into a coffee shop over the flats — which is how "the top must keep changing" and "no
+    // outward program over the homes" ended up looking like contradictory requests.
+    const SHORT_TARGETS = (resident = false) =>
+      USE_VOCAB.filter(v => isShort(v.type) && !isFixedUse(v.type) && !!v.resident === !!resident);
 
     function buildDemoTimeline() {
       if (!BASE_PROGRAM.length) return false;
@@ -5068,7 +5221,14 @@
       }
       const pool = [...byType.values()].sort((a, b) => b.area - a.area);
       const taken = new Set(pool.map(g => g.type));
-      const targets = SHORT_TARGETS();
+      // Which floors are homes, so a tenancy standing on one re-plugs through the residents'
+      // vocabulary instead of the street's. A group spanning both (a tenancy that repeats on a
+      // housing floor AND in the podium) counts as outward: the stricter door wins, since the
+      // same type has to read the same way on every floor it appears on.
+      const dwellingLv = new Set(live.filter(p => /apartment|dwelling/i.test(p.type)).map(p => p.level));
+      const isResidentGroup = g => [...g.levels].every(l => dwellingLv.has(l));
+      const TARGETS = { true: SHORT_TARGETS(true), false: SHORT_TARGETS(false) };
+      const targetsFor = g => TARGETS[isResidentGroup(g)];
       const cur = new Map(pool.map(g => [g, g.type]));
       // ONE PER BEAT WAS NOT A TIMELINE, IT WAS A QUEUE. The loop below used to run k = 1…6 and
       // re-plug pool[k-1], so with the SAMPLE's 17 plug-in tenancies only the six largest ever
@@ -5086,12 +5246,21 @@
       const beats = Math.max(1, Math.floor(span / CYCLE)), SLOTS = Math.min(3, beats);
       for (let k = 1; pool.length && k * CYCLE <= span; k++) {
         for (let n = (k - 1) % SLOTS; n < pool.length; n += SLOTS) {
-          const g = pool[n], from = cur.get(g);
-          // Fresh use first; once the vocabulary is used up, step through it from a different
-          // place each time. The old fallback always took targets[0], so with the whole stock
-          // now re-plugging, twenty of the twenty-one events read "→ coffee shop".
-          const t = targets.find(v => v.type !== from && !taken.has(v.type))
-            || targets.filter(v => v.type !== from)[(n + k) % Math.max(1, targets.filter(v => v.type !== from).length)];
+          const g = pool[n], from = cur.get(g), targets = targetsFor(g);
+          // ONE TYPE, ONE TENANCY AT A TIME (260810). A conversion is written as "every
+          // <type> on these levels becomes <target>", so the moment two tenancies hold the
+          // same type they are welded together: every later event keyed on that type hits
+          // both, and they can never come apart again. The mapping was many-to-one and had no
+          // inverse, so the palette drained — the SAMPLE went from 22 distinct uses on L0–L2
+          // at year 0 to 13 by year 18, with level 0 finishing as five identical yoga studios.
+          // Runs looked frozen after about year 9 for that reason, not because nothing moved.
+          // So a target currently held by another tenancy is off the table.
+          const inUse = new Set(cur.values());
+          const free = targets.filter(v => v.type !== from && !inUse.has(v.type));
+          const step = arr => arr.length ? arr[(n + k) % arr.length] : null;
+          // never used yet · used before but vacant now · last resort, a duplicate
+          const t = free.find(v => !taken.has(v.type)) || step(free)
+            || step(targets.filter(v => v.type !== from));
           if (!t) break;
           taken.add(t.type); cur.set(g, t.type);
           CONVERSIONS.push({
@@ -5117,7 +5286,21 @@
       }
       const longs = [...byLong.values()].sort((a, b) => b.area - a.area).slice(0, 3);
       // a target on the far side of the category line, so the plate visibly repaints
-      const flip = src => {
+      const flip = (src, i = 0) => {
+        // A HOME DOES NOT BECOME A COFFEE SHOP. Flipping the category is what makes the demo
+        // legible, but run on the housing stack it read "1b1b apartment → coffee shop" on
+        // L3–L5: the whole residential half of the building turning into street program over
+        // the remaining flats. Dwellings therefore convert WITHIN the private side, to a use
+        // whose door is still the residents' lift lobby. Different type, different colour,
+        // still legible, and it does not undo the outward/private stack.
+        if (/apartment|dwelling/i.test(src.type)) {
+          const cands = USE_VOCAB.filter(v => v.category === 'private' && !isFixedUse(v.type)
+            && v.type !== src.type && !/apartment|dwelling/i.test(v.type));
+          // stepped by rank, or all three unit types would convert to the same room
+          const res = cands.filter(v => v.resident);
+          const pick = res.length ? res[i % res.length] : cands[0];
+          return pick ? { type: pick.type, category: pick.category } : null;
+        }
         const want = src.category === 'public' ? 'private' : 'public';
         const cands = USE_VOCAB.filter(v => v.category === want && !isFixedUse(v.type) && v.type !== src.type);
         // prefer a use that reads as a different building, not a neighbour of the same one
@@ -5127,7 +5310,7 @@
       const base = Math.max(4, Math.round((span || 12) * 0.45));
       longs.forEach((g, i) => {
         const src = live.find(p => p.type === g.type) || { type: g.type, category: 'private' };
-        const to = flip(src);
+        const to = flip(src, i);
         if (!to) return;
         CONVERSIONS.push({
           id: ++CONV_SEQ, year: base + i * 4, levels: [...g.levels].sort((a, b) => a - b),
@@ -5204,6 +5387,157 @@
       if (CORE_LOCK_KEY !== CORE_OPTION) buildCoreLock();
       return CORE_LOCK;
     };
+
+    // ── WHICH CORE SCHEME THIS SITE WANTS ────────────────────────────────────────────────
+    // Arriving from the wizard used to land on Compact every time, whatever the lot looked
+    // like. The three schemes are three different plates, so one of them fits the parcel
+    // better than the other two and that is the one to open on. Each is laid out once, in
+    // memory, before the first build; nothing is drawn until the winner is known.
+    //
+    // The site leads. GFA is the same program under all three schemes, so the FAR cap cannot
+    // separate them and is left out; what does separate them is the plate: how far its
+    // bounding box runs past the lot, and whether it sits the same way round as the lot.
+    // Packing is the tie-breaker, and the whole score with no parcel to measure against.
+    const CORE_SCHEMES = ['compact', 'pinwheel', 'inset'];
+    const CORE_LABEL = { compact: '1 Compact', pinwheel: '2 Pinwheel', inset: 'B Centre' };
+    let CORE_PICK = null;         // { by, rows:[{v,score,fit,shape,pack,w,d}], chosen } or null
+    let CORE_FROM_URL = false;    // ?core= is the architect speaking: never overrule it
+
+    // The lot as the PLATE sees it. The site group is turned by GRID_ROT_DEG and the plate is
+    // not, so the parcel ring is turned back by the same angle before its box is taken —
+    // otherwise a building squared to its street reads as badly proportioned against its own lot.
+    function lotBox() {
+      const s = SITE_CTX;
+      if (!s) return null;
+      const c = (s.parcel && s.parcel.centroid) || { lat: s.lat, lng: s.lng };
+      if (!c || typeof c.lat !== 'number') return null;
+      const area = s.parcel && s.parcel.lotAreaM2;
+      const ring = s.parcel && s.parcel.ring;
+      if (!ring || ring.length < 3) return area ? { area, w: 0, d: 0 } : null;
+      const mLat = 111320, mLng = 111320 * Math.cos(c.lat * Math.PI / 180);
+      const gr = -GRID_ROT_DEG * Math.PI / 180, cg = Math.cos(gr), sg = Math.sin(gr);
+      const pts = ring.map(p => {
+        const px = (p[0] - c.lng) * mLng, pz = -(p[1] - c.lat) * mLat;
+        return [px * cg - pz * sg, px * sg + pz * cg];
+      });
+      const xs = pts.map(p => p[0]), zs = pts.map(p => p[1]);
+      return {
+        area: area || shoelace(pts),
+        w: Math.max(...xs) - Math.min(...xs),
+        d: Math.max(...zs) - Math.min(...zs),
+      };
+    }
+
+    // Lay every scheme out once and score it. Read-only: CORE_OPTION is put back before
+    // returning, and each pass gets its own copy of the program rows so a layout cannot
+    // leave marks on the rows the next pass reads.
+    function rankCoreSchemes(program) {
+      if (!program || !program.length) return null;
+      const lot = lotBox();
+      const keep = CORE_OPTION;
+      const rows = [];
+      for (const v of CORE_SCHEMES) {
+        CORE_OPTION = v;
+        let L = null;
+        try { L = computeLayout(program.map(p => ({ ...p })), null); } catch (e) { L = null; }
+        if (!L || !L.FW || !L.FD) continue;
+        const w = L.FW * MODULE, d = L.FD * MODULE;
+        // How much of the grid the plan actually uses. Cores run as continuous shafts, so
+        // their area counts on every level; the same assumption on all three schemes, which
+        // is all a comparison needs.
+        let occ = 0;
+        for (const rs of L.floorRects.values()) for (const r of rs) occ += r.wMod * r.dMod;
+        const coreCells = (L.coreShafts || []).reduce((a, c) => a + c.wMod * c.dMod, 0);
+        const nLv = Math.max(1, L.levels.length);
+        const pack = Math.min(1, (occ + coreCells * nLv) / (L.FW * L.FD * nLv));
+        // How much of the plate can actually stand on the lot. 1.0 = all of it.
+        // Two ceilings, whichever is lower: the lot box axis by axis, and the raw areas.
+        // Area alone is not enough — a 47 m plate on a 25 m wide lot overhangs by 22 m while
+        // its area still fits twice over, and that has to score as the overhang it is.
+        const byArea = lot && lot.area ? Math.min(1, lot.area / (w * d)) : null;
+        const byBox = lot && lot.w > 1 && lot.d > 1
+          ? Math.min(w, lot.w) * Math.min(d, lot.d) / (w * d) : null;
+        const fit = byBox != null && byArea != null ? Math.min(byBox, byArea) : byArea;
+        // 1.0 = plate and lot are the same shape. A square tower on a long thin lot scores low
+        // even when the areas match.
+        const shape = lot && lot.w > 1 && lot.d > 1
+          ? Math.min(w / d, lot.w / lot.d) / Math.max(w / d, lot.w / lot.d) : null;
+        const score = shape != null ? 0.5 * fit + 0.3 * shape + 0.2 * pack
+          : fit != null ? 0.75 * fit + 0.25 * pack
+          : pack;
+        rows.push({ v, score, fit, shape, pack, w, d });
+      }
+      CORE_OPTION = keep;
+      if (!rows.length) return null;
+      rows.sort((a, b) => b.score - a.score || CORE_SCHEMES.indexOf(a.v) - CORE_SCHEMES.indexOf(b.v));
+      return {
+        by: rows[0].shape != null ? 'site' : rows[0].fit != null ? 'lot area' : 'packing',
+        lot, rows, chosen: rows[0].v,
+      };
+    }
+
+    // Run the pick and light the winning button. Called once, before the first build.
+    function applyCorePick(program) {
+      CORE_PICK = rankCoreSchemes(program);
+      if (!CORE_PICK) return;
+      if (!CORE_FROM_URL) {
+        CORE_OPTION = CORE_PICK.chosen;
+        const sc = document.getElementById('seg-core');
+        if (sc) sc.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.v === CORE_OPTION));
+      }
+      renderCorePick();
+    }
+
+    // The caption under the buttons. It has to be readable at a glance by someone who has
+    // never seen the scoring, so it states the facts the scores were made of — how big each
+    // plate is, how much of it lands on the lot, how big the lot is — and says in words what
+    // decided it. The 0-1 numbers went to the tooltip: a bare 0.76 tells nobody anything.
+    function renderCorePick() {
+      const el = document.getElementById('core-pick');
+      if (!el) return;
+      if (!CORE_PICK) { el.className = ''; el.innerHTML = ''; return; }
+      const { rows: R, lot, by } = CORE_PICK;
+      const m = n => Math.round(n).toLocaleString();
+      const fits = r => r.fit != null && r.fit > 0.995;
+      const nFit = R.filter(fits).length;
+      // The right-hand fact. When every scheme clears the lot the column would just say
+      // "fits" three times, so it carries the plate size instead and the sentence below
+      // does the explaining.
+      const overhang = R.some(r => r.fit != null && !fits(r));
+      const factOf = r => r.fit == null ? `${m(r.w)} × ${m(r.d)} m`
+        : overhang ? `${m(r.w)} × ${m(r.d)} m · ${Math.round(r.fit * 100)}% on it`
+        : `${m(r.w)} × ${m(r.d)} m`;
+
+      // ?core= or a click can light a scheme the ranking did not choose. Saying "picked for
+      // this site" over a button the site did not pick is the one thing this caption must
+      // never do, so the heading follows what is actually lit.
+      const overridden = CORE_OPTION !== CORE_PICK.chosen;
+      const head = overridden ? 'How the three compare' : 'Picked for this site';
+      const body = R.map(r => {
+        const parts = [`score ${r.score.toFixed(2)}`];
+        if (r.fit != null) parts.push(`${r.fit.toFixed(2)} on the lot`);
+        if (r.shape != null) parts.push(`${r.shape.toFixed(2)} proportion`);
+        parts.push(`${r.pack.toFixed(2)} packing`);
+        return `<div class="cp-row${r.v === CORE_OPTION ? ' on' : ''}" title="${parts.join(' · ')}">` +
+          `<span class="nm">${CORE_LABEL[r.v] || r.v}</span><b>${factOf(r)}</b></div>`;
+      });
+
+      // One sentence, in plain words, on what actually separated them.
+      let note;
+      if (by === 'packing') {
+        note = 'No site data. This is the one that packs the program tightest.';
+      } else {
+        const size = lot && lot.w > 1 ? `${m(lot.w)} × ${m(lot.d)} m` : `${m(lot.area)} m²`;
+        note = `The lot is ${size}. `
+          + (nFit === R.length ? 'All three fit on it, so the closest match to its shape won.'
+            : nFit === 0 ? 'None of them fit on it, so the one that overhangs least won.'
+            : nFit === 1 ? `Only ${CORE_LABEL[R.find(fits).v]} fits on it.`
+            : `${nFit} of the three fit on it.`);
+      }
+      if (overridden) note += ` ${CORE_LABEL[CORE_PICK.chosen]} ranks first.`;
+      el.className = 'on';
+      el.innerHTML = `<div class="cp-head">${head}</div>${body.join('')}<div class="cp-note">${note}</div>`;
+    }
 
     const forecastAt = y => {
       let hit = null;
@@ -5721,12 +6055,11 @@
     function askBuildingType() {
       if (ASKED_BTYPE) return;
       ASKED_BTYPE = true;
-      if (BUILDING_TYPE) {
-        const n = BUILDING_TYPES[BUILDING_TYPE].toLowerCase();
-        say('bot ask', `Programming ${/^[aeiou]/.test(n) ? 'an' : 'a'} <b>${n}</b> building.` +
-          '<span class="sub">Pick another to recast the plates.</span>' + btChips());
-        return;
-      }
+      // The wizard already asked, so the answer is known and there is nothing to ask. Saying
+      // it back was one line of chat that told the architect what they had just typed, so it
+      // is not said at all (user 260810). The question below still runs when nobody has
+      // answered it; the type can still be changed by typing it, or via __DEBUG__.
+      if (BUILDING_TYPE) return;
       say('bot ask', '<em>What building type</em> are we programming?' +
         '<span class="sub">Sets the main use above grade. Plug-in programs stay.</span>' + btChips());
     }
@@ -6140,7 +6473,9 @@
       document.getElementById('export-structure').style.display = structure ? '' : 'none';
       document.getElementById('export-title').innerHTML = structure ? 'Export &middot; Structure' : 'Export &middot; Massing';
     }
-    seg('seg-core', v => { CORE_OPTION = v; build(); });
+    // Switching by hand keeps the ranking on screen and just moves the highlight: the scores
+    // are still true, the architect has simply chosen to overrule them.
+    seg('seg-core', v => { CORE_OPTION = v; renderCorePick(); build(); });
     // M8: the readout states the OUTCOME (which side the core landed on), not the flips —
     // "core NE" is checkable against the drawing, "flipX true" is not.
     function renderOrientReadout() {
@@ -6425,6 +6760,7 @@
 # L2 — Knowledge + Work + Wellness
 {office loft}/{322}/{1}/{private}/{16,20}
 {startup office suite}/{161}/{1}/{private}/{10,16}
+{lounge bar}/{134}/{1}/{public}/{10,13}
 {ai training classroom}/{201}/{1}/{public}/{10,20}
 {seminar room}/{161}/{1}/{public}/{10,16}
 {computer lab}/{201}/{1}/{public}/{10,20}
@@ -6461,8 +6797,8 @@
 {2b2b apartment}/{134}/{3}/{private}/{10,13}
 {2b2b apartment}/{134}/{3}/{private}/{10,13}
 {2b2b apartment}/{134}/{3}/{private}/{10,13}
-{residential lounge}/{134}/{3}/{public}/{10,13}
-{community kitchen}/{107}/{3}/{public}/{8,13}
+{residential lounge}/{134}/{3}/{private}/{10,13}
+{community kitchen}/{107}/{3}/{private}/{8,13}
 {laundry room}/{54}/{3}/{private}/{7,8}
 {fire stair & freight elevator core}/{50}/{3}/{circulation}/{10,20}
 {fire stair & passenger elevator core a}/{40}/{3}/{circulation}/{10,16}
@@ -6482,7 +6818,7 @@
 {2b2b apartment}/{134}/{4}/{private}/{10,13}
 {2b2b apartment}/{134}/{4}/{private}/{10,13}
 {2b2b apartment}/{134}/{4}/{private}/{10,13}
-{residential lounge}/{134}/{4}/{public}/{10,13}
+{residential lounge}/{134}/{4}/{private}/{10,13}
 {package room}/{40}/{4}/{private}/{6,7}
 {fire stair & freight elevator core}/{50}/{4}/{circulation}/{10,20}
 {fire stair & passenger elevator core a}/{40}/{4}/{circulation}/{10,16}
@@ -6500,8 +6836,7 @@
 {2b2b apartment}/{134}/{5}/{private}/{10,13}
 {2b2b apartment}/{134}/{5}/{private}/{10,13}
 {2b2b apartment}/{134}/{5}/{private}/{10,13}
-{shared amenity}/{161}/{5}/{public}/{10,16}
-{lounge bar}/{134}/{5}/{public}/{10,13}
+{guest suite}/{161}/{5}/{private}/{10,16}
 {fire stair & freight elevator core}/{50}/{5}/{circulation}/{10,20}
 {fire stair & passenger elevator core a}/{40}/{5}/{circulation}/{10,16}
 {fire stair & passenger elevator core b}/{40}/{5}/{circulation}/{10,16}
@@ -6512,7 +6847,7 @@
       if (q.get('color')) COLOR_MODE = q.get('color');
       if (q.get('mode')) { RENDER_MODE = q.get('mode'); const sm = document.getElementById('seg-mode'); if (sm) sm.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.v === RENDER_MODE)); }
       if (q.get('sys')) { STRUCT_SYS = q.get('sys'); const ss = document.getElementById('seg-struct-sys'); if (ss) ss.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.v === STRUCT_SYS)); }
-      if (q.get('core')) { CORE_OPTION = q.get('core'); const sc = document.getElementById('seg-core'); if (sc) sc.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.v === CORE_OPTION)); }
+      if (q.get('core')) { CORE_OPTION = q.get('core'); CORE_FROM_URL = true; const sc = document.getElementById('seg-core'); if (sc) sc.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.v === CORE_OPTION)); }
       if (q.get('coderules') !== null) CODE_ENFORCE = q.get('coderules') !== '0';
       if (q.get('rebalance') !== null) REBALANCE = q.get('rebalance') !== '0';
       if (q.get('adapt') !== null) ADAPT_ON = q.get('adapt') !== '0';   // 0 = old free re-layout (frame moves with the timeline)
@@ -6785,7 +7120,10 @@
       openChatPanel(true);   // the header toggles, so a click could just as well close it
     })();
 
-    if (_inputText) { loadText(_inputText, 'input'); }
+    // Which core scheme to open on. Deliberately here: the site panel above has already set
+    // SITE_CTX and turned the grid to the street, and loadText below does the first build, so
+    // this is the last moment the choice is still free and the first at which the lot is known.
+    if (_inputText) { applyCorePick(parse(_inputText)); loadText(_inputText, 'input'); }
     else { if (!FLOOR_H_OVERRIDE.size) FLOOR_H_OVERRIDE.set(2, MODULE); loadText(SAMPLE, 'sample'); }   // SAMPLE default: L3 (三樓) at 8'-6" storey height (height only) unless ?shorth= is set
     renderOrientReadout();   // M8: first paint of the bearing readout, after the first build set LAST_ORIENT
 
@@ -6803,6 +7141,7 @@
       get LAST_LAYOUT() { return LAST_LAYOUT; }, get LAST_ORIENT() { return LAST_ORIENT; },
       get SITE_APPROACH() { return SITE_APPROACH; }, get SITE_APPROACH_SRC() { return SITE_APPROACH_SRC; }, get CORE_FACING() { return CORE_FACING; },
       get SITE_ON() { return SITE_ON; }, setSiteLayer: v => { SITE_ON = !!v; build(); return SITE_ON; },
+      get CORE_OPTION() { return CORE_OPTION; }, get CORE_PICK() { return CORE_PICK; }, get CORE_FROM_URL() { return CORE_FROM_URL; }, rankCoreSchemes, lotBox,
       get STREET_BEARING() { return STREET_BEARING; }, get GRID_ROT_DEG() { return GRID_ROT_DEG; },
       get SITE_FRONTAGES() { return SITE_FRONTAGES; }, siteContextGeo, sitePlacement,
       get PLATE_FP() { return PLATE_FP; }, get PLATE_SHIFT() { return PLATE_SHIFT; },
