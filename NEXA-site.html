@@ -290,42 +290,11 @@
        HERO — the only centred panel, and the only one that offers the prompt
        ═══════════════════════════════════════════════════════════════════════ */
     /* The cover is the one panel that centres: mark, wordmark and line stack in the middle of
-       the frame. In the scenario clip the middle band is the dark building faces, so white type
-       still reads there with no scrim, and the lit shopfronts stay clear at the bottom. */
+       the frame. The clip runs at half strength so it reads as a near-black ground, and the
+       lock-up sits on it in flat white. No blend, no invert: one state, held the whole time. */
     #hero { align-items: center; isolation: isolate; }
     #hero .panel-copy { padding-top: 0; padding-bottom: 0; text-align: center; }
-    /* Negative mask. Centred, the copy sits over whatever the clip happens to be showing, and
-       the clip moves: dark sky one second, a lit LED panel the next. So it is not laid on the
-       frame, it is differenced against it — white over the dark faces, the inverse over the lit
-       ones, legible either way with no scrim. Same device as the nav's `.blend`.
-       `isolation` on the panel keeps the blend group inside the cover: without it the group
-       resolves at the root and the mark reaches through to the panels below. */
-    #hero .panel-copy { mix-blend-mode: difference; }
-
-    /* ---------- opening beat ----------
-       The cover does not start on the mask. It holds for a moment in plain form — the clip at
-       half strength, the lock-up in flat white over it — and then the clip comes up to full and
-       the mask takes over. `mix-blend-mode` cannot be transitioned, so the flat state is its own
-       layer: a clone of the copy, hidden from the accessibility tree, cross-faded with the real
-       one. `intro` sits in the markup rather than being added by script, so the first painted
-       frame is already the opening state. With script off the clone never appears, `plated`
-       never lands, and the cover just sits at half strength — a quieter page, not a broken one. */
-    #hero .panel-media { transition: opacity 1.2s cubic-bezier(.4, 0, .2, 1); }
-    #hero.intro .panel-media { opacity: 0.5; }
-    #hero .intro-plate {
-      position: absolute; inset: 0; z-index: 4; pointer-events: none;
-      display: flex; align-items: center;
-      opacity: 0; transition: opacity 0.75s ease;
-    }
-    #hero.intro.plated .intro-plate { opacity: 1; }
-    #hero .intro-plate .panel-copy { mix-blend-mode: normal; }
-    /* flat white throughout: the blue A belongs to the state the cover settles into */
-    #hero .intro-plate h1 span { color: var(--text); }
-    #hero > .panel-copy { transition: opacity 0.75s ease; }
-    #hero.intro.plated > .panel-copy { opacity: 0; }
-    @media (prefers-reduced-motion: reduce) {
-      #hero .panel-media, #hero .intro-plate, #hero > .panel-copy { transition: none; }
-    }
+    #hero .panel-media { opacity: 0.3; }
     /* the white mark, sitting above the wordmark at about twice its size */
     #hero .hero-mark {
       display: block; margin: 0 auto clamp(14px, 2.4vh, 28px);
@@ -338,7 +307,7 @@
       font-size: clamp(2.6rem, 6.4vw, 5.4rem); line-height: 0.96; letter-spacing: 0.008em;
       margin-bottom: clamp(8px, 1.4vh, 16px);
     }
-    #hero h1 span { color: var(--blue-lite); }
+    #hero h1 span { color: var(--text); }
     #hero .panel-copy .inner { max-width: min(560px, 62vw); margin: 0 auto; }
     #hero .lead { color: var(--text); font-size: clamp(0.9rem, 1.05vw, 1.02rem); margin: 0 auto; }
 
@@ -533,7 +502,7 @@
   </div>
 
   <!-- ═══ 01 · cover ═══════════════════════════════════════════════════════════════ -->
-  <section class="panel intro" id="hero">
+  <section class="panel" id="hero">
     <div class="panel-media">
       <video id="scenario-video" src="NEXA/deck/scenario-260730.mp4#t=2" poster="NEXA/deck/scenario-poster.jpg"
              autoplay muted loop playsinline preload="metadata"></video>
@@ -805,28 +774,6 @@
       addEventListener('scroll', update, { passive: true });
       addEventListener('resize', update);
       update();
-    })();
-
-    // ── the cover's opening beat ────────────────────────────────────────────────────
-    // Clone the lock-up into a flat-white plate, hold it over the halved clip for a beat, then
-    // drop `intro`: the clip comes up to full and the differenced original takes its place.
-    // Built BEFORE the reveal pass below so the clone is picked up by it and both layers rise
-    // together — cloned after, the plate would appear fully formed while the real copy animates.
-    (function () {
-      var hero = document.getElementById('hero');
-      if (!hero || !hero.classList.contains('intro')) return;
-      var copy = hero.querySelector('.panel-copy');
-      if (!copy) return;
-      var plate = document.createElement('div');
-      plate.className = 'intro-plate';
-      plate.setAttribute('aria-hidden', 'true');   // one h1 per page: the clone is decoration
-      var clone = copy.cloneNode(true);
-      clone.querySelectorAll('[id]').forEach(function (n) { n.removeAttribute('id'); });
-      plate.appendChild(clone);
-      hero.appendChild(plate);
-      hero.classList.add('plated');
-      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      setTimeout(function () { hero.classList.remove('intro'); }, reduce ? 0 : 1800);
     })();
 
     // ── copy rises as its panel arrives ─────────────────────────────────────────────
