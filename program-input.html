@@ -2420,13 +2420,57 @@
     let ord = 0;
     for (const key of activityKeys)
       for (const [t, a] of (ACTIVITY_DEFS[key] || [])) actItems.push({ t, a, rank: affinity(key), ord: ord++ });
-    actItems.sort((x, y) => x.rank - y.rank || x.ord - y.ord);
+    // ── SHORT TARGET (260810) ─────────────────────────────────────────────────────────────
+    // The activity band used to be whatever the chosen presets happened to add up to, and the
+    // calibScale clamp below could only stretch it by 15%. Measured: 592 m² of plug-in program
+    // in a 12,000 m² brief with two activities, 5.7% of the building; six activities reached
+    // 16.5%. Everything else fell through to the office and housing plates. The SAMPLE, for
+    // comparison, runs 23%.
+    // So the band is now sized to a target share of the GFA, and it gets there by adding SEATS
+    // rather than by inflating rooms: a second coffee shop, a third gallery. Preset areas are
+    // the realistic ones and they stay exact — a 161 m² coffee shop stretched to 800 would be
+    // a number, not a room. The ground's own retail anchor already counts toward the target.
+    const SHORT_TARGET_SHARE = 0.25;
+    {
+      const baseTotal = actItems.reduce((s, x) => s + x.a, 0);
+      // Seats are counted in PRE-scale area. The activity lines are the `calib` tier, so the
+      // solve below multiplies them again by calibScale, which sits at its 1.15 ceiling
+      // whenever the band is small against the brief — aiming the raw total straight at the
+      // target overshot it by a third. Divide it back out.
+      const wantAct = gfaTarget * SHORT_TARGET_SHARE / 1.15 - GROUND_SHORT;
+      if (baseTotal > 0 && wantAct > baseTotal) {
+        const base = actItems.slice();
+        let tot = baseTotal, seat = 1;
+        // one more seat of each activity per pass, in the same affinity order, so the band
+        // grows evenly instead of filling up with whichever preset happens to be largest
+        while (tot < wantAct && seat < 40) {
+          for (const x of base) {
+            if (tot >= wantAct) break;
+            actItems.push({ t: x.t, a: x.a, rank: x.rank, ord: x.ord, seat });
+            tot += x.a;
+          }
+          seat++;
+        }
+      }
+    }
+    // seats of the same activity stay together, so a floor reads as one kind of place
+    actItems.sort((x, y) => x.rank - y.rank || x.ord - y.ord || (x.seat || 0) - (y.seat || 0));
     const actLines = actItems.map(x => [x.t, x.a]);
 
+    // ── MIXED USE STACKS, IT DOES NOT ALTERNATE (260810) ──────────────────────────────────
+    // This used to read ((f - 1) % 2 === 1), which put housing on every other floor: office,
+    // flats, office, flats up the building. No one builds that. The two uses want opposite
+    // things from a floor — offices want visitors, a lift lobby that strangers use and a
+    // service route; flats want none of it — so they stack, visitor-facing use underneath and
+    // dwellings on top, with one boundary between them to run two lift groups off.
+    // The SPLIT KEEPS THE OLD COUNT: housing starts far enough up that exactly as many floors
+    // are dwellings as the alternating rule produced, so this reorders the floors without
+    // reallocating them. Assigned below, once bandTop is known — see the plate loop.
+    let housingFrom = Infinity;
     const useHousingAt = f =>
       buildingType === 'office' ? false :
       buildingType === 'housing' ? true :
-      ((f - 1) % 2 === 1); // mixed-use: alternate by upper-floor index
+      f >= housingFrom;   // mixed-use: office below, dwellings above
 
     // Greedy whole-line split into exactly n non-empty bins against 4:3:2:1 area
     // targets, then accept only if bin raw areas are STRICTLY decreasing. Returns
@@ -2434,7 +2478,9 @@
     function splitBins(lines, n) {
       if (n < 1 || lines.length < n) return null;
       const tot = lines.reduce((s, x) => s + x[1], 0);
-      const weights = [4, 3, 2, 1].slice(0, n);
+      // a decreasing ramp n, n-1, … 1. For n ≤ 4 this is the [4,3,2,1] it always was; the band
+      // can now be taller than four levels, so the ramp is generated rather than sliced.
+      const weights = Array.from({ length: n }, (_, i) => n - i);
       const sumW = weights.reduce((s, w) => s + w, 0);
       const targets = weights.map(w => tot * w / sumW);
       const bins = Array.from({ length: n }, () => ({ area: 0, lines: [] }));
@@ -2454,7 +2500,10 @@
 
     // pick the largest feasible n (≤4, ≤floorsAbove, ≤lines); n=1 always splits.
     let bins = null, nLev = 0;
-    const maxLev = Math.min(4, floorsAbove, actLines.length);
+    // Raised from 4 with the SHORT target above: the band now carries several times the area
+    // it used to and four levels would make each one enormous. It still has to leave floors for
+    // the main-use plates, which the nLev > upperCount check further down enforces.
+    const maxLev = Math.min(6, floorsAbove, actLines.length);
     for (let n = maxLev; n >= 1; n--) { const b = splitBins(actLines, n); if (b) { bins = b; nLev = n; break; } }
 
     const bins0 = bins, nLev0 = nLev;
@@ -2513,6 +2562,12 @@
         const startLevel = includeGround ? 0 : 1;
         const uppers = includeGround ? nLev - 1 : nLev;
         // upper-level target shares: a gentle decreasing taper, all strictly > 0.5.
+        // These are NOT the knob for the building's SHORT proportion, measured 260810: raising
+        // them to 0.82 / 0.65 moved one level in one configuration and nothing else. They cap
+        // the LONG filler, and the filler is already at zero on most band levels — what fixes a
+        // level's ceiling is the rigid 80 m² toilets line, so the best it can reach is
+        // shortI / (shortI + 80). The building's SHORT share is set by how much area the
+        // activity band gets in the first place, which is the calibScale clamp below.
         const topT = includeGround ? Math.min(0.70, gShare - 0.02) : 0.70;
         const botT = 0.53;
         const upperShare = j => uppers <= 1 ? topT : Math.max(0.505, topT - (topT - botT) * j / (uppers - 1));
@@ -2538,7 +2593,18 @@
       //    presets stay exact.
       const officePlates = [];   // recs (area set by the solve)
       const housingFloors = [];  // floor numbers (lines emitted by the solve)
-      for (let f = Math.max(1, bandTop + 1); f <= upperCount; f++) {
+      // Where dwellings take over. Counted over the MAIN-USE PLATES only, for two reasons.
+      // One: a plate carries an order of magnitude more area than a band level's LONG filler,
+      // so counting the band levels in would shift the office / housing balance instead of
+      // just reordering it. Two: the activity band is the outward-facing part of the building,
+      // and a flat does not belong on a floor with a classroom and a gallery. A short building
+      // that is all band therefore gets NO dwellings at all rather than one wedged in beside
+      // the teaching rooms — the area stays, as office filler.
+      const pStart = Math.max(1, bandTop + 1);
+      let nHousing = 0;
+      for (let f = pStart; f <= upperCount; f++) if ((f - 1) % 2 === 1) nHousing++;
+      housingFrom = nHousing > 0 ? upperCount - nHousing + 1 : upperCount + 1;
+      for (let f = pStart; f <= upperCount; f++) {
         if (useHousingAt(f)) housingFloors.push(f);
         else officePlates.push(add('office', 900, f, 'private', 'sponge'));
       }
@@ -3849,7 +3915,13 @@
   // ── draft persistence: Back from the massing page reloads this page from scratch,
   //    so review state must survive in localStorage or every retry re-runs the wizard ──
   const DRAFT_KEY = 'programInputDraft';
-  function saveDraft() { try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ wiz, entries, reviewOrigin, answered })); } catch (e) {} }
+  // Stamp of the rules that BUILT the entries in a draft. A draft holds a generated program,
+  // and restoreDraft renders it without regenerating, so a change to the generator is invisible
+  // to anyone with a draft in their browser: they reopen the wizard, see the old program, and
+  // reasonably conclude nothing was fixed. Bump this whenever generateEntries changes what it
+  // emits — a draft with an older stamp keeps the answers and re-runs the generator.
+  const DRAFT_RULES = '260810-use-stack';
+  function saveDraft() { try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ rules: DRAFT_RULES, wiz, entries, reviewOrigin, answered })); } catch (e) {} }
 
   // ── commit-on-build: values typed into a still-open inline/add form must not be
   //    silently dropped when the user clicks Build without the small save button.
@@ -4006,7 +4078,11 @@
     if (Array.isArray(d.answered)) { answered.length = 0; d.answered.forEach(a => answered.push(a)); }
     (wiz.activities || []).forEach(a => selectedActivities.add(a));
     step = steps.length;
-    enterReview(false); // render the saved entries — do NOT regenerate from wiz answers
+    // A draft written under older generator rules carries an old program. Keep the answers,
+    // throw the program away and build it again, so a fix to generateEntries actually reaches
+    // someone who has used the wizard before. Hand edits made to that old program go with it;
+    // that is the point, since the rules they were made under no longer hold.
+    enterReview(d.rules !== DRAFT_RULES);   // same rules → render the saved entries, do NOT regenerate
   })();
 
   // ── NEXA Intel: Site Forecast (additive layer — wizard and review flows above are
