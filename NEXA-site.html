@@ -337,8 +337,12 @@
     #shift .panel-copy .inner { max-width: min(1100px, 82vw); margin: 0 auto; }
     #shift h2.statement { font-size: clamp(1.7rem, 4vw, 3.4rem); margin: 0; }
 
-    /* The close is the one panel with nothing behind it. No image, no split: the statement
-       and the way in, centred on black, and then the page ends. */
+    /* The close carries the court render full bleed. Same treatment as the market panel: the
+       image sits at half opacity over black, which halves its luminance instead of laying a
+       scrim over it. The copy is centred and so is the floodlit court, so at full strength the
+       paragraph and the buttons would not hold. */
+    #closing .panel-media { background: var(--bg); }
+    #closing .panel-media img { opacity: 0.5; }
     #closing { align-items: center; justify-content: center; text-align: center; }
     #closing .panel-copy { padding-bottom: 0; }
     #closing .panel-copy .inner { margin: 0 auto; }
@@ -688,6 +692,7 @@
 
   <!-- ═══ 12 · close ═══════════════════════════════════════════════════════════════ -->
   <section class="panel" id="closing">
+    <div class="panel-media"><img src="NEXA/scenario/closing-court.jpg" alt="A NEXA frame at night around a floodlit court, a game running with the upper floors occupied above it" loading="lazy" /></div>
     <div class="panel-copy">
       <div class="inner">
         <h2 class="statement">Build once<br>Evolve continuously</h2>
