@@ -20,6 +20,9 @@
       --accent:   #172FC7;
       --accent-dim: rgba(23,47,199,0.08);
       --accent-glow: rgba(23,47,199,0.18);
+      /* --bg at 0.62: the analysing veil. Enough to push the step behind it back and carry
+         white type, not so much that the page you are waiting on disappears. */
+      --bg-veil:  rgba(23,47,199,0.62);
       --font:     'DM Sans', system-ui, sans-serif;
       --mono:     'JetBrains Mono', monospace;
       --short:    #E67033;
@@ -63,6 +66,81 @@
       font-size: 11px; font-weight: 600;
       letter-spacing: 0.22em; text-transform: uppercase;
       color: var(--ink-mid);
+    }
+
+    /* ── ANALYSING ──
+       Every step that goes away and thinks lays a blue veil over the page it is on, with the
+       mark folding above it and one line naming the stage. The step stays visible underneath:
+       the wait belongs to the question you just answered, and replacing the whole screen with
+       a logo loses that. The address lookup is four network calls deep and used to show one
+       grey "locating…" line in the panel, which reads as a hang rather than as work.
+       Whether it is THERE is `display`, and nothing else. A covering element whose presence
+       depends on a transition finishing is a page that locks if the transition never runs, and
+       transitions measurably were not firing when this was read back inside a throttled frame.
+       The fade-in is a keyframe animation instead, which does run there, and it fills forwards
+       so it settles opaque and stays. */
+    #analyzing {
+      position: fixed; inset: 0; z-index: 60;
+      display: none; flex-direction: column; align-items: center; justify-content: center; gap: 24px;
+      background: var(--bg-veil);
+      /* the blur is what stops the type behind from reading as part of the mark; where it is
+         unsupported the veil alone still does the job */
+      backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+    }
+    #analyzing.on { display: flex; animation: an-in 0.22s ease both; }
+    @keyframes an-in { from { opacity: 0; } to { opacity: 1; } }
+    /* ── the mark, drawn and animated rather than the raster brand PNG ──
+       Same construction as the NEXA-LOGO motion study: four identical capsules placed by
+       cx/cy and rotated about their own centres, so the mark reads as one stroke folding
+       rather than as a logo being spun. Numbers are the study's own:
+         geometry   bar 30×108, x = cx − 15, y = cy − 54, cy defaults to 85
+         stages     N  P0(65,+40) P1(115,−40) P2(165,+40) P3(165,+40)  P3 hidden behind P2
+                    X  P3 rotates to −40°, crossing P2
+                    M  P3 stands up at cx 190, cy 88, scaleY 0.843
+         sequence   N → X → M → X, 950 ms held, 700 ms of travel, cubic-bezier(.4,0,.2,1)
+       so one turn of the study's cycle is 4 × 1650 = 6600 ms and the travel is 700/6600 =
+       10.606% of it, which is where the keyframe percentages come from. It is played at twice
+       that speed here, on the duration below. P0 to P2 never move, which is why only P3
+       carries an animation.
+       The blue halo is invisible on the blue ground and only does anything where the veil is
+       thin enough to let something light through, which on the review stage is a white floor
+       card sitting right under the mark. White on white is the one way this can fail. */
+    #an-mark { width: 172px; height: auto; filter: drop-shadow(0 0 16px rgba(23,47,199,0.9)); }
+    #an-mark path { fill: #fff; }
+    #an-mark g { transform-box: fill-box; transform-origin: 50% 50%; }
+    .an-b0 { transform: translate(50px, 31px)  rotate(40deg); }
+    .an-b1 { transform: translate(100px, 31px) rotate(-40deg); }
+    .an-b2 { transform: translate(150px, 31px) rotate(40deg); }
+    /* Twice the study's speed: 475 ms held, 350 ms of travel, 3.3 s to the cycle. The keyframe
+       percentages below are proportions, so they carry over untouched. */
+    .an-b3 { animation: an-p3 3.3s linear infinite; }
+    /* --ink-mid, not --ink-lo: it is the only text on the screen and the panel greys are meant
+       for rows that sit beside brighter ones */
+    #an-step {
+      font-family: var(--mono); font-size: 10px; font-weight: 500;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mid);
+      text-shadow: 0 0 10px rgba(23,47,199,0.9);   /* same reason as the mark's halo */
+      animation: an-fade 1.6s ease-in-out infinite;
+    }
+    /* Each stage holds, then travels. The easing is declared on the keyframe that STARTS a
+       leg, which is how a per-segment ease is expressed in CSS; the holds are flat, so their
+       timing function never shows. */
+    @keyframes an-p3 {
+      0%       { transform: translate(150px, 31px) rotate(40deg)  scaleY(1);     animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+      10.606%  { transform: translate(150px, 31px) rotate(-40deg) scaleY(1); }
+      25%      { transform: translate(150px, 31px) rotate(-40deg) scaleY(1);     animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+      35.606%  { transform: translate(175px, 34px) rotate(0deg)   scaleY(0.843); }
+      50%      { transform: translate(175px, 34px) rotate(0deg)   scaleY(0.843); animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+      60.606%  { transform: translate(150px, 31px) rotate(-40deg) scaleY(1); }
+      75%      { transform: translate(150px, 31px) rotate(-40deg) scaleY(1);     animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+      85.606%  { transform: translate(150px, 31px) rotate(40deg)  scaleY(1); }
+      100%     { transform: translate(150px, 31px) rotate(40deg)  scaleY(1); }
+    }
+    @keyframes an-fade { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+    /* less motion: the mark stops folding and rests on the N it starts from */
+    @media (prefers-reduced-motion: reduce) {
+      .an-b3 { animation: none; transform: translate(150px, 31px) rotate(40deg); }
+      #an-step { animation: none; opacity: 0.8; }
     }
 
     /* ── STEP INDICATOR (top right) ── */
@@ -777,6 +855,21 @@
     <span id="brand-name">NEXA</span>
   </div>
 
+  <!-- Shown by analyzing() while a step is off working. The line under the mark is the stage
+       it is on, not a generic "loading". The mark is four capsules, white, built to the same
+       numbers as the NEXA-LOGO motion study: one bar path, 30×108 with fully round ends,
+       placed by cx/cy and rotated. Only the fourth bar moves. Geometry and stages are in the
+       CSS. -->
+  <div id="analyzing" role="status" aria-live="polite">
+    <svg id="an-mark" viewBox="5 25 210 135" fill="none" role="img" aria-label="NEXA">
+      <g class="an-b0"><path d="M30 15C30 6.716 23.284 0 15 0C6.716 0 0 6.716 0 15V93C0 101.284 6.716 108 15 108C23.284 108 30 101.284 30 93V15Z"/></g>
+      <g class="an-b1"><path d="M30 15C30 6.716 23.284 0 15 0C6.716 0 0 6.716 0 15V93C0 101.284 6.716 108 15 108C23.284 108 30 101.284 30 93V15Z"/></g>
+      <g class="an-b2"><path d="M30 15C30 6.716 23.284 0 15 0C6.716 0 0 6.716 0 15V93C0 101.284 6.716 108 15 108C23.284 108 30 101.284 30 93V15Z"/></g>
+      <g class="an-b3"><path d="M30 15C30 6.716 23.284 0 15 0C6.716 0 0 6.716 0 15V93C0 101.284 6.716 108 15 108C23.284 108 30 101.284 30 93V15Z"/></g>
+    </svg>
+    <div id="an-step"></div>
+  </div>
+
   <!-- Step indicator -->
   <!-- pips are built by updatePips() from steps.length, so adding a step needs no edit here -->
   <div id="step-indicator">
@@ -1216,6 +1309,34 @@
   const btnBrief = document.getElementById('btn-brief');
   const briefPanel = document.getElementById('brief-panel');
 
+  // ── ANALYSING OVERLAY ────────────────────────────────────────────────────────────────
+  // analyzing(msg) puts it up or changes the line under the mark; analyzingDone() takes it
+  // away. It stays for AN_MIN_MS even when the work returns at once: a 90 ms flash of a
+  // folding logo reads as a glitch rather than as an answer.
+  const AN_MIN_MS = 650;
+  const anEl = document.getElementById('analyzing');
+  const anStepEl = document.getElementById('an-step');
+  // The overlay covers the page, so anything that leaves it up leaves the wizard unusable.
+  // Every caller hides it on both paths, and this is the belt: no stage of this flow takes
+  // 25 s, so if one ever does, the page comes back rather than staying locked behind a mark
+  // that folds forever. Navigating away (Build) unloads the page long before it fires.
+  const AN_WATCHDOG_MS = 25000;
+  let anShownAt = 0, anHideTimer = null, anWatchdog = null;
+  function analyzing(msg) {
+    if (anHideTimer) { clearTimeout(anHideTimer); anHideTimer = null; }
+    anStepEl.textContent = msg || '';
+    if (!anEl.classList.contains('on')) { anShownAt = Date.now(); anEl.classList.add('on'); }
+    clearTimeout(anWatchdog);
+    anWatchdog = setTimeout(() => anEl.classList.remove('on'), AN_WATCHDOG_MS);
+  }
+  function analyzingDone() {
+    clearTimeout(anWatchdog);
+    if (!anEl.classList.contains('on')) return;
+    const wait = Math.max(0, AN_MIN_MS - (Date.now() - anShownAt));
+    if (anHideTimer) clearTimeout(anHideTimer);
+    anHideTimer = setTimeout(() => { anEl.classList.remove('on'); anHideTimer = null; }, wait);
+  }
+
   // pips are built once from steps.length so a new step needs no markup change
   const stepNumEl = document.getElementById('step-num');
   (function buildPips() {
@@ -1380,7 +1501,10 @@
       qEl.classList.add('hidden');
       btnActivities.style.display = 'none';
       reviewOrigin = 'wizard';
-      setTimeout(() => enterReview(), 250);
+      // The overlay goes up first and the draft is generated a frame later, or the synchronous
+      // solve would eat the frame the overlay was meant to appear in and nothing would show.
+      analyzing('drafting the program');
+      setTimeout(() => { enterReview(); analyzingDone(); }, 250);
     }
   }
 
@@ -1581,12 +1705,14 @@
     if (!LLM_PROXY && !LLM_KEY) { briefState = { phase: 'key' }; renderBrief(); return; }
     briefState = { raw, phase: 'busy' };
     renderBrief();
+    analyzing('reading the brief');
     try {
       const out = await briefRead(raw);
       briefState = { raw, phase: 'done', out };
     } catch (e) {
       briefState = { raw, phase: 'error', msg: 'Could not reach the model. ' + e.message };
     }
+    analyzingDone();
     renderBrief();
   }
 
@@ -2200,6 +2326,7 @@
     sitePanel.className = 'busy';
     sitePanel.style.display = 'block';
     sitePanel.textContent = 'locating…';
+    analyzing('locating the address');
 
     try {
       const g = await geocodeAddress(q);
@@ -2212,6 +2339,7 @@
 
       // parcel first — its centroid is a better probe for the zoning polygon than the
       // street-centerline geocode point
+      analyzing('reading the parcel');
       try {
         site.parcel = await findParcel({ lat: g.lat, lng: g.lng }, q);
         if (!site.parcel) site.parcelNote = 'no LA County parcel within 45 m. Outside LA County, or unparcelled.';
@@ -2221,6 +2349,7 @@
       renderSitePanel(site);
 
       const zPt = (site.parcel && site.parcel.centroid) || { lat: g.lat, lng: g.lng };
+      analyzing('reading the zoning');
       try {
         site.zoning = await findZoning(zPt);
         if (!site.zoning) site.zoningNote = 'no LA City zoning polygon at this point';
@@ -2234,6 +2363,7 @@
       // and could freeze the whole step.
       // volumes + linework for the two massing-view context modes. Independent: whichever
       // resolves is available, and the viewer says which mode has no data.
+      analyzing('reading the surroundings');
       const [nb, lots, roads, gens] = await Promise.all([
         findNeighbours(zPt).catch(() => null),
         findLotLines(zPt).catch(() => null),
@@ -2275,6 +2405,7 @@
       btnSite.disabled = false;
     } finally {
       siteBusy = false;
+      analyzingDone();
     }
   }
 
@@ -4040,6 +4171,9 @@
     // which is not an answer, so only the three wizard values are passed on.
     if (['mixed-use', 'office', 'housing'].includes(wiz.buildingType)) localStorage.setItem('programBuildingType', wiz.buildingType);
     else localStorage.removeItem('programBuildingType');
+    // stays up until the massing page takes over: that page packs the modules and builds the
+    // scene before it paints, which is the longest wait in the whole flow
+    analyzing('building the massing');
     location.href = 'program-massing-shortfloor.html?src=input';
   });
 
@@ -4254,6 +4388,7 @@
       // the scenarios name their own uses, so no wizard building type applies here; a stale
       // one left in storage would make the chat claim an answer nobody gave
       localStorage.removeItem('programBuildingType');
+      analyzing('building the timeline');
       location.href = 'program-massing-shortfloor.html?src=input&timeline=1';
     }
 
@@ -4312,7 +4447,8 @@
   })();
 
   // test hook (read-only accessors for the headless verification pipeline)
-  window.__debug = { entries: () => entries, serialize: () => serialize(entries), site: () => wiz.site, interpretZone };
+  window.__debug = { entries: () => entries, serialize: () => serialize(entries), site: () => wiz.site, interpretZone,
+    analyzing, analyzingDone };
 </script>
 
 </body></html>
