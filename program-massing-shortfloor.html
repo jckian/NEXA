@@ -131,7 +131,152 @@
        first and core option under it, both centred and both cut to the same size. */
     /* Same height as the chat bar and the core options (--floor-h), so the three pieces of
        furniture around the model read as one system. The inner sizes still follow the viewport. */
-    #viewbar { position: fixed; top: clamp(12px, 2.2vh, 26px); left: 50%; transform: translateX(-50%); z-index: 12; display: flex; flex-direction: column; align-items: center; gap: clamp(5px, 0.8vh, 10px); }
+    /* ── ANALYSIS STAGE ──
+       The workflow's last step, so it is allowed to take the screen: site, program, massing,
+       then this. It covers the model instead of replacing it, and the mode switch stays on top
+       (z 12) so stepping back is one click away from where the eye already is. */
+    /* above the side panels (10 / 11) and the chat bar (12); the mode switch is lifted to 14
+       so the way back out stays on top of it */
+    #analysis-stage {
+      position: fixed; inset: 0; z-index: 13; display: none;
+      background: rgba(245, 245, 245, 0.97);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      overflow-y: auto; padding: calc(var(--floor-h) + clamp(34px, 7vh, 76px)) 40px 60px;
+    }
+    #analysis-stage.on { display: block; animation: an-stage-in 0.24s ease both; }
+    @keyframes an-stage-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    /* Three columns, and the order is the argument: MEASURED off the program, ASSUMED by the
+       reader, then DERIVED from the two. Each column holds exactly one of those and nothing
+       else, so which kind a figure is never has to be stated in words.
+       Areas rather than raw columns, because the collapse is not a straight stack: at the
+       middle width the derived column keeps its own full-height column beside the other two,
+       and only below that does everything fall into one. */
+    #analysis-inner {
+      max-width: 1440px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.78fr) minmax(0, 1.22fr);
+      grid-template-areas: "left mid right";
+      gap: clamp(24px, 2.8vw, 52px); align-items: start;
+    }
+    #an-left { grid-area: left; }
+    #an-mid { grid-area: mid; }
+    #an-right { grid-area: right; }
+    /* `top` here is measured from the scrollport, and the scrollport already starts under the
+       stage's own padding, so repeating the padding value in `top` pushed the column a second
+       padding down before anything had even scrolled. 16px is clear of the mode switch, which
+       is fixed over the stage rather than inside it. */
+    #an-left { position: sticky; top: 16px; }
+    /* in its own column the table starts at the top: the rule above it was a divider from the
+       block it used to sit under */
+    #an-mid .an-rates { margin-top: 0; padding-top: 0; border-top: none; }
+    /* nothing rests on a rate yet (no timeline, or a stale one), so there are no other columns
+       to hold the first one to a third of the page */
+    #analysis-inner.solo { grid-template-columns: 1fr; grid-template-areas: "left"; }
+    #analysis-inner.solo #an-left { position: static; max-width: 760px; }
+    @media (max-width: 1280px) {
+      #analysis-inner {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+        grid-template-areas: "left right" "mid right";
+        gap: clamp(22px, 3vw, 40px);
+      }
+    }
+    @media (max-width: 940px) {
+      #analysis-inner { grid-template-columns: 1fr; grid-template-areas: "left" "mid" "right"; gap: 26px; }
+      #an-left { position: static; }
+    }
+    .an-step-mark {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--text-lo); margin-bottom: 10px;
+    }
+    .an-step-mark b { color: var(--blue); font-weight: 700; }
+    #an-title {
+      font-size: clamp(28px, 4vw, 46px); font-weight: 300; letter-spacing: -0.02em;
+      color: var(--text-hi); margin-bottom: 8px;
+    }
+    /* the measured sentence, which every figure below is derived from */
+    .an-lede { font-size: clamp(14px, 1.5vw, 17px); line-height: 1.6; color: var(--text-mid); }
+    .an-lede b { color: var(--text-hi); font-weight: 500; }
+    /* the three figures, still the largest type in their column. The sizes came down with the
+       column: at the old clamp one cell of three filled half the right-hand side. */
+    .an-figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 11px; margin: 0 0 18px; }
+    .an-cell {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 16px 17px;
+    }
+    /* nowrap: a third of a third of the page is narrow enough that "2,496 m²" broke across two
+       lines, which reads as two figures for a moment */
+    .an-v { display: block; font-size: clamp(23px, 1.9vw, 31px); font-weight: 300; letter-spacing: -0.03em; color: var(--blue); line-height: 1.05; white-space: nowrap; }
+    .an-k { display: block; margin-top: 8px; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-lo); }
+    .an-sub { display: block; margin-top: 7px; font-size: 12px; line-height: 1.5; color: var(--text-mid); }
+    /* ── the two charts ──────────────────────────────────────────────────────────────
+       This page is about a DIFFERENCE, and a difference is the one thing a single number
+       hides: $6.0M says nothing about what it is 6.0M less than. Both charts draw figures
+       the page already carried; neither computes a new claim. */
+
+    /* what changes, against what is built. Entirely measured, so it sits above the line
+       where the assumed rates start. */
+    .an-share { margin: 22px 0 0; }
+    .an-share .sh-t { display: flex; height: 14px; border-radius: 3px; overflow: hidden; background: rgba(20,24,32,0.07); }
+    .an-share .sh-t i { display: block; height: 100%; }
+    .an-share .sh-t i.conv { background: var(--blue); }
+    .an-share .sh-k { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 9px; font-size: 11.5px; color: var(--text-mid); }
+    .an-share .sh-k span { display: flex; align-items: center; gap: 6px; }
+    .an-share .sh-k b { width: 9px; height: 9px; border-radius: 2px; display: block; }
+    .an-share .sh-k b.conv { background: var(--blue); }
+    .an-share .sh-k b.rest { background: rgba(20,24,32,0.14); }
+    .an-share .sh-churn { font-size: 11.5px; line-height: 1.6; color: var(--text-lo); margin-top: 8px; }
+
+    /* the counterfactual: two bars on one scale, and the gap between them named */
+    .an-cf { margin: 22px 0 2px; }
+    .an-cf-h { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-lo); margin-bottom: 10px; }
+    .an-cf-row { display: grid; grid-template-columns: 152px 1fr 86px; gap: 12px; align-items: center; margin-bottom: 7px; }
+    .an-cf-k { font-size: 12px; color: var(--text-mid); }
+    .an-cf-t { height: 16px; background: rgba(20,24,32,0.05); border-radius: 3px; }
+    .an-cf-t i { display: block; height: 100%; border-radius: 3px; background: rgba(20,24,32,0.3); }
+    .an-cf-t i.keep { background: var(--blue); }
+    .an-cf-v { font-size: 12px; text-align: right; color: var(--text-hi); }
+    .an-cf-gap { font-size: 12px; color: var(--blue); padding-left: 164px; margin-top: 1px; }
+    @media (max-width: 780px) {
+      .an-cf-row { grid-template-columns: 1fr 72px; }
+      .an-cf-k { grid-column: 1 / -1; }
+      .an-cf-gap { padding-left: 0; }
+    }
+
+    /* The rates, as the table of assumptions they are. They sit at the foot of the left column,
+       under the measured sentence, rather than beside the figures they produce: these are the
+       five numbers the reader owns, and a row of loose inputs threaded between two charts read
+       as part of the output. */
+    .an-rates { margin-top: 24px; padding-top: 15px; border-top: 1px solid var(--border-dim); }
+    .an-rates-h { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-lo); margin-bottom: 4px; }
+    .an-rates-s { font-size: 11.5px; line-height: 1.6; color: var(--text-lo); margin-bottom: 11px; }
+    table.an-rt { width: 100%; border-collapse: collapse; }
+    .an-rt th {
+      text-align: left; font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-lo); padding: 0 0 7px; border-bottom: 1px solid var(--border-dim);
+    }
+    .an-rt th.n { text-align: right; }
+    .an-rt td { padding: 6px 0; border-bottom: 1px solid var(--border-dim); font-size: 12.5px; color: var(--text-mid); }
+    .an-rt tr:last-child td { border-bottom: none; }
+    .an-rt td.n { text-align: right; width: 108px; }
+    .an-rt td.u { font-size: 10px; color: var(--text-lo); white-space: nowrap; padding-left: 12px; width: 1%; }
+    .an-rt input {
+      width: 92px; height: 29px; border: 1px solid var(--border-dim); border-radius: var(--radius-sm);
+      background: #fff; text-align: right; padding: 0 9px;
+      font-family: inherit; font-size: 12.5px; color: var(--text-hi); outline: none;
+    }
+    .an-rt input:focus { border-color: var(--blue); }
+    .an-note { font-size: 12.5px; line-height: 1.65; color: var(--text-mid); margin-top: 16px; }
+    .an-note b { color: var(--text-hi); font-weight: 500; }
+    .an-caveat { font-size: 11.5px; line-height: 1.65; color: var(--text-lo); margin-top: 12px; }
+    @media (max-width: 780px) { #analysis-stage { padding-left: 20px; padding-right: 20px; } }
+    /* the model's furniture belongs to the model: the last step is not the place to keep
+       offering a chat line and a code check */
+    body.analysis-on #chat-bar,
+    body.analysis-on #left-stack,
+    body.analysis-on #right-stack,
+    body.analysis-on #title-block { display: none; }
+
+    #viewbar { position: fixed; top: clamp(12px, 2.2vh, 26px); left: 50%; transform: translateX(-50%); z-index: 14; display: flex; flex-direction: column; align-items: center; gap: clamp(5px, 0.8vh, 10px); }
     #viewbar .vb-group { height: var(--floor-h); display: flex; align-items: stretch; gap: 2px; padding: clamp(3px, 0.45vh, 6px); background: var(--panel-bg); border: 1px solid var(--border-dim); border-radius: 999px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
     #viewbar button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(3px, 0.45vh, 6px); border: none; background: none; border-radius: 999px; cursor: pointer; color: var(--text-lo); font-family: inherit; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; transition: background 0.18s, color 0.18s; }
     #viewbar button svg { fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
@@ -499,6 +644,25 @@
 
   <div id="tooltip"></div>
   <div id="drop-overlay"><span>Drop output.txt</span></div>
+
+  <!-- ANALYSIS · the last step of the walk. Filled by renderAnalysis() from the program on
+       screen and the timeline it arrived with. Sits over the model rather than replacing it,
+       so stepping back to Massing finds the view exactly where it was left. -->
+  <div id="analysis-stage">
+    <div id="analysis-inner">
+      <!-- Left: what was measured, and nothing else. Where you are in the walk, the claim, the
+           sentence the claim rests on, and the one bar that is read straight off the program.
+           Right: everything derived from a rate somebody typed. The split is the same line the
+           page has always been about, now drawn as a column edge. -->
+      <div id="an-left">
+        <div class="an-step-mark">Site · Program · Massing · <b>Analysis</b></div>
+        <h1 id="an-title">What changing it this way avoids</h1>
+        <div id="an-body"></div>
+      </div>
+      <div id="an-mid"></div>
+      <div id="an-right"></div>
+    </div>
+  </div>
   <!-- Program Mode's palette: stands exactly where the chat bar stands and only one of the two is
        ever on screen. -->
   <div id="add-palette">
@@ -516,10 +680,17 @@
         <svg viewBox="0 0 18 18"><rect x="2" y="2" width="14" height="14" rx="1.5" /><line x1="2" y1="2" x2="16" y2="16" /><line x1="16" y1="2" x2="2" y2="16" /></svg>
         <span>Structure</span>
       </button>
+      <!-- The last step of the walk: site, program, massing, then what changing it this way
+           avoids. It is not a render mode — it lays a stage over the model and leaves whatever
+           was drawn underneath exactly as it was. -->
+      <button data-v="analysis" title="What changing it this way avoids">
+        <svg viewBox="0 0 18 18"><line x1="2.5" y1="15.5" x2="15.5" y2="15.5" /><rect x="4" y="9" width="3" height="6.5" /><rect x="9.5" y="5" width="3" height="10.5" /><line x1="3" y1="6" x2="8" y2="2.5" /><line x1="8" y1="2.5" x2="15" y2="6" /></svg>
+        <span>Analysis</span>
+      </button>
     </div>
     <!-- Structural system. Only meaningful in Structure mode, so it is hidden in Massing. -->
     <div class="vb-group vb-mode" id="seg-struct-sys" style="display:none;">
-      <button data-v="steel" class="active" title="Steel frame: braced long-span truss at every cantilever">
+      <button data-v="steel" class="active" title="Steel frame: one spine truss core to core, one-way bracing at the cantilevers">
         <svg viewBox="0 0 18 18"><rect x="2.5" y="3" width="13" height="12" /><line x1="2.5" y1="15" x2="15.5" y2="3" /><line x1="2.5" y1="9" x2="15.5" y2="9" /></svg>
         <span>Steel</span>
       </button>
@@ -554,6 +725,7 @@
     const isCore = t => /fire stair|elevator|escalator|\bstair\b|\bcore\b|shaft/i.test(t);
     const isFreight = t => /freight/i.test(t);
     const isToilet = t => /toilet|restroom|\bwc\b|washroom|lavatory/i.test(t);
+    const isLobby = t => /lobby|foyer|entrance/i.test(t);
     // SHORT = replaceable plug-in zones (retail / wellness / education / event) per MIX table.
     // Everything else (housing, office, service, cores) is LONG = structural permanence.
     // Matching is by keyword, so a family only lands SHORT if its synonyms are listed here;
@@ -742,6 +914,25 @@
     // making P2 take one modal depth per floor instead of one per band. Not attempted here.
     function splitSides(rooms) {
       const north = [], south = []; let nW = 0, sW = 0;
+      // ── SPAN MIX (user 260815: "LONG 都聚集在一邊") ────────────────────────────────────
+      // Balancing on width alone says nothing about WHAT lands on each band. On a floor that
+      // carries both spans the SHORT rooms are many and wide, so they even the two sides out
+      // between themselves and the LONG rooms then fall as one lump onto whichever side is
+      // behind. Measured before this: L2 put 72 of 72 LONG cells on north, L3 64 of 64, both
+      // 100% one-sided, while the pure-LONG tower floors sat at a healthy 50-67%.
+      // Balancing each span class separately across the bands guarantees both sides get some
+      // of each, and total width stays balanced because a sum of balanced parts is balanced.
+      // Total width is the tie-break, so within a class the old behaviour is what breaks ties.
+      // ?spanmix=0 restores the single width-ordered pass.
+      if (SPAN_MIX) {
+        for (const cls of [rooms.filter(r => !isShort(r.type)), rooms.filter(r => isShort(r.type))]) {
+          let cn = 0, cs = 0;
+          for (const r of [...cls].sort((a, b) => b.wMod - a.wMod)) {
+            if (cn < cs || (cn === cs && nW <= sW)) { north.push(r); cn += r.wMod; nW += r.wMod; }
+            else { south.push(r); cs += r.wMod; sW += r.wMod; }
+          }
+        }
+      } else
       for (const r of [...rooms].sort((a, b) => b.wMod - a.wMod)) {
         if (nW <= sW) { north.push(r); nW += r.wMod; } else { south.push(r); sW += r.wMod; }
       }
@@ -758,6 +949,98 @@
       else if (anyShort(south) && lS.length === 0 && lN.length === 1 && !anyShort(north)) moveLong(north, south);
       nW = north.reduce((s, r) => s + r.wMod, 0); sW = south.reduce((s, r) => s + r.wMod, 0);
       return { north, south, nW, sW };
+    }
+
+    // ── LONE-LONG SPLIT (second half of the span-mix fix) ────────────────────────────────
+    // A room cannot straddle the corridor, so a floor whose whole LONG allocation is ONE room
+    // is unbalanceable by splitSides however it sorts — the band split can only choose a side.
+    // The site-driven wizard writes exactly that: one {office} of 479 m² on L2, 438 m² on L3,
+    // 341 m² on L1, each the floor's only LONG row once the auto-restroom has replaced
+    // {toilets}. SAMPLE splits its apartments per unit (分戶), which is why the band split
+    // works there and did nothing here.
+    // Halving the dominant room gives the split two pieces to place, one per band, which is
+    // what a double-loaded office floor is anyway. Area is conserved exactly: same type, same
+    // `h`, so rectDims hands each half the same depth and half the width.
+    // Only fires when one room really does own the floor's LONG side (≥ SPLIT_DOMINANCE), and
+    // only when both halves stay big enough to be rooms. Floors that already carry several
+    // LONG rooms — every tower floor, every SAMPLE band floor — are untouched.
+    // The trigger is a DOMINANCE ratio, not "the floor has exactly one LONG room". The stricter
+    // one-room test was tried (260815) and is worse, for a reason worth recording: firing on
+    // fewer floors is not a smaller change. Band widths feed coreNxLo through `bandMax`, and a
+    // coreN that lands further east drags every floor's spine out to meet it (E-7 extends the
+    // corridor to every active core). The one-room variant moved coreN from x13 to x29 and took
+    // the site case from 188 to 308 corridor modules. Same trap as the 260815 aspect-cap
+    // attempt. Until coreN placement is made insensitive to band widths, prefer the trigger
+    // that MEASURED well over the one that reads more principled.
+    const SPLIT_DOMINANCE = 0.7;   // share of the floor's LONG cells one room must hold to be split
+    const SPLIT_MIN_CELLS = 16;    // ~107 m²; below this the two halves stop being rooms
+    function splitLoneLong(items) {
+      if (!SPAN_MIX) return;
+      const longs = items.filter(r => !isShort(r.type));
+      if (!longs.length) return;
+      const cellsOf = r => Math.max(1, Math.round(r.area / MA));
+      const tot = longs.reduce((s, r) => s + cellsOf(r), 0);
+      const big = longs.reduce((m, x) => x.area > m.area ? x : m, longs[0]);
+      const c = cellsOf(big);
+      if (c < SPLIT_MIN_CELLS || c / tot < SPLIT_DOMINANCE) return;
+      // Split on CELLS, not on area. An even area split sends both halves through the same
+      // Math.round in rectDims and can buy a module of width that the whole room never paid
+      // for: 71 cells at depth 8 is one room 9 wide, but two 36-cell halves round to 5 + 5.
+      // Splitting 71 into 36 + 35 gives 5 + 4, so the band totals are unchanged and the fix
+      // costs no corridor. Areas follow the cell split, so the sum is still exact.
+      const i = items.indexOf(big);
+      const c1 = Math.ceil(c / 2), a1 = big.area * c1 / c;
+      const halves = [{ ...big, area: a1 }, { ...big, area: big.area - a1 }];
+      for (const p of halves) { const d = rectDims(p.area, p.h); p.wMod = d.w; p.dMod = d.d; }
+      items.splice(i, 1, ...halves);
+    }
+
+    // ── RUN CAP (user 260816: "不要因為基地變大 circulation 就變長") ────────────────────────
+    // The corridor spans the floor's whole x extent, so corridor length IS the run. And the run
+    // grows with area for one reason: rectDims pins each room's depth to its program `h` and lets
+    // WIDTH absorb everything else. Double the GFA and the plate goes sideways, so a bigger site
+    // buys a longer corridor. That is the thing being stopped here.
+    //
+    // A first attempt (260815, reverted) re-proportioned only the LONG rooms and moved the run by
+    // almost nothing. The reason is measurable: on the podium floors that set the worst corridor,
+    // 218 of L0's 281 cells are SHORT, and SHORT was exempt. The run was being set by rooms the
+    // cap was not allowed to touch. It has to include them or it does nothing.
+    //
+    // Re-proportioning SHORT was measured as harmful in 260707 (it breaks the vertical 8'-6"
+    // weave overlap between floors), so this is gated and has to be verified against
+    // TEST/_weave-probe.html, not just the corridor number. ?aspect=0 disables.
+    //
+    // Method: pick the smallest common depth D whose resulting run fits PLATE_ASPECT_MAX × the
+    // plate depth, and re-proportion every room to it. Areas never change: only the w/d split of
+    // the same cell count moves, so GFA, the area readouts and the occupant loads are untouched.
+    // Runs BEFORE splitSides, so the band split is computed once on the final dimensions and
+    // cannot feed back into it.
+    const PLATE_ASPECT_MAX = 1.35;   // run : plate depth a floor may reach before it is re-proportioned
+    const ASPECT_D_MAX = 12;         // 12 modules ≈ 31 m — past that a room stops being a room
+    function runCap(items) {
+      if (!ASPECT_CAP || items.length < 2) return;
+      const cellsOf = r => Math.max(1, Math.round(r.area / MA));
+      const dimsAt = (r, D) => {
+        if (D === null) return { wMod: r.wMod, dMod: r.dMod };
+        const c = cellsOf(r), d = Math.min(D, c);
+        return { wMod: Math.max(1, Math.ceil(c / d)), dMod: d };
+      };
+      const measure = D => {
+        const s = splitSides(items.map(r => ({ ...r, ...dimsAt(r, D) })));
+        const nD = Math.max(1, ...s.north.map(r => r.dMod));
+        const sD = Math.max(1, ...s.south.map(r => r.dMod));
+        return { run: Math.max(s.nW, s.sW), depth: nD + 1 + sD };
+      };
+      const now = measure(null);
+      if (now.run <= PLATE_ASPECT_MAX * now.depth) return;     // already square enough
+      let best = null;
+      for (let D = Math.max(1, ...items.map(r => r.dMod)); D <= ASPECT_D_MAX; D++) {
+        const m = measure(D);
+        if (!best || m.run < best.m.run) best = { D, m };
+        if (m.run <= PLATE_ASPECT_MAX * m.depth) { best = { D, m }; break; }
+      }
+      if (!best || best.m.run >= now.run) return;              // no depth beats the status quo
+      for (const r of items) Object.assign(r, dimsAt(r, best.D));
     }
 
     // ─────────────────────────────────────────────────────────
@@ -915,7 +1198,7 @@
       const LEGACY = CORE_OPTION === 'inset';
       const PINWHEEL = CORE_OPTION === 'pinwheel';
       const COMPACT = !LEGACY && !PINWHEEL;   // Scheme 1 — default
-      const TOILET_ON = TOILET_AUTO && (COMPACT || LEGACY);   // auto-restroom placement scoped to the core-skip pack
+      const TOILET_ON = TOILET_AUTO;   // 260817: PINWHEEL was excluded and left 7 of 11 floors with no toilet   // auto-restroom placement scoped to the core-skip pack
       const floorSplit = new Map();
       let northDepth = 1, southDepth = 1, maxNW = 0, maxSW = 0;
       let FD, zMid, coreSx, coreNx, FW, coreShafts = [], floorRects = new Map();
@@ -932,10 +1215,112 @@
       }
       // ── per-floor rooms (true module size) split onto the two sides; plate floors EXCLUDED from
       //    depths & band-width maxima so their big block no longer inflates FD or FW ──
+      // ── APRON RELIEF (user 260817: too much SHORT hanging outside the mass) ─────────────────
+      // A SHORT storey is one course tall, so a floor carrying more plug-in than the floor above
+      // has nowhere to put the difference except outside the building. Measured: L0 held 224 SHORT
+      // module cells against L1's 150, and 116 of them (52%) had nothing at all above them.
+      // Two earlier attempts failed and are worth not repeating. Re-proportioning the rooms deeper
+      // changed NOTHING (an apron is an area imbalance, not a shape). Flattening the wizard's band
+      // taper moved the apron up a floor and made the total slightly worse, because a flatter ramp
+      // let `splitBins` fit fewer band levels and the same area landed on fewer floors.
+      // The area itself has to move, and `rebalanceFloors` refuses to move SHORT at all, on the
+      // grounds that "the 8'-6" weave depends on their clustering". That is true of the RUN, not of
+      // which floor inside it a room sits on: moving a SHORT room from L0 to L2 leaves the run just
+      // as continuous. So SHORT may move, strictly INSIDE its own run of consecutive SHORT floors.
+      // Bottom up, the smallest room moves off any floor that out-sizes the floor above it by more
+      // than APRON_STEP, until the profile is a bounded taper instead of a slab with a skirt.
+      // ?apron=0 disables.
+      if (APRON_RELIEF) {
+        const cellsOf = r => Math.max(1, Math.round(r.area / MA));
+        const shortAt = lv => program.filter(p => p.level === lv && !p.isCore && !isCorridor(p.type) && isShort(p.type));
+        const sizeAt = lv => shortAt(lv).reduce((s, r) => s + cellsOf(r), 0);
+        // runs of consecutive levels that carry SHORT
+        const runs = []; let cur = [];
+        for (const lv of levels) { if (sizeAt(lv) > 0) cur.push(lv); else { if (cur.length > 1) runs.push(cur); cur = []; } }
+        if (cur.length > 1) runs.push(cur);
+        // ── MECHANISM D: WIDTH CAP (260817d, SHORT-CONSOLIDATION-PLAN-2 §1) ────────────────────
+        // APRON_STEP above governs how much AREA a floor may hold against the floor above it. That
+        // is the vertical half of the skirt. The other half is planar: a SHORT floor whose band is
+        // simply WIDER than the tower over it has to put the surplus somewhere, and it goes outside
+        // the tower's footprint however the window is then positioned. Moving the window cannot
+        // hide width, so the width itself is capped and the surplus AREA moves up the run.
+        // Rooms are split into bands (floorSplit) BEFORE the window scan, so every floor's Wwin is
+        // already decided by then, and so is the tower's. That is what makes this measurable here.
+        // Measured before, site case: tower 13 modules wide, the SHORT run 20/17/24/16, so 4/1/8/0
+        // modules of surplus at CONSOL_MARGIN 3. SAMPLE came out 21/21/21 against a tower of 18,
+        // exactly at the cap, so it is untouched at this margin.
+        // Only p.level moves, exactly as APRON RELIEF does, so every restriction there still holds:
+        // never out of the run, never reshaped, the wizard untouched.
+        const wwinAt = lv => {
+          const items = program.filter(q => q.level === lv && !q.isCore && !isCorridor(q.type)
+              && !(TOILET_ON && isToilet(q.type)) && !(LOBBY_ANCHOR && isLobby(q.type)))
+            .map(q => { const d = rectDims(q.area, q.h); return { ...q, wMod: d.w, dMod: d.d }; });
+          if (!items.length) return 0;
+          const sp = splitSides(items);
+          return Math.max(sp.nW, sp.sW);
+        };
+        const towerCapOf = run => {
+          const top = run[run.length - 1];
+          const above = levels.filter(lv => lv > top && sizeAt(lv) === 0 && !plateInfo.has(lv));
+          if (!above.length) return null;                       // pure SHORT stack: nothing to align to
+          return Math.max(...above.map(wwinAt)) + CONSOL_MARGIN;
+        };
+        for (const run of runs) {
+          const CONSOL_CAP = CONSOL_ON ? towerCapOf(run) : null;
+          if (STRUCT_DIAG_CONSOL) STRUCT_DIAG_CONSOL.runs.push({ run: run.slice(), cap: CONSOL_CAP, before: run.map(wwinAt) });
+          for (let pass = 0; pass < 24; pass++) {
+            let moved = false;
+            // The TOP floor of a run never receives. It is the one floor whose apron nothing can
+            // cover, so pushing area into it just relocates the skirt upward where it reads worse:
+            // measured, letting it receive took L0 from 49% to 36% but L3 from 27% to 40%.
+            for (let i = 0; i < run.length - 2; i++) {
+              const lo = run[i], hi = run[i + 1];
+              const sLo = sizeAt(lo), sHi = sizeAt(hi);
+              if (sLo <= sHi * APRON_STEP) continue;            // already a bounded step
+              // The band ends up mildly INCREASING upward (measured 158/174/180 over the three
+              // receiving floors) because the pairs are walked bottom up and each receiver becomes
+              // the next donor. That was checked rather than assumed to be a fault, and it is the
+              // right shape: total apron is Σ max(0, S(lv) − S(lv+1)), which a profile that never
+              // narrows going up drives to zero everywhere except the very top. A 14% rise over
+              // three floors reads as one mass; a 49% skirt at grade does not. A condition that
+              // forced the band level instead was tried and changed nothing measurable.
+              const cands = shortAt(lo).sort((a, b) => a.area - b.area || (a.type < b.type ? -1 : 1));
+              const pick = cands.find(r => sLo - cellsOf(r) >= sHi);
+              if (!pick) continue;
+              pick.level = hi; moved = true;
+            }
+            // Second trigger, same pass, same direction: a floor wider than the cap sheds its
+            // smallest SHORT room upward, to the first floor in the run that stays inside the cap
+            // after receiving it. Both triggers run until neither fires, or they fight each other
+            // across passes.
+            if (CONSOL_CAP !== null) for (let i = 0; i < run.length - 1; i++) {
+              const lv = run[i];
+              if (wwinAt(lv) <= CONSOL_CAP) continue;
+              const cands = shortAt(lv).sort((a, b) => a.area - b.area || (a.type < b.type ? -1 : 1));
+              let done = false;
+              for (const r of cands) {
+                for (let j = i + 1; j < run.length - 1; j++) {   // top of the run still never receives
+                  const tgt = run[j], keep = r.level;
+                  r.level = tgt;
+                  if (wwinAt(tgt) <= CONSOL_CAP) { moved = true; done = true; break; }
+                  r.level = keep;
+                }
+                if (done) break;
+              }
+              if (!done && STRUCT_DIAG_CONSOL) STRUCT_DIAG_CONSOL.residual.push({ lv, over: wwinAt(lv) - CONSOL_CAP });
+            }
+            if (!moved) break;
+          }
+          if (STRUCT_DIAG_CONSOL) STRUCT_DIAG_CONSOL.runs[STRUCT_DIAG_CONSOL.runs.length - 1].after = run.map(wwinAt);
+        }
+      }
+
       for (const lv of levels) {
         if (plateInfo.has(lv)) continue;
-        const items = program.filter(p => p.level === lv && !p.isCore && !isCorridor(p.type) && !(TOILET_ON && isToilet(p.type)))
+        const items = program.filter(p => p.level === lv && !p.isCore && !isCorridor(p.type) && !(TOILET_ON && isToilet(p.type)) && !(LOBBY_ANCHOR && isLobby(p.type)))
           .map(p => { const d = rectDims(p.area, p.h); return { ...p, wMod: d.w, dMod: d.d }; });
+        splitLoneLong(items);    // give the band split two pieces when the floor's LONG side is one room
+        runCap(items);           // stop the floor buying its area in LENGTH — see runCap()
         const s = splitSides(items);
         floorSplit.set(lv, s);
       }
@@ -1008,7 +1393,12 @@
         ol = Math.ceil(ol);
         if (ol <= 0) continue;                             // no occupants on this floor → no required restroom
         const fixtures = Math.max(2, Math.ceil(ol / 40));  // ~1 WC / 40 occ (proxy)
-        const area = fixtures * 4.5 + 5;                   // ~4.5 m²/fixture incl. access aisle + one accessible (~5 m²)
+        // Capped (user 260817: "不要太大"). The fixture count is linear in occupant load, so a big
+        // podium floor grows a restroom that reads as a room rather than a service block. TOILET_MAX
+        // is per CLUSTER, and there are two of them when both cores exist, so a floor tops out at
+        // 2 × 60 m². Past that the proxy is telling you the floor needs a second core, which is an
+        // E-2 question, not a reason to draw a bigger toilet.
+        const area = Math.min(fixtures * 4.5 + 5, TOILET_MAX * (coreN && coreS ? 2 : 1));
         const cl = coreN && coreS ? area / 2 : area;       // split between the two clusters when both cores exist
         // SHORT edge faces the corridor (wMod = min), long side runs deep into the band (dMod = max) —
         // same orientation as the core shafts (Round 3): the narrow end plugs into circulation. ──
@@ -1016,6 +1406,44 @@
         toiletDim.set(lv, { n: coreN ? dim(cl) : null, s: coreS ? dim(cl) : null });
       }
       for (const td of toiletDim.values()) { if (td.n) northDepth = Math.max(northDepth, td.n.d); if (td.s) southDepth = Math.max(southDepth, td.s.d); }
+
+      // ── LOBBY ANCHORED TO THE PASSENGER CORE (user 260817: "lobby 跟主要量體隔太遠") ──
+      // The lobby was never detached: measured, it touches its neighbour on every scheme (0.0 m).
+      // What it was far from is the thing it exists to serve. `splitSides` orders by width and
+      // `packLegacy` emits from x=0, so a narrow lobby lands at the END of the run, while the
+      // passenger core sits mid-plate. Measured before this, ground floor:
+      //   compact lobby x23..26, core x13..15 → 20.7 m      inset 15.5 m      pinwheel 0.0 m
+      // Nothing pulled it back: rebalanceFloors excludes lobby from `movable`, correctly (it is
+      // floor-bound), but that only means nothing moves it at all.
+      // It is now reserved a column on the NORTH band immediately past the core-flush restroom,
+      // exactly the way AUTO-TOILET reserves its own, so the packer wraps the other rooms around
+      // it instead of pushing it to the tail. Same orientation rule as the cores and restrooms:
+      // short edge to the corridor, depth into the band. ?lobbyanchor=0 disables.
+      // PINWHEEL packs on its own branch and never reaches the emit below, so it keeps the lobby
+      // in the normal list. Excluding it there without emitting it lost the room entirely.
+      const lobbyDim = new Map();   // level → {w, d} on the north band
+      if (LOBBY_ANCHOR && coreN) for (const lv of levels) {
+        let a = 0;
+        for (const p of program) if (p.level === lv && !p.isCore && isLobby(p.type)) a += p.area;
+        if (a <= 0) continue;
+        const d = rectDims(a, Math.sqrt(a));
+        lobbyDim.set(lv, { w: Math.max(1, Math.min(d.w, d.d)), d: Math.max(1, Math.max(d.w, d.d)), area: a });
+      }
+      for (const ld of lobbyDim.values()) northDepth = Math.max(northDepth, ld.d);
+      // ── AND BETWEEN THE CORES (user 260817) ──────────────────────────────────────────────
+      // The first version parked it EAST of coreN, past the core-flush restroom. That is next to
+      // the lifts, which was the ask at the time, but on a floor whose coreN already sits east of
+      // most of the rooms it pushes the entrance out past the mass and it reads as a stray block.
+      // The entrance belongs on the approach side, in the middle of the plan: centred in the span
+      // between the two shafts, clamped so it never crosses coreN and never runs off the west end.
+      // One function so the reserved interval and the emitted rect cannot drift apart.
+      const lobbyXAt = lv => {
+        const ld = lobbyDim.get(lv); if (!ld) return null;
+        const west = coreSx + cwS, east = coreNx;             // the clear span between the shafts
+        let lo = Math.round((west + east) / 2 - ld.w / 2);    // centred in it
+        lo = Math.max(west, Math.min(lo, east - ld.w));       // never over coreN, never west of coreS
+        return Math.max(0, lo);
+      };
       // pin the corridor line first: zMid IS southDepth, so locking it keeps every core's
       // z constant across iterations even as the bands change depth
       if (lock && lock.southDepth) southDepth = Math.max(southDepth, lock.southDepth);
@@ -1066,6 +1494,8 @@
           } else {
             if (coreN && cwN > 0 && lv >= coreN.minL && lv <= coreN.maxL) ivs.push({ lo: coreNx, hi: coreNx + cwN });
             if (td && td.n) ivs.push({ lo: coreNx + cwN, hi: coreNx + cwN + td.n.w });   // restroom flush east of coreN
+            { const ld = LOBBY_ANCHOR ? lobbyDim.get(lv) : null, lx = LOBBY_ANCHOR ? lobbyXAt(lv) : null;
+              if (ld && lx !== null) ivs.push({ lo: lx, hi: lx + ld.w }); }   // entrance, centred between the shafts
           }
           ivs.sort((a, b) => a.lo - b.lo);
           const zOf = p => side === 'north' ? zMid + 1 : zMid - p.dMod;
@@ -1097,6 +1527,14 @@
             const arr = floorRects.get(lv);
             if (coreN && td.n) arr.push({ type: 'toilets', category: 'public', level: lv, isCore: false, side: 'north', isToilet: true, xMod: coreNx + cwN, zMod: zMid + 1, wMod: td.n.w, dMod: td.n.d, area: td.n.w * td.n.d * MA });
             if (coreS && td.s) arr.push({ type: 'toilets', category: 'public', level: lv, isCore: false, side: 'south', isToilet: true, xMod: coreSx + cwS, zMod: zMid - td.s.d, wMod: td.s.w, dMod: td.s.d, area: td.s.w * td.s.d * MA });
+          }
+          // lobby rects at their reserved column, past the restroom, still against the core
+          if (LOBBY_ANCHOR && coreN) for (const lv of levels) {
+            const ld = lobbyDim.get(lv); if (!ld) continue;
+            const lo = lobbyXAt(lv); if (lo === null) continue;
+            const src = program.find(p => p.level === lv && !p.isCore && isLobby(p.type));
+            floorRects.get(lv).push({ type: src ? src.type : 'lobby', category: (src && src.category) || 'public', level: lv,
+              isCore: false, side: 'north', xMod: lo, zMod: zMid + 1, wMod: ld.w, dMod: ld.d, area: ld.area });
           }
           // 3rd+ shafts (user 260710: no hard-coded corner box, no detached tower): each sits at the
           // east end of its OWN ACTIVE floors' packed extent — embedded in the podium levels that
@@ -1150,7 +1588,30 @@
           if (lv < 0) continue;               // above-grade only
           winMax = Math.max(winMax, Math.ceil(info.cells / (southDepth + northDepth)));
         }
-        coreNx = Math.max(cwS + 1, cwS + winMax);   // right end of the widest window = true NE corner
+        // ── coreN DOES NOT HAVE TO SIT AT THE WIDEST FLOOR'S EDGE (user 260816: "pinwheel 的
+        //    circulation 還是很長, 另外兩個還好") ─────────────────────────────────────────────
+        // PINWHEEL's envelope is fixed and the spine is extended to every active core, so EVERY
+        // floor pays the full coreS..coreN span whatever its own rooms reach. Measured on the
+        // site case (TEST/_core-corridor.html), corridor per floor against the span its rooms
+        // actually occupy:
+        //   compact  191 mod total, excess 0 on every floor
+        //   inset    232 mod total, excess 0 on every floor
+        //   pinwheel 308 mod total, excess 4 to 18 — L5..L8 rooms span 10 and got 28
+        // Pinning coreN at `cwS + winMax` (the widest floor's east edge) is what buys that: the
+        // tower floors were paying for the podium's width, eleven times over.
+        // E-7 (CBC 1020) allows the spine to dead-end up to 15.24 m past the LAST exit, so coreN
+        // only has to be within that of the widest floor's edge, not on it. Pulling it west by
+        // that allowance is refunded on every floor. The widest floor then oversails coreN by up
+        // to the same allowance, which is why FW below takes the max of the two.
+        // E-3 still governs from the other side: the fixed-point loop underneath pushes coreNx
+        // back out if remoteness needs it, and it runs on the value chosen here.
+        // 3, not the 5 the bare 15.24 m / MODULE arithmetic suggests. checkCompliance measures the
+        // dead-end from the last exit to the END OF THE SPINE, which sits further east than the
+        // widest band run this is derived from (core skips and the core-flush restroom push rooms
+        // out). Measured: DEADEND_MOD 5 put E-7 at 18.1 m on L0 and L1, over the limit. 3 lands at
+        // 12.9 m and keeps the check clean. Verify with TEST/_core-code.html before raising it.
+        const DEADEND_MOD = 3;
+        coreNx = Math.max(cwS + 1, cwS + winMax - DEADEND_MOD - cwN);
         // ── E-3 FLOOR FOR PINWHEEL (260810 · CBC 1007.1.1) ────────────────────────────────
         // COMPACT runs a fixed-point loop that pushes coreN out until the two shafts are ⅓ of
         // the plate diagonal apart (:1070). PINWHEEL was exempted on the grounds that its cores
@@ -1173,7 +1634,7 @@
             coreNx = needNx;
           }
         }
-        FW = coreNx + cwN;                          // fixed envelope
+        FW = Math.max(coreNx + cwN, cwS + winMax);   // fixed envelope; the widest floor may now oversail coreN by up to DEADEND_MOD
         if (coreS) coreShafts.push({ ...coreS, xMod: coreSx, zMod: zMid - coreS.dMod });
         if (coreN) coreShafts.push({ ...coreN, xMod: coreNx, zMod: zMid + 1 });
         // 3rd+ shafts tuck into the SE corner (south band, under coreN's x-range) — inside the fixed
@@ -1190,10 +1651,16 @@
         // the cores and this list never bites, but a floor wider than the above-grade window is
         // now allowed to run east past coreN (see the scan clamp below), and rooms laid straight
         // through a shaft would be drawn inside it. Same wrap COMPACT does in packLegacy.
-        const bandIvs = (lv, side) => coreShafts
-          .filter(c => lv >= c.minL && lv <= c.maxL && (c.zMod > zMid ? 'north' : 'south') === side)
-          .map(c => ({ lo: c.xMod, hi: c.xMod + c.wMod }))
-          .sort((a, b) => a.lo - b.lo);
+        const bandIvs = (lv, side) => {
+          const ivs = coreShafts
+            .filter(c => lv >= c.minL && lv <= c.maxL && (c.zMod > zMid ? 'north' : 'south') === side)
+            .map(c => ({ lo: c.xMod, hi: c.xMod + c.wMod }));
+          const td = TOILET_ON ? toiletDim.get(lv) : null;   // reserve the core-flush restroom here too
+          if (td && side === 'north' && td.n && coreN) ivs.push({ lo: coreNx + cwN, hi: coreNx + cwN + td.n.w });
+          if (td && side === 'south' && td.s && coreS) ivs.push({ lo: coreSx + cwS, hi: coreSx + cwS + td.s.w });
+          if (side === 'north' && LOBBY_ANCHOR) { const ld = lobbyDim.get(lv), lx = lobbyXAt(lv); if (ld && lx !== null) ivs.push({ lo: lx, hi: lx + ld.w }); }
+          return ivs.sort((a, b) => a.lo - b.lo);
+        };
         const layLR = (list, x0, side, ivs) => {
           let x = x0; const out = [];
           const zOf = p => side === 'north' ? zMid + 1 : zMid - p.dMod;
@@ -1266,14 +1733,51 @@
           const anchorR = hugN(lv);   // odd above-grade floor → hug coreN (window right edge = coreNx)
           const sList = orderList(south, lv, anchorR), nList = orderList(north, lv, anchorR);
           const useShort = clusterFloor(lv) && prevShort && prevShort.size;
-          let best = null, bScore = -Infinity, bTie = Infinity;
-          const hiW0 = Math.max(coreSx + cwS, coreNx - Wwin);
+          let best = null, bScore = -Infinity, bCov = -1, bTie = Infinity;
+          // ── THE WINDOW STARTS AT THE PLATE EDGE, NOT PAST coreS (user 260817: "CORE A 對面一直
+          //    沒有量體") ────────────────────────────────────────────────────────────────────────
+          // The lower bound used to be `coreSx + cwS`, the east face of coreS. But coreS stands on
+          // the SOUTH band only, and this w0 is shared by BOTH bands, so it pushed the north band
+          // east of a shaft that was never in its way. The strip opposite the freight core came out
+          // empty on every single floor: measured 11 of 11 levels with nothing across the corridor
+          // from it, against 0 of 11 in COMPACT, whose coreN floats onto the mass instead.
+          // `layLR` already wraps each band around its own shafts through `bandIvs`, so the south
+          // band still steps over coreS on its own. The bound was doing that job a second time, for
+          // the wrong band.
+          const w0Lo = coreSx;
+          // The east bound reaches PAST coreN by its own width so the south band can run behind the
+          // shaft. On its own this barely moved the metric (passenger A 8 empty levels → 7) because
+          // the window choice was still decided by the interlock score, which knows nothing about
+          // shafts. Paired with the ranking below it is what makes covering coreN reachable at all.
+          const hiW0 = Math.max(w0Lo, coreNx - Wwin);
           const sIvs = bandIvs(lv, 'south'), nIvs = bandIvs(lv, 'north');
-          for (let w0 = coreSx + cwS; w0 <= hiW0; w0++) {
+          for (let w0 = w0Lo; w0 <= hiW0; w0++) {
             const cand = [...layLR(sList, w0, 'south', sIvs), ...layLR(nList, w0, 'north', nIvs)];
             const score = useShort ? [...shortCellsOf(cand)].filter(k => prevShort.has(k)).length : overlapCount(progColsOf(cand), prevCols);
-            const tie = anchorR ? (hiW0 - w0) : (w0 - (coreSx + cwS));
-            if (score > bScore || (score === bScore && tie < bTie)) { bScore = score; bTie = tie; best = cand; }
+            // ── A CORE WANTS SOMETHING ACROSS THE CORRIDOR FROM IT ──────────────────────────────
+            // Freeing w0 above let the window sit west, which fixed the strip opposite coreS and
+            // promptly emptied the one opposite coreN instead: measured, freight 11 of 11 empty
+            // levels → 2, passenger A 5 → 8. Choosing on interlock and then hugging an end is what
+            // does it, because neither term knows a shaft is standing there. Covering the shafts is
+            // now a ranked objective in its own right, ahead of the hug and behind the interlock,
+            // so a window is only pulled to an end once both cores already have a neighbour.
+            let cov = 0;
+            for (const c of coreShafts) {
+              if (lv < c.minL || lv > c.maxL) continue;
+              const opp = (c.zMod > zMid ? 'south' : 'north');
+              for (const r of cand) {
+                if (r.side !== opp) continue;
+                if (r.xMod < c.xMod + c.wMod && r.xMod + r.wMod > c.xMod) { cov++; break; }
+              }
+            }
+            // Coverage outranks the interlock score. Ranked below it (tried first) the score
+            // almost always differed across w0, so cov never got a vote and the strip opposite
+            // coreN stayed empty on 8 of 11 levels. A shaft with nothing across the corridor from
+            // it is a worse thing to look at than a floor whose plug-in cells align a little less
+            // with the floor below, and the weave cost is measured rather than assumed.
+            const tie = anchorR ? (hiW0 - w0) : (w0 - w0Lo);
+            if (cov > bCov || (cov === bCov && score > bScore) ||
+                (cov === bCov && score === bScore && tie < bTie)) { bCov = cov; bScore = score; bTie = tie; best = cand; }
           }
           const rects = best || [];
           floorRects.set(lv, rects);
@@ -1294,6 +1798,23 @@
         if (zOv >= 1 && (ax2 === B.xMod || bx2 === A.xMod)) return true;
         return false;
       };
+      // PINWHEEL packs on its own branch, so the restroom rects place() appends for COMPACT/LEGACY
+      // have to be appended here too. Same reserved columns bandIvs wrapped the rooms around.
+      if (PINWHEEL && TOILET_ON) for (const lv of levels) {
+        const td = toiletDim.get(lv); if (!td) continue;
+        const arr = floorRects.get(lv); if (!arr) continue;
+        if (coreN && td.n) arr.push({ type: 'toilets', category: 'public', level: lv, isCore: false, side: 'north', isToilet: true, xMod: coreNx + cwN, zMod: zMid + 1, wMod: td.n.w, dMod: td.n.d, area: td.n.w * td.n.d * MA });
+        if (coreS && td.s) arr.push({ type: 'toilets', category: 'public', level: lv, isCore: false, side: 'south', isToilet: true, xMod: coreSx + cwS, zMod: zMid - td.s.d, wMod: td.s.w, dMod: td.s.d, area: td.s.w * td.s.d * MA });
+      }
+      // and the entrance, on the same branch, at the same reserved column bandIvs wrapped around
+      if (PINWHEEL && LOBBY_ANCHOR && coreN) for (const lv of levels) {
+        const ld = lobbyDim.get(lv); if (!ld) continue;
+        const lo = lobbyXAt(lv); if (lo === null) continue;
+        const arr = floorRects.get(lv); if (!arr) continue;
+        const src = program.find(p => p.level === lv && !p.isCore && isLobby(p.type));
+        arr.push({ type: src ? src.type : 'lobby', category: (src && src.category) || 'public', level: lv,
+          isCore: false, side: 'north', xMod: lo, zMod: zMid + 1, wMod: ld.w, dMod: ld.d, area: ld.area });
+      }
       const floorCorr = new Map();
       for (const lv of levels) {
         const rects = floorRects.get(lv);
@@ -1599,7 +2120,41 @@
     let STREET_BEARING = null, GRID_ROT_DEG = 0, SITE_FRONTAGES = null;
     let CODE_ENFORCE = true;     // E-3 generation constraint (CODE-RULES-CA-EGRESS-ACCESS.md); ?coderules=0 disables — checkCompliance always runs
     let REBALANCE = true;        // floor rebalance (move LONG rooms off crowded floors); ?rebalance=0 disables
+    const TOILET_MAX = 60;       // m2 per restroom cluster; keeps a big podium floor from growing a room-sized toilet
     let TOILET_AUTO = true;      // occupant-load-driven restrooms, one cluster flush against each core, vertically stacked; ?toilets=0 disables (COMPACT/LEGACY only)
+    // OFF by default: implemented, measured, does not converge. ?consol=1 enables it.
+    // The move is validated per step (does the receiver stay inside the cap) but there is no global
+    // convergence condition, so a receiver that goes over becomes the next donor and, because the
+    // top of a run never receives, the surplus piles up on the second floor from the top. Measured
+    // on the site case, cap 15: pre-pack widths went 20,20,16,18 → 14,21,26,18 with seven residual
+    // entries, and the outlier ratio did not move at all (5.3% before and after). Same ratchet
+    // shape as the 260817 apron work: pairwise validation, bottom-up, closed top.
+    // A working version needs to solve the run as a whole (distribute the surplus against every
+    // floor's cap at once) instead of shedding one room at a time.
+    //
+    // 260817(f), SHORT-CONSOLIDATION-PLAN-3: that whole-run solver was NOT built, because the
+    // re-anchored measurement the plan asked for first said there was nothing left to solve.
+    // Counting placed bricks (not program cells) against the tower that really runs through the
+    // run — the INTERSECTION of the pure LONG levels above it, dilated by the margin — gives
+    // SAMPLE 122/122 = 100% inside and site 146/163 = 89.6%, both past the 80% the user set.
+    // The 17 residual bricks are all on the band's two z edges (z 4-5 and 17-18 against a through
+    // tower of z 7-15); the x direction, which is what mechanism D policed, is at zero. So the
+    // remaining skirt is a thin north/south fringe, not a wide apron, and building §B/§C for it
+    // would repeat v2's mistake of moving before measuring. Kept off, and left as it is.
+    let SKIN_ONLY = true;        // perimeter braces must sit on the outermost skin of every level they span; ?skin=0 restores the old extreme-grounded-line pick
+    let CONSOL_ON = false;
+    const CONSOL_MARGIN = 2;     // modules a SHORT band may exceed the tower over it (3 → 2 per the
+                                 // user 260817; inert while CONSOL_ON is false, it only bites on ?consol=1)
+    let STRUCT_DIAG_CONSOL = null;
+    let APRON_RELIEF = true;     // move SHORT up inside its own run so a floor does not out-size the one above it; ?apron=0 disables
+    const APRON_STEP = 1.1;      // a SHORT floor may not out-size the SHORT floor above it at all
+                                 // (user 260817: "儘量讓整個建築是一整個量體, 不要有底部突出來").
+                                 // 1.25 left the ground 36% uncovered; at 1.0 the excess keeps
+                                 // climbing floor by floor until the profile stops widening downward.
+    let LOBBY_ANCHOR = true;     // reserve the lobby a column against the passenger core instead of letting it pack to the tail; ?lobbyanchor=0 disables
+    let ASPECT_CAP = true;       // cap a floor's run so corridor length stops scaling with GFA; ?aspect=0 disables
+    let SPAN_MIX = true;         // balance LONG and SHORT across the two bands separately, so neither piles on one side; ?spanmix=0 disables
+    let PROTRUDE_AIR = true;     // a SHORT brick may only pop out where the neighbour cell is open air, never into a LONG room; ?protrudeair=0 restores the old test
     const CORE_INSET_MOD = 4;    // option B: inward shift ≈ 1–2 programs (modules)
     // P1.5 — no rendered volume side exceeds MAX_SIDE_MOD modules (4 × 8'-6" = 34'-0"). If "under 34ft"
     // is meant strictly, flip this single constant to 3 (25'-6"). SHORT rooms are exempt — the SHORT
@@ -1650,6 +2205,8 @@
     const floorModulesOf = lv => Math.max(1, Math.round(floorHeightOf(lv) / MODULE));
     let exportBoxes = [];    // {type,category,level,cx,cy,cz,w,h,d,vertical} for OBJ/txt export
     let SHORT_PLACE = null;  // kit placements {frameHx,frameHz,infillX,infillZ,frameV,stair} from the last build (both modes) — feeds the FRAME/INFILL module export
+    let STRUCT_DIAG = null;          // read-only census of the transfer/truss system — TEST probes only
+    let SHORT_DIAG = [];              // per-run, per-course packer census (present / free / rests / placed) — read by TEST probes
     let SHORT_STACK_TOP = new Map();  // run's first level → ACTUAL physical top (m) of that run's placed brick/stair stack (buildShortBlocks); consumed by buildStructure's boundary-shift block
 
     // ── FREE MOVE (program massing) ──
@@ -1769,6 +2326,7 @@
       // the thing worth reading off the drawing.
       const COL_CANT = RC ? COL_MAIN : 0.38;
       const PRI_W = RC ? 0.40 : 0.25, PRI_H = priGirderH();            // primary girder, grounded col ↔ grounded col: steel W24 · RC 40×80 (≈ span/10 at an 8 m bay)
+      const CAN_SEC = 0.14, CAN_SEC_TIGHT = 0.15;       // SYS3 cantilever members, per cantilever_truss_whole_building.py (CAN_H_140 / CAN_V_140/150)
       const CANT_W = RC ? 0.35 : 0.24, CANT_H = RC ? 0.70 : 0.52;      // cantilever girder / hung back-span — reach 1–2 modules, R5
       const SEC_W = RC ? 0.30 : 0.19, SEC_H = RC ? 0.55 : 0.46;        // secondary joist: steel W18 · RC 30×55
       const COLSTEP = 3;                                  // columns every 3 modules (~7.77 m ≈ 8 m bay)
@@ -1782,7 +2340,12 @@
       // a transfer beam narrower than the column standing on it is not a support, it is a ledge.
       const rcBeamWidth = C => COL_CANT + 0.06 * (Math.min(6, Math.max(3, Math.round(C))) - 3);   // 0.70 → 0.88 m
       const RC_XFER_DMAX = 2.2;                           // deepest an RC transfer beam may hang below its floor line
-      const R3_RATIO = 2;                                 // R3: backspan B must be ≥ R3_RATIO × reach C
+      // R3 in two tiers (260817, STRUCTURE-SPINE-TRUSS-PLAN §1C). The user's rule is C ≤ ⅔B, with
+      // anything past it required to come down to the ground. B is measured to a DEEP anchor (a
+      // core or the corridor), not to any grounded column: see backspanToAnchor below.
+      const R3_COMFORT = 2;                               // B ≥ 2C — comfortable, drawn as-is
+      const R3_LIMIT = 1.5;                               // B ≥ 1.5C ⟺ C ≤ ⅔B — the hard line
+      const R3_RATIO = R3_COMFORT;                        // kept: the older call sites read this name
       // ── THREE-TIER HIERARCHY (260722(c)) — from references/cantilever_truss_whole_building.py's
       // SYSTEM_MAP/SYSTEM_DEFS (SYS1 主要量體 / SYS2 長跨桁架 / SYS3 懸挑量體). Ratio, not literal cm:
       //   SYS1 = the grounded column grid + cores already built below (COL_MAIN, PRI_ girders, cores).
@@ -1840,7 +2403,7 @@
             // upper bound (may overstate the true top, but it's the best estimate available).
             let belowFoot = null;
             const li = levels.indexOf(run[0]);   // previous ENTRY in levels, not run[0]-1: level numbers are labels
-            if (li > 0) {
+            if (li > 0 && run[0] > 0) {          // at or below grade the run rests on the ground — mirrors buildShortBlocks
               belowFoot = new Set(); const bl = levels[li - 1];
               const addF = r => { for (let i = r.xMod; i < r.xMod + r.wMod; i++) for (let j = r.zMod; j < r.zMod + r.dMod; j++) belowFoot.add(i + ',' + j); };
               for (const r of (L.floorRects.get(bl) || [])) addF(r);
@@ -2014,6 +2577,48 @@
         }
         return acc;
       };
+      // ── R3 REVISED 260817 (STRUCTURE-SPINE-TRUSS-PLAN §1C) ─────────────────────────────────
+      // `backspanModules` above walks grounded grid points and stops caring where it ends up, so a
+      // back span that runs three modules into open floor counts the same as one that reaches a
+      // core. R9 asks for the opposite: the tie has to land in something deep. Measured on the
+      // SAMPLE before this, B came back 0 on 18 of 28 transfers and every single one of the 28
+      // failed R3 — a test that fails everything is not a test.
+      // `backspanToAnchor` walks the same way and stops at the first grid point sitting on a core
+      // footprint or the corridor spine, reporting whether it ever got there.
+      const anchorCells = new Map();
+      const anchorAt = lv => {
+        let s = anchorCells.get(lv); if (s) return s;
+        s = new Set();
+        const add = r => { for (let i = r.xMod; i < r.xMod + r.wMod; i++) for (let j = r.zMod; j < r.zMod + r.dMod; j++) s.add(i + ',' + j); };
+        for (const c of L.coreShafts) if (lv >= c.minL && lv <= c.maxL) add(c);
+        for (const r of (L.floorCorr.get(lv) || [])) add(r);
+        anchorCells.set(lv, s); return s;
+      };
+      const backspanToAnchor = (axisArr, anchorPos, hungPos, fixedCoord, rowCase, gSet, lv) => {
+        const dir = anchorPos > hungPos ? 1 : -1, idx = axisArr.indexOf(anchorPos);
+        const deep = anchorAt(lv);
+        const cellOf = pos => rowCase ? (pos + ',' + fixedCoord) : (fixedCoord + ',' + pos);
+        // A grid point sits on the CORNER of four cells, which is why colGroundedAtLv tests all
+        // four. Testing only the (gi,gj) cell found a core on no transfer at all: the first cut of
+        // this rule sent every one of the 28 SAMPLE groups to 'prop'.
+        const onDeep = pos => {
+          const gi = rowCase ? pos : fixedCoord, gj = rowCase ? fixedCoord : pos;
+          return deep.has((gi - 1) + ',' + (gj - 1)) || deep.has(gi + ',' + (gj - 1))
+              || deep.has((gi - 1) + ',' + gj) || deep.has(gi + ',' + gj);
+        };
+        // The anchor standing ON the core is the BEST case, not the worst: the tie lands straight
+        // into the deep element, so there is no back span to run out of. Returning 0 here made
+        // every such group fail the ratio and go to 'prop' — 28 of 28 on the SAMPLE.
+        if (onDeep(anchorPos)) return { mods: Infinity, hitAnchor: true, atCore: true };
+        let acc = 0, prev = anchorPos;
+        for (let k = idx + dir; k >= 0 && k < axisArr.length; k += dir) {
+          const cand = axisArr[k];
+          if (!gSet.has(cellOf(cand))) break;
+          acc += Math.abs(cand - prev); prev = cand;
+          if (onDeep(cand)) return { mods: acc, hitAnchor: true };
+        }
+        return { mods: acc, hitAnchor: false };
+      };
       // SYS2 long-span extension — from the immediate anchor, keep walking further into the
       // grounded zone (same direction, away from the hung point), up to `capMods` additional
       // modules, staying on grounded grid points (restricted to `gSet`, the level-specific anchor
@@ -2146,7 +2751,7 @@
         if (sec.chord > t.sec.chord) t.sec = sec;                       // heaviest reach on the line sizes it
         t.flagged = t.flagged || flagged;
         if (floorYs.length > t.floorYs.length) { t.floorYs = floorYs; t.zb = zb; }
-        t.reach.push([Math.min(tipX, reachAnchorX), Math.max(tipX, reachAnchorX)]);   // hangers only over these
+        t.reach.push([Math.min(tipX, reachAnchorX), Math.max(tipX, reachAnchorX), tipX]);   // braces only over these; 3rd entry marks the free end
         t.roots.set(farX.toFixed(2), { far: farX, dir: Math.sign(tipX - farX) || 1 });
         // No SYS3 interface tie is recorded. It was a vertical member at reachAnchorX running from
         // the group's base up to the bottom chord — but reachAnchorX is by definition a GROUNDED
@@ -2158,86 +2763,62 @@
       //    leaves the other's collector empty). Everything below is the 260722(b) coat-hanger
       //    mechanism — chords, one Warren web, tension hangers, short root struts — over the
       //    merged span, once per line. ──
+      // ── SYS3 CANTILEVER BRACING (260817, STRUCTURE-SPINE-TRUSS-PLAN §1B) ────────────────────
+      // This used to be the coat-hanger: a one-storey top truss with a Warren web, tension hangers
+      // below it and root struts, recorded once per grid line. It made one building-scale truss per
+      // cantilevered line — SAMPLE carried 11 of them, 513 m of chord — scattered over the facade at
+      // different heights, sharing no plane and no node. The reference model says the opposite:
+      // SYS3 is CAN_H / CAN_V / CAN_PL at 140-150 mm, small members, no big truss anywhere. The
+      // building-scale long span is SYS2, and there are only a few of those (see the spine below).
+      //
+      // Each merged group now gets, over its reach only:
+      //   · one horizontal tie per floor line, tip back to the anchor
+      //   · one vertical post per panel node
+      //   · one diagonal per panel per storey, ALL LEANING THE SAME WAY — high at the anchor, low
+      //     at the tip, so the load path reads as one direction of tension. That single direction
+      //     is the point of this change; the Warren web alternated and read as noise.
+      // The merge collector is untouched: two hung runs on one line within 0.6 m are still one
+      // assembly, or the overlapping-member problem from 260722 comes straight back.
       const emitSteelTrusses = () => {
         for (const list of steelTrusses.values()) for (const t of list) {
+          const span = t.b - t.a;
+          if (STRUCT_DIAG) STRUCT_DIAG.trusses.push({ span: +span.toFixed(2), ztop: +t.ztop.toFixed(2), flagged: !!t.flagged });
           const c = t.flagged ? STRUCT.flag : STRUCT.trans;
-          const label = t.flagged ? 'cantilever long-span truss (R3 short)' : 'cantilever long-span truss';
+          const label = t.flagged ? 'cantilever brace (R3 tight)' : 'cantilever brace';
+          const sc = t.flagged ? CAN_SEC_TIGHT : CAN_SEC;
           const posAt = (p, y) => t.axisIsX ? new THREE.Vector3(p, y, t.fixedW) : new THREE.Vector3(t.fixedW, y, p);
-          const len = t.b - t.a, mid = (t.a + t.b) / 2, sec = t.sec;
-          if (len < 1e-6) continue;
-          // The truss occupies the TOP STOREY of the group: top chord under its ceiling, bottom
-          // chord sitting ON the top hung floor. It used to straddle that floor line (yBotC =
-          // botFloor − chord/2), which put the bottom chord exactly where that floor's girders
-          // run — the chord and the girder were the same member drawn twice, 0.68 m³ of overlap on
-          // the worst line. Sitting the chord above the line leaves the girders their own zone
-          // below it. A minimum depth is still enforced for a shallow storey.
-          // The top chord clears the GIRDER ZONE of the floor above. `ztop` is a floor line, and
-          // that floor's girders hang PRI_H below it, so a top chord placed just under ztop landed
-          // inside them — 0.68 m³ on the worst line, the largest clash left in the model.
-          const yTopC = t.ztop - PRI_H - sec.chord / 2;
-          const yBotC = Math.min(t.botFloor + sec.chord / 2, yTopC - sec.chord * 1.5);
-          if (t.axisIsX) {
-            addStruct(mid, yBotC, t.fixedW, len, sec.chord, sec.chord, c, 1, label + ' bottom chord', null, null);
-            addStruct(mid, yTopC, t.fixedW, len, sec.chord, sec.chord, c, 1, label + ' top chord', null, null);
-          } else {
-            addStruct(t.fixedW, yBotC, mid, sec.chord, sec.chord, len, c, 1, label + ' bottom chord', null, null);
-            addStruct(t.fixedW, yTopC, mid, sec.chord, sec.chord, len, c, 1, label + ' top chord', null, null);
-          }
-          // Warren diagonals across the merged span, alternating slope for /\/\ triangles. Panel
-          // nodes are derived from the merged span, so there is exactly one node set on this line
-          // and exactly one member arriving at each node from each side.
-          const segs = Math.max(2, Math.round(len / M / COLSTEP));
-          const nodeCoord = n => t.a + len * n / segs;
-          for (let n = 0; n < segs; n++) {
-            const up = n % 2 === 0;
-            addStrut(posAt(nodeCoord(n), up ? yBotC : yTopC), posAt(nodeCoord(n + 1), up ? yTopC : yBotC), sec.web, c, label + ' diagonal', null, null);
-          }
-          // 2. HANGERS — slender vertical tension ties from the bottom chord down through every
-          //    floor of the group below, but ONLY at panel nodes inside a REACH zone. The rest of
-          //    the span rides on already-grounded structure and has nothing to hang. R5 web ×0.5,
-          //    per the source schedule's CAN_V 14×14 against TR_CHORD 30×30. The top hung floor
-          //    sits at the bottom chord already, so hangers serve floorYs[0..length-2].
-          //    A panel node that lands on a COLUMN gets no hanger. Panel nodes step by COLSTEP and
-          //    the columns sit on the same grid, so they coincide often, and the hung column there
-          //    already carries those floors — the hanger was drawn inside it, holding up what was
-          //    holding it up. Redundant, and it read as a clash.
-          const hangSec = sec.web * 0.5;
-          const lowest = t.floorYs.length ? t.floorYs[0] : t.zb;
-          for (let n = 0; n <= segs; n++) {
-            const p = nodeCoord(n);
-            if (!t.reach.some(r => p >= r[0] - 1e-6 && p <= r[1] + 1e-6)) continue;
-            const px = t.axisIsX ? p : t.fixedW, pz = t.axisIsX ? t.fixedW : p;
-            if (colPts.some(cp => Math.abs(cp.x - px) < 0.35 && Math.abs(cp.z - pz) < 0.35 && cp.y1 > lowest + 0.05 && cp.y0 < yBotC - 0.05)) continue;
-            let yCur = yBotC;
-            for (let k = t.floorYs.length - 2; k >= 0; k--) {
-              const yNext = t.floorYs[k], h = Math.abs(yCur - yNext);
-              if (h > 1e-6) {
-                const cy = (yCur + yNext) / 2;
-                if (t.axisIsX) addStruct(p, cy, t.fixedW, hangSec, h, hangSec, c, 1, label + ' hanger', null, null);
-                else addStruct(t.fixedW, cy, p, hangSec, h, hangSec, c, 1, label + ' hanger', null, null);
-              }
-              yCur = yNext;
+          const ys = (t.floorYs && t.floorYs.length ? t.floorYs.slice() : [t.zb]).sort((a, b) => a - b);
+          for (const rr of t.reach) {
+            const lo = Math.min(rr[0], rr[1]), hi = Math.max(rr[0], rr[1]);
+            const len = hi - lo;
+            if (len < 1e-6) continue;
+            const tipAtHi = rr.length > 2 ? rr[2] >= (lo + hi) / 2 : true;   // which end is the free one
+            // panel nodes across the reach, one per column bay
+            const bay = COLSTEP * M;
+            const n = Math.max(1, Math.round(len / bay));
+            const nodeAt = k => lo + (len * k) / n;
+            // horizontal tie at every floor line the group spans
+            for (const y of ys) {
+              if (t.axisIsX) addStruct((lo + hi) / 2, y - sc / 2, t.fixedW, len, sc, sc, c, 1, label + ' tie', null, null);
+              else addStruct(t.fixedW, y - sc / 2, (lo + hi) / 2, sc, sc, len, c, 1, label + ' tie', null, null);
             }
-          }
-          // 3. ROOT STRUTS — short braces at each DEEP grounded end (the SYS2↔SYS1 tie into the
-          //    column grid or core), per the source schedule's STRUT_200: short, root-only, never a
-          //    full-depth web. Keyed by position, so two transfers rooting at the same node give
-          //    one pair of struts rather than two pairs on top of each other.
-          //    They now live IN THE TRUSS PLANE, cross-bracing the end panel at the root: one
-          //    strut per root, the diagonal opposite to the Warren one in that panel, so it can
-          //    never coincide with it. Before, they ran from the group's BASE up to the chords,
-          //    which for a single-floor group came out horizontal and lay along the bottom chord
-          //    (96% buried in the member it was meant to brace) and for a multi-floor group cut
-          //    down through the girders of every storey it passed. STRUT_200 in the source
-          //    schedule is short and root-only; a member crossing three floors is neither.
-          const panels = len / segs, braced = new Set();
-          for (const { far, dir } of t.roots.values()) {
-            const n0 = Math.max(0, Math.min(segs, Math.round((far - t.a) / panels)));
-            const nLo = Math.max(0, Math.min(segs - 1, dir > 0 ? n0 : n0 - 1));
-            if (braced.has(nLo)) continue;   // two roots can land in one panel; brace it once
-            braced.add(nLo);
-            const warrenUp = nLo % 2 === 0;   // the web already runs bottom→top across this panel when true
-            addStrut(posAt(nodeCoord(nLo), warrenUp ? yTopC : yBotC), posAt(nodeCoord(nLo + 1), warrenUp ? yBotC : yTopC), sec.web * 0.7, c, label + ' root strut', null, null);
+            // vertical post at each node, from the group's base to its top
+            const yLo = ys[0], yHi = ys[ys.length - 1];
+            if (yHi - yLo > 1e-6) for (let k = 0; k <= n; k++) {
+              const x = nodeAt(k);
+              if (t.axisIsX) addStruct(x, (yLo + yHi) / 2, t.fixedW, sc, yHi - yLo, sc, c, 1, label + ' post', null, null);
+              else addStruct(t.fixedW, (yLo + yHi) / 2, x, sc, yHi - yLo, sc, c, 1, label + ' post', null, null);
+            }
+            // ONE-WAY diagonals: anchor end high, tip end low, every panel, every storey
+            for (let si = 0; si < ys.length - 1; si++) {
+              const yA = ys[si], yB = ys[si + 1];
+              for (let k = 0; k < n; k++) {
+                const x0 = nodeAt(k), x1 = nodeAt(k + 1);
+                const p0 = tipAtHi ? posAt(x0, yB) : posAt(x0, yA);
+                const p1 = tipAtHi ? posAt(x1, yA) : posAt(x1, yB);
+                addStrut(p0, p1, sc, c, label + ' diagonal', null, null);
+              }
+            }
           }
         }
       };
@@ -2250,23 +2831,74 @@
       // still hold it down. R3 is judged on the TRUE backspan (backspanModules, uncapped), so the
       // flag does not move with this.
       const spanCapMods = RC ? 2 * COLSTEP : SYS2_SPAN_MODS;
+      STRUCT_DIAG = { rc: !!RC, transfers: transfers.length, noAnchor: 0, flagged: 0, built: 0,
+                      stacks: {}, reach: [], backspan: [], trusses: [], verdict: {}, props: 0, propFail: 0 };
+      // ── R3 VERDICT ──────────────────────────────────────────────────────────────────────────
+      //   C ≤ B/2            comfortable, drawn as it was
+      //   B/2 < C ≤ 2B/3     allowed, brace section goes up a step and the label says so
+      //   C > 2B/3, or the back span never reached a core or corridor → the cantilever has to come
+      //                      down: a prop under the tip, and the group is drawn as a plain girder
+      //                      because it is not a cantilever any more.
+      const r3Verdict = (bs, C) => {
+        if (!bs.hitAnchor) return { tier: 'prop', tight: false };
+        if (bs.mods >= R3_COMFORT * C) return { tier: 'ok', tight: false };
+        if (bs.mods >= R3_LIMIT * C) return { tier: 'tight', tight: true };
+        return { tier: 'prop', tight: false };
+      };
+      // A prop stands under the tip and runs to the ground. It may only land INSIDE the building
+      // footprint (user 260817): with nowhere to land the member keeps the red flag and the breach
+      // is written into CODE_CHECK instead of being hidden by a column standing on the plaza.
+      const groundFoot = (() => {
+        const s = new Set(), lv = levels[0];
+        for (const r of (L.floorRects.get(lv) || [])) for (let i = r.xMod; i < r.xMod + r.wMod; i++) for (let j = r.zMod; j < r.zMod + r.dMod; j++) s.add(i + ',' + j);
+        for (const r of (L.floorCorr.get(lv) || [])) for (let i = r.xMod; i < r.xMod + r.wMod; i++) for (let j = r.zMod; j < r.zMod + r.dMod; j++) s.add(i + ',' + j);
+        for (const c of L.coreShafts) if (lv >= c.minL && lv <= c.maxL) for (let i = c.xMod; i < c.xMod + c.wMod; i++) for (let j = c.zMod; j < c.zMod + c.dMod; j++) s.add(i + ',' + j);
+        return s;
+      })();
+      const yGround = yBase(levels[0]);
+      const propUnder = (t, axisIsX) => {
+        const inside = groundFoot.has(t.gi + ',' + t.gj);
+        if (!inside) {
+          STRUCT_DIAG.propFail++;
+          CODE_CHECK.violations.push({ rule: 'R3', level: t.lv0, measured: 'no landing', threshold: 'prop inside footprint',
+            unit: '', note: 'cantilever exceeds C ≤ ⅔B and its tip has nowhere to come down inside the building' });
+          return;
+        }
+        STRUCT_DIAG.props++;
+        const h = t.zb - yGround;
+        if (h <= 0) return;
+        addStruct(wx(t.gi), yGround + h / 2, wz(t.gj), COL_MAIN, h, COL_MAIN, STRUCT.col, 1, 'cantilever prop', t.lv0, matFrame);
+      };
+      for (const t of transfers) STRUCT_DIAG.stacks[t.stack] = (STRUCT_DIAG.stacks[t.stack] || 0) + 1;
       for (const t of transfers) {
         const gSet = groundedAtLv.get(t.lv0) || new Set();          // anchors grounded AT this run's root floor
         const gpts = [...gSet].map(s => s.split(',').map(Number));
         if (corridorAlongX) {   // project ±Z → tie back along Z only (col: fixed gi, varying gj)
           const col = gpts.filter(([x, y]) => x === t.gi && y !== t.gj);
-          if (!col.length) continue;
+          if (!col.length) { STRUCT_DIAG.noAnchor++; continue; }
           const gy = col.reduce((p, c) => Math.abs(c[1] - t.gj) < Math.abs(p[1] - t.gj) ? c : p)[1];
-          const reachMods = Math.abs(gy - t.gj), B = backspanModules(gys, gy, t.gj, t.gi, false, gSet);
+          const reachMods = Math.abs(gy - t.gj);
+          const bs = backspanToAnchor(gys, gy, t.gj, t.gi, false, gSet, t.lv0);
+          const v = r3Verdict(bs, reachMods);
+          STRUCT_DIAG.built++; STRUCT_DIAG.reach.push(reachMods); STRUCT_DIAG.backspan.push(isFinite(bs.mods) ? bs.mods : -1);   // -1 = anchored straight into a core
+          STRUCT_DIAG.verdict[v.tier] = (STRUCT_DIAG.verdict[v.tier] || 0) + 1;
+          if (v.tier === 'prop') { propUnder(t, false); continue; }
+          if (v.tier !== 'ok') STRUCT_DIAG.flagged++;
           const farGy = extendGroundedFar(gys, gy, t.gj, t.gi, false, gSet, Math.max(0, spanCapMods - reachMods));
-          buildTransferMember(wz(t.gj), wz(gy), wz(farGy), wx(t.gi), false, t.zb, t.ztop, reachMods, B < R3_RATIO * reachMods, t.stack, t.floorYs);
+          buildTransferMember(wz(t.gj), wz(gy), wz(farGy), wx(t.gi), false, t.zb, t.ztop, reachMods, v.tight, t.stack, t.floorYs);
         } else {   // project ±X → tie back along X only (row: fixed gj, varying gi)
           const row = gpts.filter(([x, y]) => y === t.gj && x !== t.gi);
-          if (!row.length) continue;
+          if (!row.length) { STRUCT_DIAG.noAnchor++; continue; }
           const gx = row.reduce((p, c) => Math.abs(c[0] - t.gi) < Math.abs(p[0] - t.gi) ? c : p)[0];
-          const reachMods = Math.abs(gx - t.gi), B = backspanModules(gxs, gx, t.gi, t.gj, true, gSet);
+          const reachMods = Math.abs(gx - t.gi);
+          const bs = backspanToAnchor(gxs, gx, t.gi, t.gj, true, gSet, t.lv0);
+          const v = r3Verdict(bs, reachMods);
+          STRUCT_DIAG.built++; STRUCT_DIAG.reach.push(reachMods); STRUCT_DIAG.backspan.push(isFinite(bs.mods) ? bs.mods : -1);   // -1 = anchored straight into a core
+          STRUCT_DIAG.verdict[v.tier] = (STRUCT_DIAG.verdict[v.tier] || 0) + 1;
+          if (v.tier === 'prop') { propUnder(t, true); continue; }
+          if (v.tier !== 'ok') STRUCT_DIAG.flagged++;
           const farGx = extendGroundedFar(gxs, gx, t.gi, t.gj, true, gSet, Math.max(0, spanCapMods - reachMods));
-          buildTransferMember(wx(t.gi), wx(gx), wx(farGx), wz(t.gj), true, t.zb, t.ztop, reachMods, B < R3_RATIO * reachMods, t.stack, t.floorYs);
+          buildTransferMember(wx(t.gi), wx(gx), wx(farGx), wz(t.gj), true, t.zb, t.ztop, reachMods, v.tight, t.stack, t.floorYs);
         }
       }
       emitSteelTrusses();
@@ -2548,30 +3180,229 @@
           if (shared >= ALIGN_MIN) cur.push(levels[k]); else { runsAligned.push(cur); cur = [levels[k]]; }
         }
         runsAligned.push(cur);
+        // ── PERIMETER MEGA-BRACING (260817b, STRUCTURE-PERIMETER-BRACING-PLAN §2) ──────────────
+        // What used to be here: an X on the two long faces of every core, over every aligned
+        // volume. It is deleted, and the reason matters or someone will put it back.
+        //
+        // 1. The core is ALREADY a shear wall. It is drawn at ~3060 as one continuous RC solid over
+        //    its whole height. Gluing a steel X to the outside of a solid concrete core is bracing
+        //    the stiff thing with the soft thing: the load never takes the steel, so the member
+        //    does nothing but draw a line.
+        // 2. The spec was read backwards. HYBRID-STRUCTURE-RULES §4 picks "CORE + MEGA frame", and
+        //    a mega-frame is the PERIMETER structure that helps the core walls. This code had the
+        //    frame stuck onto the core instead.
+        // 3. The reference model has no such member. In the 275-piece schedule of
+        //    cantilever_truss_whole_building.py the only diagonals are the TRUSS layer, i.e. SYS2's
+        //    web. Core-related entries are VOL_CORE, SLAB and COL. Nothing braces a core face.
+        //
+        // So the bracing moves to the OUTERMOST grounded column lines, where a mega-frame belongs.
+        // Per volume, because a setback changes which lines are outermost. Two panels per facade,
+        // symmetric about its midpoint, one bay in from the corner (a corner column belongs to both
+        // facades and would collect two directions of brace on one member). Both axes get their own,
+        // or the building has a lateral system in one direction only, which is recorded as a
+        // CODE_CHECK entry rather than passed over.
+        // ── OUTERMOST SKIN ONLY (260817e, STRUCTURE-OUTERMOST-BRACE-PLAN) ─────────────────
+        // Picking the extreme grounded lines of a volume's BASE floor is not the same as picking
+        // the building's skin, and it failed three ways: a setback volume's extremes sit in the
+        // middle of the plan below it, a grounded line can be several bays inboard of an edge that
+        // is cantilevered, and the extreme x is often the core's own line, which is the member
+        // 260817b deleted for good reasons (see the note above this loop).
+        // A panel now has to sit ON the skin of every level it spans: nothing of the LONG massing,
+        // the corridor or a core may lie outboard of its plane on that level. Judged per level, so
+        // a setback tower's own facade still qualifies over its own floors.
+        const cellAt = (lv, gi, gj) => (occ.get(lv) || new Set()).has(gi + ',' + gj);
+        // outward is the opposite of the inward offset sgn
+        const onSkinAt = (lv, fixed, sgn, alongX, u0, u1) => {
+          const outIdx = sgn > 0 ? fixed - 1 : fixed;
+          for (let u = u0; u < u1; u++) {
+            if (alongX ? cellAt(lv, u, outIdx) : cellAt(lv, outIdx, u)) return false;
+          }
+          return true;
+        };
+        // a line running along a core face is excluded outright: the RC shaft is that plane's
+        // lateral system already, which is the whole reason the core braces went.
+        const coreFaceLines = { x: new Set(), z: new Set() };
+        for (const c of L.coreShafts) {
+          coreFaceLines.z.add(c.zMod); coreFaceLines.z.add(c.zMod + c.dMod);
+          coreFaceLines.x.add(c.xMod); coreFaceLines.x.add(c.xMod + c.wMod);
+        }
         for (const vol of runsAligned) {
-          if (vol.length < 2) continue;           // a single floor is not a volume to brace
+          if (vol.length < 2) continue;
           const vLo = vol[0], vHi = vol[vol.length - 1];
-          for (const c of L.coreShafts) {
-            // the braced segment is where this core and this volume actually overlap
-            const lo = Math.max(c.minL, vLo), hi = Math.min(c.maxL, vHi);
-            if (hi <= lo) continue;
-            const y0 = yBase(lo), y1 = zTopOf(hi);
-            if (y1 - y0 < M) continue;
-            const x0 = wx(c.xMod), x1 = wx(c.xMod + c.wMod), z0 = wz(c.zMod), z1 = wz(c.zMod + c.dMod);
-            // Brace the two LONGER faces only. Both pairs would read as a cage and would cross
-            // every beam framing into the core from both directions; the long faces carry the
-            // stiffness that matters and leave the short ones free for the girders.
-            const alongX = (x1 - x0) >= (z1 - z0);
-            const faces = alongX ? [[z0, -1], [z1, 1]] : [[x0, -1], [x1, 1]];
-            const a0 = alongX ? x0 : z0, a1 = alongX ? x1 : z1;
-            for (const [plane, sgn] of faces) {
-              // Clear of the core face AND of any column standing on it. Half a brace was enough
-              // to escape the core, but the brace is near vertical, so where a column sits on that
-              // face it ran 4 m up the inside of it. Half a column plus half a brace clears both.
-              const off = plane + sgn * (COL_MAIN / 2 + BRACE / 2 + 0.02);
-              const p = (u, y) => alongX ? new THREE.Vector3(u, y, off) : new THREE.Vector3(off, y, u);
-              addStrut(p(a0, y0), p(a1, y1), BRACE, STRUCT.core, 'core mega-brace', lo, null);
-              addStrut(p(a0, y1), p(a1, y0), BRACE, STRUCT.core, 'core mega-brace', lo, null);
+          // The line only has to be GROUNDED, which `groundedAtLv` already means: its column
+          // reaches grade. Demanding it also exist on every floor of the volume was my own extra
+          // condition and it is far too strong here, where the whole building is one aligned
+          // volume: only 10 grid points survive B2 to L5, essentially the core, and no facade got
+          // a single panel. Instead the line is chosen off the volume's base floor, and each brace
+          // then spans only the storeys where that line actually stands.
+          const base = groundedAtLv.get(vLo) || new Set();
+          const common = [...base].map(k => k.split(',').map(Number));
+          if (common.length < 4) continue;
+          const xsAll = [...new Set(common.map(q => q[0]))].sort((a, b) => a - b);
+          const zsAll = [...new Set(common.map(q => q[1]))].sort((a, b) => a - b);
+          if (xsAll.length < 3 || zsAll.length < 3) continue;
+          const y0 = yBase(vLo), y1 = zTopOf(vHi);
+          if (y1 - y0 < M) continue;
+          const solidAll = (gi, gj) => base.has(gi + ',' + gj);
+          // the contiguous floor runs where BOTH lines of a panel stand, so a brace never spans a
+          // storey whose columns are not there
+          const runsFor = (a, b, fixed, alongX) => {
+            const out = []; let cur = [];
+            for (const lv of vol) {
+              const g = groundedAtLv.get(lv) || new Set();
+              const ok = alongX ? (g.has(a + ',' + fixed) && g.has(b + ',' + fixed))
+                                : (g.has(fixed + ',' + a) && g.has(fixed + ',' + b));
+              if (ok) cur.push(lv); else { if (cur.length) out.push(cur); cur = []; }
+            }
+            if (cur.length) out.push(cur);
+            return out;
+          };
+          // Slenderness: BRACE 0.30 over a 4-5 storey volume is KL/r ~140, at the limit for a strut
+          // that is ever in compression. Split the X per 2 storeys instead of one X over the whole
+          // volume, which keeps each panel near a storey pair and the section honest.
+          const STOREY_STEP = 2;
+          const bays = [];
+          for (let k = 0; k + 1 < vol.length; k += STOREY_STEP) bays.push([vol[k], vol[Math.min(k + STOREY_STEP, vol.length - 1)]]);
+          const placed = { x: 0, z: 0 }; const dbgSides = []; const skipped = [];
+          // For each of the four sides: walk in from the corner until the line is grounded all the
+          // way up, take two positions either side of the facade midpoint.
+          const sides = [
+            { axis: 'x', fixed: zsAll[0], sgn: 1, arr: xsAll },                    // south edge, brace runs along X
+            { axis: 'x', fixed: zsAll[zsAll.length - 1], sgn: -1, arr: xsAll },    // north edge
+            { axis: 'z', fixed: xsAll[0], sgn: 1, arr: zsAll },                    // west edge, brace runs along Z
+            { axis: 'z', fixed: xsAll[xsAll.length - 1], sgn: -1, arr: zsAll },    // east edge
+          ];
+          for (const sd of sides) {
+            const alongX = sd.axis === 'x';
+            // core faces are out, whatever else they are
+            const faceSet = alongX ? coreFaceLines.z : coreFaceLines.x;
+            if (faceSet.has(sd.fixed)) { skipped.push(sd.axis + ':core-face'); continue; }
+            const ok = sd.arr.filter(u => alongX ? solidAll(u, sd.fixed) : solidAll(sd.fixed, u));
+            dbgSides.push(sd.axis + ':ok' + ok.length);
+            if (ok.length < 3) continue;                     // need a bay that is not the corner
+            // Adjacent pairs, corners dropped, then the two whose centres sit nearest the quarter
+            // points of the facade. Splitting `inner` into halves and demanding two candidates in
+            // each was far too fussy for these facades: `ok` runs 3 to 5, so `inner` is 1 to 3 and
+            // almost nothing qualified. Quarter points give the same symmetry with what is there.
+            // Corners are dropped so one column does not collect a brace from both directions.
+            // On a SHORT facade that rule costs the whole axis: this plan is a bar, its z-facing
+            // facades have 2 to 4 grounded lines, and dropping corners left one of them with none,
+            // so the z axis got a single panel and the building was free to twist. An axis with no
+            // lateral system is worse than a corner column carrying two braces, so below five lines
+            // the corners stay in.
+            const inner = ok.length >= 5 ? ok.slice(1, -1) : ok.slice();
+            if (inner.length < 2) continue;
+            const pairs = [];
+            for (let q = 0; q + 1 < inner.length; q++) pairs.push([inner[q], inner[q + 1]]);
+            if (!pairs.length) continue;
+            const lo0 = ok[0], hi0 = ok[ok.length - 1];
+            const target = [lo0 + (hi0 - lo0) * 0.25, lo0 + (hi0 - lo0) * 0.75];
+            const picks = [];
+            for (const tgt of target) {
+              let best = null, bd = Infinity;
+              for (const pr of pairs) {
+                if (picks.includes(pr)) continue;
+                const d = Math.abs((pr[0] + pr[1]) / 2 - tgt);
+                if (d < bd) { bd = d; best = pr; }
+              }
+              if (best) picks.push(best);
+            }
+            for (const [u0, u1] of picks) {
+              if (u1 - u0 < 1) continue;
+              const fixedW = alongX ? wz(sd.fixed) : wx(sd.fixed);
+              const off = fixedW + sd.sgn * (COL_MAIN / 2 + BRACE / 2 + 0.02);   // inboard, clear of the curtain wall
+              const a0 = alongX ? wx(u0) : wz(u0), a1 = alongX ? wx(u1) : wz(u1);
+              const pt = (u, y) => alongX ? new THREE.Vector3(u, y, off) : new THREE.Vector3(off, y, u);
+              let any = false;
+              // A run of ONE storey still gets an X. Requiring two consecutive floors was the
+              // reason a facade came back with a single panel per axis instead of two: the second
+              // pair was chosen but its lines only stood together on one floor, so nothing drew.
+              // A one-storey X is a perfectly ordinary braced bay.
+              for (const run of runsFor(u0, u1, sd.fixed, alongX)) {
+                for (let k = 0; k < run.length; k += STOREY_STEP) {
+                  const bLo = run[k], bHi = run[Math.min(k + STOREY_STEP - 1, run.length - 1)];
+                  const by0 = yBase(bLo), by1 = zTopOf(bHi);
+                  if (by1 - by0 < M) continue;
+                  // every level this X spans has to have the plane on its skin. A line can be the
+                  // edge for three floors and be swallowed by a wider floor above, and then only
+                  // the lower segment is drawn.
+                  if (SKIN_ONLY) {
+                    let allSkin = true;
+                    for (let q = k; q <= Math.min(k + STOREY_STEP - 1, run.length - 1); q++)
+                      if (!onSkinAt(run[q], sd.fixed, sd.sgn, alongX, u0, u1)) { allSkin = false; break; }
+                    if (!allSkin) { skipped.push(sd.axis + ':interior'); continue; }
+                  }
+                  addStrut(pt(a0, by0), pt(a1, by1), BRACE, STRUCT.col, 'perimeter mega-brace', bLo, null);
+                  addStrut(pt(a0, by1), pt(a1, by0), BRACE, STRUCT.col, 'perimeter mega-brace', bLo, null);
+                  any = true;
+                }
+              }
+              if (any) placed[sd.axis]++;
+            }
+          }
+          if (STRUCT_DIAG) (STRUCT_DIAG.perim = STRUCT_DIAG.perim || []).push({ vol: vLo + '..' + vHi, x: placed.x, z: placed.z, common: common.length, nx: xsAll.length, nz: zsAll.length, sides: dbgSides, skipped });
+          if (placed.x < 2 || placed.z < 2)
+            CODE_CHECK.violations.push({ rule: 'LAT', level: vLo, measured: placed.x + '/' + placed.z,
+              threshold: '2/2 panels per axis', unit: '', note: 'aligned volume has fewer than two perimeter brace panels on an axis' });
+        }
+
+        // ── SYS2 SPINE TRUSS (260817, STRUCTURE-SPINE-TRUSS-PLAN §1A) ──────────────────────────
+        // Until now nothing tied the two cores together along the circulation. The braced cores
+        // above are two independent lateral systems facing each other across the gallery, and what
+        // used to be called SYS2 was a per-cantilever hanger truss: 11 of them on the SAMPLE,
+        // 513 m of chord, at eleven different heights, sharing no plane. The reference model has
+        // ONE building-scale long span (TR_CHORD_300 ×11 chords, TR_POST_300 ×15, TR_PANEL ×40),
+        // not one per overhang.
+        // The spine runs core to core along the gallery axis, one storey deep, on the two grounded
+        // column lines that FLANK the corridor rather than down its middle, which is empty. It
+        // appears at the top of each aligned volume, at most SPINE_MAX in the building; past that
+        // the longest spans win. Voids do not break it: the user's call is that crossing one is
+        // what a long-span truss is for.
+        {
+          const SPINE_MAX = 3;
+          const TR_SEC = 0.30;                       // TR_CHORD_300 / TR_POST_300 / TR_PANEL
+          // The pair is chosen PER LEVEL, not once for the building. Taking the outermost two
+          // shafts by x picked SAMPLE's two single-storey extra exits, which exist only on L1, so
+          // no aligned volume top ever had both alive and the building got no spine at all.
+          const cand = [];
+          {
+            for (const vol of runsAligned) {
+              if (vol.length < 2) continue;
+              const top = vol[vol.length - 1];
+              const live = L.coreShafts.filter(c => top >= c.minL && top <= c.maxL);
+              if (live.length < 2) continue;
+              const uOf = c => corridorAlongX ? wx(c.xMod + c.wMod / 2) : wz(c.zMod + c.dMod / 2);
+              const us = live.map(uOf);
+              const a = Math.min(...us), b = Math.max(...us);
+              if (b - a < M) continue;
+              cand.push({ top, a, b, span: b - a });
+            }
+          }
+          {
+            cand.sort((x, y) => y.span - x.span);
+            for (const sp of cand.slice(0, SPINE_MAX)) {
+              const yTop = zTopOf(sp.top) - PRI_H - TR_SEC / 2;      // clear of the girder zone above
+              const yBot = Math.min(yBase(sp.top) + TR_SEC / 2, yTop - TR_SEC * 1.5);
+              const len = sp.b - sp.a, mid = (sp.a + sp.b) / 2;
+              // the two grounded lines flanking the gallery, half a bay either side of its centre
+              // the gallery is the zMid row, so its two long edges are the flanking column lines
+              const offs = corridorAlongX ? [wz(L.zMid), wz(L.zMid + 1)] : [wx(L.zMid), wx(L.zMid + 1)];
+              // ── SPINE IS A SOLID DEEP BEAM, NOT A TRUSS (260817e) ──────────────────────────
+              // The user's rule is that the inside of the LONG massing carries no diagonals at all,
+              // WoZoCo-style: bracing reads on the skin, the volume is clean. The spine sits on the
+              // two column lines flanking the gallery, which is the middle of the plan, so its web
+              // went with the rest.
+              // Removing the diagonals from a truss and keeping the chords would leave two parallel
+              // sticks that carry nothing, so the member is rebuilt as what it now is: one solid
+              // beam per line, its depth the old chord-to-chord dimension. Same span, same two
+              // lines, same clearance under the girder zone above.
+              const dBeam = Math.max(TR_SEC, (yTop - yBot) + TR_SEC);
+              const yMid = (yBot + yTop) / 2;
+              for (const off of offs) {
+                if (corridorAlongX) addStruct(mid, yMid, off, len, dBeam, TR_SEC, STRUCT.trans, 1, 'spine deep beam', sp.top, null);
+                else addStruct(off, yMid, mid, TR_SEC, dBeam, len, STRUCT.trans, 1, 'spine deep beam', sp.top, null);
+              }
+              if (STRUCT_DIAG) (STRUCT_DIAG.spines = STRUCT_DIAG.spines || []).push({ level: sp.top, span: +sp.span.toFixed(2) });
             }
           }
         }
@@ -2664,7 +3495,7 @@
 
       // masked 3-D porous packer: 1:2 modules on axes X(0)/Z(1)/vertical(2); fills ONLY present
       // cells; vertical bricks span k,k+1 (across the floor line). Non-overlapping by construction.
-      const porousMasked = (present, W, D, K, seed, restsBase, axisPref) => {
+      const porousMasked = (present, W, D, K, seed, restsBase, axisPref, openTop) => {
         const occ = new Int8Array(W * D * K), id = (i, j, k) => (k * D + j) * W + i;
         for (let k = 0; k < K; k++) for (let j = 0; j < D; j++) for (let i = 0; i < W; i++) occ[id(i, j, k)] = present(i, j, k) ? -1 : 0;
         const inb = (i, j, k) => i >= 0 && i < W && j >= 0 && j < D && k >= 0 && k < K;
@@ -2674,10 +3505,26 @@
         // gravity: a cell rests on the FILLED module directly below (or on the floor below at course 0).
         // Scanning k ascending, the course below is already resolved. No support ⇒ no placement ⇒ no float.
         const rests = (i, j, k) => k === 0 ? restsBase(i, j) : (inb(i, j, k - 1) && occ[id(i, j, k - 1)] >= 1);
+        // per-course diagnosis: how many cells the floor asks for, how many have anything to stand
+        // on, how many a brick actually reached. Published so a probe can see WHERE a run dies
+        // instead of only that it did.
+        const diag = [];
+        for (let k = 0; k < K; k++) {
+          let p = 0;
+          for (let j = 0; j < D; j++) for (let i = 0; i < W; i++) if (present(i, j, k)) p++;
+          diag.push({ k, present: p, free: 0, rests: 0, placed: 0 });
+        }
         const out = [];
         for (let k = 0; k < K; k++) for (let j = 0; j < D; j++) for (let i = 0; i < W; i++) {
           if (occ[id(i, j, k)] !== -1) continue;
-          const cands = []; for (let a = 0; a < 3; a++) { const [x, y, z] = part(i, j, k, a); if (emp(x, y, z)) cands.push(a); }
+          diag[k].free++;
+          if (rests(i, j, k)) diag[k].rests++;
+          const cands = [];
+          for (let a = 0; a < 3; a++) {
+            const [x, y, z] = part(i, j, k, a);
+            if (emp(x, y, z)) cands.push(a);
+            else if (a === 2 && z >= K && openTop && openTop(i, j)) cands.push(a);   // rises past the top course into open air
+          }
           if (!cands.length) continue;
           const pref = axisPref ? axisPref(i, j, k) : (((i + j + k + seed) % 3) + 3) % 3;
           cands.sort((a, b) => ((a - pref + 3) % 3) - ((b - pref + 3) % 3));
@@ -2685,11 +3532,19 @@
           for (const a of cands) {
             const [x, y, z] = part(i, j, k, a);
             if (forb.has(a) || nbr(x, y, z, [i, j, k]).includes(a)) continue;
-            // support: the brick's lowest cell(s) must rest on a filled module below (axis 2 rests on its base cell)
-            if (a === 2 ? !rests(i, j, k) : (!rests(i, j, k) || !rests(x, y, z))) continue;
-            occ[id(i, j, k)] = a + 1; occ[id(x, y, z)] = a + 1; out.push([i, j, k, a]); break;
+            // Support: a 1:2 module needs SOMETHING under it, not something under all of it.
+            // Bearing on one module and oversailing the other by half a brick is what the domino
+            // kit is for, and it is exactly what the gravity post-pass below already accepts
+            // (`.some`). The packer used to demand BOTH cells and it runs first, so the strict
+            // rule decided and a multi-floor run died from its second course up: two of four SHORT
+            // floors were never built (232 cells), and the kit read as a flat tiling.
+            // Restored 260817 together with the grade gate below, which is the pairing that gives
+            // a four-course weave without the stack punching into the LONG floor above.
+            if (a === 2 ? !rests(i, j, k) : (!rests(i, j, k) && !rests(x, y, z))) continue;
+            occ[id(i, j, k)] = a + 1; if (inb(x, y, z)) occ[id(x, y, z)] = a + 1; out.push([i, j, k, a]); diag[k].placed++; break;
           }
         }
+        out.diag = diag;
         return out;
       };
 
@@ -2752,9 +3607,25 @@
         // does not exist, `run[0] > 0` read false for a run seven metres up, and the whole gate
         // switched itself off: 5 modules landed on cells whose nearest floor plate was a storey
         // further down.
+        // KNOWN DEFECT, deliberately left in place (260816, user's call — see the session log).
+        // This gate exists so an above-grade plug-in stack cannot start in mid-air past the plate
+        // under it. Applied to the GROUND floor it says something false: it makes the ground run
+        // rest on the BASEMENT, so every SHORT cell the basement does not reach counts as
+        // unsupported. S falls below `area`, and since a SHORT storey is exactly one course tall
+        // (floorHeightOf → MODULE, so natK = 1), K = ceil(area/S) climbs to 2+ and the overflow
+        // course is built INSIDE the LONG floor above. Nothing lifts that floor in massing mode:
+        // the boundary shift that would (buildStructure :1886) only runs in structure mode.
+        // Measured, same program with and without the basement rows (TEST/_grade-repro.html):
+        //   with basement  50 boxes, 16 overlaps, deepest 2.591 m (one whole module)
+        //   no basement    57 boxes, clean
+        // Fixed by `run[0] > 0`: only an ABOVE-GRADE run needs the plate below it. Restored
+        // 260817 alongside the packer support rule. That pairing matters: on its own this fix
+        // takes the overflow away and with it the ground floor's vertical weave, which is why it
+        // was reverted the first time. With the support rule relaxed too, a four-floor run has
+        // four courses to weave in and does not need to punch through the storey above to do it.
         let belowFoot = null;
         const li = L.levels.indexOf(run[0]);
-        if (li > 0) {
+        if (li > 0 && run[0] > 0) {
           belowFoot = new Set(); const bl = L.levels[li - 1];
           const addF = r => { for (let i = r.xMod; i < r.xMod + r.wMod; i++) for (let j = r.zMod; j < r.zMod + r.dMod; j++) belowFoot.add(i + ',' + j); };
           for (const r of (L.floorRects.get(bl) || [])) addF(r);
@@ -2762,6 +3633,31 @@
           for (const c of L.coreShafts) if (bl >= c.minL && bl <= c.maxL) addF(c);
         }
         const restsBase = (i, j) => belowFoot === null || belowFoot.has(i + ',' + j);
+
+        // ── OPEN SKY OVER THE STACK (user 260817: SHORT with nothing above it weaves too) ──
+        // A vertical module spans two courses, so the packer can only stand one where the cell is
+        // SHORT on the course above as well. That makes the TOP course of every run horizontal by
+        // construction: measured across four configurations today, the top SHORT floor came back
+        // with 0 verticals every single time.
+        // Where nothing sits above the run, though, there is no reason for that. The module can
+        // rise past the storey line into open air, which is what the roof courses already do.
+        // `openTop` is the licence: true only where the level above the run has NOTHING at that
+        // cell (no room, no corridor, no shaft), or where the run is the top of the building.
+        // Anywhere a LONG floor does sit above, this stays shut, because a vertical standing into
+        // it is exactly the overlap fixed earlier today.
+        let aboveFoot = null;
+        {
+          const lt = L.levels.indexOf(run[run.length - 1]);
+          if (lt >= 0 && lt + 1 < L.levels.length) {
+            const al = L.levels[lt + 1];
+            aboveFoot = new Set();
+            const addF = r => { for (let i = r.xMod; i < r.xMod + r.wMod; i++) for (let j = r.zMod; j < r.zMod + r.dMod; j++) aboveFoot.add(i + ',' + j); };
+            for (const r of (L.floorRects.get(al) || [])) addF(r);
+            for (const r of (L.floorCorr.get(al) || [])) addF(r);
+            for (const c of L.coreShafts) if (al >= c.minL && al <= c.maxL) addF(c);
+          }
+        }
+        const openTop = (i, j) => aboveFoot === null || !aboveFoot.has(i + ',' + j);
         // SHORT footprint per floor, total area, and how many cells the supported base can start
         const footByFloor = run.map(lv => { const m = new Map(); for (const r of L.floorRects.get(lv)) if (rectShort(r) && !r.vacant) for (let i = r.xMod; i < r.xMod + r.wMod; i++) for (let j = r.zMod; j < r.zMod + r.dMod; j++) m.set(i + ',' + j, r); return m; });
         let area = 0; const uni = new Set(); for (const m of footByFloor) { area += m.size; for (const key of m.keys()) uni.add(key); }
@@ -2881,7 +3777,8 @@
           if (edAt(i, j, k) >= 2) return (2 + b) % 3;                        // core → vertical
           return (((!present(i - 1, j, k) || !present(i + 1, j, k)) ? 0 : 1) + b) % 3;   // ±X facade → X-long; else ±Z facade → Z-long
         };
-        const packed = porousMasked(present, L.FW, L.FD, K, (run[0] * 131) | 0, restsBase, axisPref);
+        const packed = porousMasked(present, L.FW, L.FD, K, (run[0] * 131) | 0, restsBase, axisPref, openTop);
+        SHORT_DIAG.push({ run: run.slice(), natK, K, courseFloor: courseFloor.slice(), diag: packed.diag });
         // ── GRAVITY ── `restsBase` only gates course 0. Above it the porous packer could leave a
         // module with nothing at all underneath: measured on SAMPLE, an island of 4 infill + 3
         // VERTICAL FRAME modules at course 6 with courses 3, 4 and 5 completely empty, floating
@@ -2899,7 +3796,7 @@
           // which put its upper half above the allotted height — and since SHORT_STACK_TOP reads
           // the highest course anything reaches, one such module pushed every LONG floor above the
           // stack up by a full course. That is where the over-tall storey came from.
-          const live = new Set(packed.filter(b => b[3] !== 2 || b[2] + 2 <= K));
+          const live = new Set(packed.filter(b => b[3] !== 2 || b[2] + 2 <= K || openTop(b[0], b[1])));
           const occAt = new Map();   // "i,j,k" → brick occupying that cell (vertical fills two)
           for (const b of packed) {
             const ks = b[3] === 2 ? [b[2], b[2] + 1] : [b[2]];
@@ -2926,7 +3823,16 @@
         // [k, k+2). Stair segments (one push per occupied course) occupy [k, k+1) like horizontals.
         {
           let maxTopCourse = 0;
-          for (const b of bricks) { const top = b[2] + (b[3] === 2 ? 2 : 1); if (top > maxTopCourse) maxTopCourse = top; }
+          // A vertical standing into open sky (the 260817 licence above) is deliberately NOT
+          // counted. SHORT_STACK_TOP is one number for the whole run and buildStructure lifts
+          // every LONG floor above the run to clear it, so letting one open-air module set it
+          // would raise the whole building by a course to clear something with nothing over it.
+          // It is capped at K for that brick: the courses it actually shares with the stack.
+          for (const b of bricks) {
+            const raw = b[2] + (b[3] === 2 ? 2 : 1);
+            const top = (b[3] === 2 && raw > K && openTop(b[0], b[1])) ? K : raw;
+            if (top > maxTopCourse) maxTopCourse = top;
+          }
           // a shaft now reaches the top of its enclosing vertical frame, not of its last stair run
           for (const key of stairSet) { const s = stairShaft(key); if (s && s.top > maxTopCourse) maxTopCourse = s.top; }
           const actualTop = base + maxTopCourse * MODULE;
@@ -3065,6 +3971,33 @@
           for (let k = s.k0; k <= s.k1; k++) place.stair.push([wx(s.si), yk(k), wz(s.sj)]);
         }
 
+        // ── A PROTRUSION MUST FACE OPEN AIR (user 260815: "有的 SHORT 長到 LONG 裡面") ──
+        // The exposure test below read `!present(i, j, k)`, i.e. "the neighbour is not part of
+        // the SHORT volume". That is true of open air AND of a LONG room's cell, so every brick
+        // sitting on a LONG/SHORT boundary popped ½–⅔ of a module straight into the room next
+        // door. protrudeOffset() at :714 documents the correct rule ("Restricted to the exterior
+        // long face per side ... so a protrusion can never overlap a neighbour or the floor
+        // above") but it has never been called from anywhere: this inline copy is the live one
+        // and it lost the restriction.
+        // A cell counts as open only when NOTHING on that course's floor occupies it: not SHORT,
+        // and not a LONG rect, the corridor or a core shaft either. Courses above the storeys
+        // (k ≥ natK, the roof stack) keep the old test, since there is no floor beside them.
+        const solidByLv = new Map();
+        const solidOf = lv => {
+          let s = solidByLv.get(lv);
+          if (s) return s;
+          s = new Set();
+          const addF = r => { for (let i = r.xMod; i < r.xMod + r.wMod; i++) for (let j = r.zMod; j < r.zMod + r.dMod; j++) s.add(i + ',' + j); };
+          for (const r of (L.floorRects.get(lv) || [])) if (!(rectShort(r) && !r.vacant)) addF(r);
+          for (const r of (L.floorCorr.get(lv) || [])) addF(r);
+          for (const c of L.coreShafts) if (lv >= c.minL && lv <= c.maxL) addF(c);
+          solidByLv.set(lv, s);
+          return s;
+        };
+        // ?protrudeair=0 restores the old "not SHORT" test, so the defect stays reproducible.
+        const openCell = (i, j, k) => !present(i, j, k) &&
+          (!PROTRUDE_AIR || k >= natK || !solidOf(courseFloor[k]).has(i + ',' + j));
+
         if (!structure) {
           for (const b of bricks) {
             const [i, j, k, a] = b;
@@ -3080,8 +4013,8 @@
               const amt = (hash3(i + 6, j + 7, k + 8) < 0.5 ? 0.5 : 2 / 3) * M;
               const loCells = a === 0 ? [[i, j - 1], [i + 1, j - 1]] : [[i, j - 1]];
               const hiCells = a === 0 ? [[i, j + 1], [i + 1, j + 1]] : [[i, j + 2]];
-              const loOpen = loCells.every(c => !present(c[0], c[1], k));
-              const hiOpen = hiCells.every(c => !present(c[0], c[1], k));
+              const loOpen = loCells.every(c => openCell(c[0], c[1], k));
+              const hiOpen = hiCells.every(c => openCell(c[0], c[1], k));
               if (loOpen && !hiOpen) { cz -= amt; protruded = true; }
               else if (hiOpen && !loOpen) { cz += amt; protruded = true; }
               else if (loOpen && hiOpen) { cz += (j < L.FD / 2 ? -amt : amt); protruded = true; }
@@ -3579,7 +4512,7 @@
 
     function build() {
       root.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => m.dispose()); });
-      root.clear(); meshes = []; exportBoxes = []; SHORT_PLACE = null; SHORT_STACK_TOP = new Map(); SHORT_BEAT = 0;   // adaptLayout re-sets the beat; ?adapt=0 leaves it at 0
+      root.clear(); meshes = []; exportBoxes = []; SHORT_PLACE = null; SHORT_DIAG = []; STRUCT_DIAG_CONSOL = { runs: [], residual: [] }; SHORT_STACK_TOP = new Map(); SHORT_BEAT = 0;   // adaptLayout re-sets the beat; ?adapt=0 leaves it at 0
       if (!PROGRAM.length) { renderStats(); renderCodePanel(); return; }
 
       // M8: orient AFTER packing and before anything reads the layout, so the structure frame,
@@ -6459,7 +7392,215 @@
         cb(b.dataset.v);
       });
     }
-    seg('seg-mode', v => { RENDER_MODE = v; updateExportPanel(); updateSysToggle(); build(); });
+    // ══════════════════════════════════════════════════════════════════
+    // ANALYSIS · the last step of the walk (260815)
+    // ══════════════════════════════════════════════════════════════════
+    // Site, program, massing, then what changing it this way avoids. Two halves, and the line
+    // between them is the whole point:
+    //
+    //   MEASURED, from the program on screen and the timeline it arrived with: how much floor
+    //   area changes use over the horizon, how often, and in which year. Moving the rates below
+    //   never moves these.
+    //
+    //   ASSUMED, by whoever is reading: what a square metre costs to build, to demolish and to
+    //   convert, and what it carries in embodied carbon. Nothing in this platform measures any
+    //   of that. The rates are placeholders in the same sense the forecast's FAR is one, they
+    //   are editable here, and every figure derived from them says it rests on them.
+    //
+    // THE COUNTERFACTUAL IS PRINTED, NOT IMPLIED: the saving is against delivering the same
+    // change by demolishing that floor area and building it again. Against doing nothing it is
+    // zero. Only the permanent conversion is priced — a plug-in floor taking a new tenancy does
+    // not avoid a demolition, so the re-plugs are reported as measured churn with no money on
+    // them. Pricing those would be the easiest way to make this page lie.
+    const AN_RATES = { build: 3500, demo: 120, convert: 1200, ecBuild: 600, ecConv: 120 };
+    const anMoney = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(1) + 'M'
+      : v >= 1e3 ? '$' + Math.round(v / 1e3) + 'k' : '$' + Math.round(v);
+    const anCO2 = kg => kg >= 1e6 ? (kg / 1e6).toFixed(1) + ' kt'
+      : kg >= 1e3 ? Math.round(kg / 1e3) + ' t' : Math.round(kg) + ' kg';
+
+    function analysisRead() {
+      const evs = (EVOLUTION && Array.isArray(EVOLUTION.events)) ? EVOLUTION.events : [];
+      const conv = evs.filter(e => e.kind === 'long');
+      const replug = evs.filter(e => e.kind === 'short');
+      const sum = a => a.reduce((s, e) => s + (+e.area || 0), 0);
+      const convArea = sum(conv), replugArea = sum(replug);
+      const r = AN_RATES, rebuild = r.build + r.demo;
+      return {
+        has: !!evs.length,
+        // a timeline written before events carried their area: say so rather than print a zero
+        stale: !!(conv.length && !convArea),
+        gfa: PROGRAM.reduce((s, p) => s + (p.area || 0), 0),
+        horizon: (EVOLUTION && EVOLUTION.horizon) || TL_HORIZON || 0,
+        convArea, replugArea, replugCount: replug.length,
+        year: conv.length ? conv[0].year : null,
+        to: conv.length ? conv[0].toType : null,
+        rebuildRate: rebuild, keepRate: r.convert,
+        money: Math.max(0, convArea * (rebuild - r.convert)),
+        carbon: Math.max(0, convArea * (r.ecBuild - r.ecConv)),
+        rates: r,
+      };
+    }
+
+    function renderAnalysis() {
+      // Two hosts, and which one a block goes to is the point of the page. `host` is the left
+      // column: what was measured off the program, and the five rates the reader sets. `side`
+      // is the right: only what those two produce. So everything on the right is derived and
+      // nothing derived is printed beside something typed, which is what keeps an assumption
+      // from reading as a measurement. The rate table says in its own head which it is.
+      const host = document.getElementById('an-body'), side = document.getElementById('an-right'),
+            midEl = document.getElementById('an-mid');
+      if (!host) return;
+      const a = analysisRead(), esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      const inner = document.getElementById('analysis-inner');
+      const solo = on => { if (inner) inner.classList.toggle('solo', on); };
+      if (side) side.innerHTML = '';
+      if (midEl) midEl.innerHTML = '';
+      solo(true);
+      if (!a.has) {
+        host.innerHTML = '<div class="an-lede">This model arrived without a timeline, so there is no change to count. ' +
+          'Build it from the program wizard, or write a conversion into the chat line, and the analysis fills in.</div>';
+        return;
+      }
+      if (a.stale) {
+        host.innerHTML = '<div class="an-lede">This timeline was written before the conversion carried its floor area, ' +
+          'so there is nothing here to count yet. Go back to the program and press Build again.</div>';
+        return;
+      }
+      solo(false);
+      const out = [], mid = [], right = [];
+      // "Nothing below them is" was written for a single column and is now spatially false, so
+      // the sentence names the page rather than a direction. The rest is the same three facts
+      // with the padding taken out.
+      out.push('<div class="an-lede">Over <b>' + a.horizon + ' years</b> this building changes <b>' +
+        Math.round(a.convArea + a.replugArea).toLocaleString() + ' m²</b> of use' +
+        (a.convArea ? ': <b>' + Math.round(a.convArea).toLocaleString() + ' m²</b> converted once in year ' +
+          a.year + ' to ' + esc(a.to) : '') +
+        (a.replugCount ? (a.convArea ? ', and ' : ': ') + '<b>' + Math.round(a.replugArea).toLocaleString() +
+          ' m²</b> of plug-in floor re-let ' + a.replugCount + ' time' + (a.replugCount === 1 ? '' : 's') : '') +
+        ', all of it inside the frame on screen. These areas are measured from the program. ' +
+        'Nothing else on this page is.</div>');
+
+      // ── what changes, against what is built ──
+      // Only the conversion is drawn as a share. The re-plug total counts the same floor once
+      // per re-let, so stacking it here would claim a share of the building that does not
+      // exist; it is reported underneath as the churn it actually is.
+      if (a.gfa && a.convArea) {
+        const pc = Math.min(100, a.convArea / a.gfa * 100);
+        out.push('<div class="an-share"><div class="sh-t"><i class="conv" style="width:' + pc.toFixed(1) + '%"></i></div>' +
+          '<div class="sh-k"><span><b class="conv"></b>' + Math.round(a.convArea).toLocaleString() + ' m² converted, ' +
+          Math.round(pc) + '% of what is built</span>' +
+          '<span><b class="rest"></b>' + Math.round(a.gfa - a.convArea).toLocaleString() + ' m² carries on as built</span></div>' +
+          (a.replugCount ? '<div class="sh-churn">On top of that, ' + Math.round(a.replugArea).toLocaleString() +
+            ' m² of plug-in tenancy changes hands ' + a.replugCount + ' time' + (a.replugCount === 1 ? '' : 's') +
+            '. That total counts a floor once per re-let, so it is churn over ' + a.horizon +
+            ' years and not a share of the building.</div>' : '') +
+          '</div>');
+      }
+
+      if (a.convArea) {
+        right.push('<div class="an-figs">' +
+          '<div class="an-cell"><span class="an-v">' + anMoney(a.money) + '</span>' +
+          '<span class="an-k">not spent</span>' +
+          '<span class="an-sub">' + Math.round(a.convArea).toLocaleString() + ' m² × (' +
+          a.rebuildRate.toLocaleString() + ' to rebuild − ' + a.keepRate.toLocaleString() + ' to convert)</span></div>' +
+          '<div class="an-cell"><span class="an-v">' + anCO2(a.carbon) + '</span>' +
+          '<span class="an-k">CO2e not emitted</span>' +
+          '<span class="an-sub">embodied in the structure and envelope that stays</span></div>' +
+          '<div class="an-cell"><span class="an-v">' + Math.round(a.convArea).toLocaleString() + ' m²</span>' +
+          '<span class="an-k">not demolished</span>' +
+          '<span class="an-sub">' + (a.gfa ? Math.round(a.convArea / a.gfa * 100) + '% of the ' +
+            Math.round(a.gfa).toLocaleString() + ' m² built' : 'of what is built') + '</span></div>' +
+          '</div>');
+
+        // ── the counterfactual, drawn ──
+        // Both routes deliver the same change to the same floor area. Drawing them on one
+        // scale is what makes the saving a length rather than a number to be taken on trust,
+        // and it makes the rates below read as what moves the bars.
+        const cf = (head, keepV, rebuildV, gap, fmt, tail) => {
+          const max = Math.max(keepV, rebuildV) || 1;
+          const row = (k, v, cls) => '<div class="an-cf-row"><span class="an-cf-k">' + esc(k) + '</span>' +
+            '<span class="an-cf-t"><i class="' + cls + '" style="width:' + (v / max * 100).toFixed(1) + '%"></i></span>' +
+            '<span class="an-cf-v">' + fmt(v) + '</span></div>';
+          return '<div class="an-cf"><div class="an-cf-h">' + esc(head) + '</div>' +
+            row('Demolish and rebuild', rebuildV, '') +
+            row('Convert and keep', keepV, 'keep') +
+            '<div class="an-cf-gap">' + fmt(gap) + esc(tail || ' is the gap') + '</div></div>';
+        };
+        right.push(cf('The same ' + Math.round(a.convArea).toLocaleString() + ' m², two ways · cost',
+          a.convArea * a.keepRate, a.convArea * a.rebuildRate, a.money, anMoney,
+          ' is the gap, and the gap is the whole claim'));
+        right.push(cf('The same ' + Math.round(a.convArea).toLocaleString() + ' m², two ways · embodied carbon',
+          a.convArea * a.rates.ecConv, a.convArea * a.rates.ecBuild, a.carbon, anCO2));
+
+        // The five dials go at the foot of the LEFT column, under the sentence they cannot
+        // move. Left is now what the reader owns: the measured areas, and the rates they set.
+        // Right is only what those two produce, so every figure over there is derived and
+        // nothing derived sits next to something typed.
+        const rate = (id, label, val, unit) =>
+          '<tr><td>' + esc(label) + '</td>' +
+          '<td class="n"><input id="' + id + '" type="number" min="0" step="10" value="' + val + '"></td>' +
+          '<td class="u">' + esc(unit) + '</td></tr>';
+        mid.push('<div class="an-rates"><div class="an-rates-h">Rates you are assuming</div>' +
+          // Three facts, one clause each: what they are, why the platform cannot supply them,
+          // and what they do not touch. Everything else here was scene-setting.
+          '<div class="an-rates-s">Placeholders. This platform measures floor areas, not prices or embodied ' +
+          'carbon. Set your own; the measured areas do not move when these do.</div>' +
+          '<table class="an-rt"><thead><tr><th>Rate</th><th class="n">Value</th><th></th></tr></thead><tbody>' +
+          rate('an-build', 'New build', a.rates.build, 'USD/m²') +
+          rate('an-demo', 'Demolition', a.rates.demo, 'USD/m²') +
+          rate('an-conv', 'Conversion', a.rates.convert, 'USD/m²') +
+          rate('an-ecb', 'Embodied, new', a.rates.ecBuild, 'kgCO2e/m²') +
+          rate('an-ecc', 'Embodied, conversion', a.rates.ecConv, 'kgCO2e/m²') +
+          '</tbody></table></div>');
+        right.push('<div class="an-note"><b>Against one alternative only</b>: delivering the same change by ' +
+          'demolishing that floor area and building it again. Against leaving the building alone the ' +
+          'saving is zero, and against a lighter refit it is smaller than this.</div>');
+      } else {
+        right.push('<div class="an-note">No permanent conversion falls inside the horizon, so there is nothing here to price. ' +
+          'The re-plugs on the left change what the building is used for without changing what was built, which is the point of them, ' +
+          'but a tenancy change does not avoid a demolition.</div>');
+      }
+
+      // The placeholder warning moved to the rate table, next to the fields it is about. What
+      // is left here is the one thing the table cannot say: what is deliberately NOT priced.
+      right.push('<div class="an-caveat">Re-letting the plug-in floors is deliberately not priced: nobody demolishes ' +
+        'a building to replace a coffee shop, so counting those as avoided demolition would be the easiest way to ' +
+        'make the figures in this column a lie.</div>');
+
+      host.innerHTML = out.join('');
+      if (midEl) midEl.innerHTML = mid.join('');
+      if (side) side.innerHTML = right.join('');
+      for (const [id, key] of [['an-build', 'build'], ['an-demo', 'demo'], ['an-conv', 'convert'],
+                               ['an-ecb', 'ecBuild'], ['an-ecc', 'ecConv']]) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        el.addEventListener('change', () => {
+          const v = parseFloat(el.value);
+          if (!isNaN(v) && v >= 0) { AN_RATES[key] = v; renderAnalysis(); }
+        });
+      }
+    }
+
+    // Analysis is a STAGE, not a render mode: it lays itself over the model and leaves
+    // RENDER_MODE, the camera and the scene exactly as they were, so stepping back to Massing
+    // returns to the same view rather than rebuilding it.
+    let ANALYSIS_ON = false, ANALYSIS_FROM_URL = false;
+    function setAnalysis(on) {
+      ANALYSIS_ON = !!on;
+      document.getElementById('analysis-stage').classList.toggle('on', ANALYSIS_ON);
+      document.body.classList.toggle('analysis-on', ANALYSIS_ON);
+      if (ANALYSIS_ON) renderAnalysis();
+    }
+
+    seg('seg-mode', v => {
+      if (v === 'analysis') { setAnalysis(true); return; }   // the model underneath is untouched
+      const cameFromStage = ANALYSIS_ON;
+      setAnalysis(false);
+      // stepping back out onto the mode that is already drawn: take the stage away and leave
+      // the scene alone. Rebuilding here would re-pack and re-frame a view the eye was just on.
+      if (cameFromStage && v === RENDER_MODE) return;
+      RENDER_MODE = v; updateExportPanel(); updateSysToggle(); build();
+    });
     seg('seg-struct-sys', v => { STRUCT_SYS = v; build(); });
     // The structural-system switch only changes what Structure mode draws, so it rides with it.
     function updateSysToggle() {
@@ -6667,7 +7808,8 @@
       { key: 'roof', label: 'Roof', match: t => t === 'roof slab' || t === 'roof beam' },
       { key: 'cw', label: 'Curtain wall', match: t => t === 'curtain wall' },
       { key: 'fin', label: 'Fins', match: t => t.startsWith('timber frame') },
-      { key: 'core', label: 'Core', match: t => t.endsWith(' (RC core)') || t === 'core mega-brace' },
+      { key: 'core', label: 'Core', match: t => t.endsWith(' (RC core)') },
+      { key: 'perimeter', label: 'Perimeter bracing', match: t => t === 'perimeter mega-brace' },
     ];
     // All / None toggle every structure checkbox — both the permanent-structure and relocatable-unit groups.
     document.getElementById('struct-chk-all').addEventListener('click', () => document.querySelectorAll('.struct-chk, .reloc-chk').forEach(c => c.checked = true));
@@ -6845,11 +7987,21 @@
     // URL params (headless verification): ?color=type|category · ?mode=solid|structure · ?sys=steel|rc · ?interlock=0..1 · ?skin=0|1 · ?move=type:dx,dy,dz;type2:...
     { const q = new URLSearchParams(location.search);
       if (q.get('color')) COLOR_MODE = q.get('color');
-      if (q.get('mode')) { RENDER_MODE = q.get('mode'); const sm = document.getElementById('seg-mode'); if (sm) sm.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.v === RENDER_MODE)); }
+      // ?mode=analysis opens the last step over whatever the model was already drawing, so it
+      // must not reach RENDER_MODE: build() knows solid and structure and nothing else.
+      if (q.get('mode') === 'analysis') { ANALYSIS_FROM_URL = true; const sm = document.getElementById('seg-mode'); if (sm) sm.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.v === 'analysis')); }
+      else if (q.get('mode')) { RENDER_MODE = q.get('mode'); const sm = document.getElementById('seg-mode'); if (sm) sm.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.v === RENDER_MODE)); }
       if (q.get('sys')) { STRUCT_SYS = q.get('sys'); const ss = document.getElementById('seg-struct-sys'); if (ss) ss.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.v === STRUCT_SYS)); }
       if (q.get('core')) { CORE_OPTION = q.get('core'); CORE_FROM_URL = true; const sc = document.getElementById('seg-core'); if (sc) sc.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.v === CORE_OPTION)); }
       if (q.get('coderules') !== null) CODE_ENFORCE = q.get('coderules') !== '0';
       if (q.get('rebalance') !== null) REBALANCE = q.get('rebalance') !== '0';
+      if (q.get('spanmix') !== null) SPAN_MIX = q.get('spanmix') !== '0';
+      if (q.get('aspect') !== null) ASPECT_CAP = q.get('aspect') !== '0';
+      if (q.get('lobbyanchor') !== null) LOBBY_ANCHOR = q.get('lobbyanchor') !== '0';
+      if (q.get('apron') !== null) APRON_RELIEF = q.get('apron') !== '0';
+      if (q.get('consol') !== null) CONSOL_ON = q.get('consol') !== '0';
+      if (q.get('skin') !== null) SKIN_ONLY = q.get('skin') !== '0';
+      if (q.get('protrudeair') !== null) PROTRUDE_AIR = q.get('protrudeair') !== '0';
       if (q.get('adapt') !== null) ADAPT_ON = q.get('adapt') !== '0';   // 0 = old free re-layout (frame moves with the timeline)
       if (q.get('phase') !== null) PHASE_FLOORS_PER_YEAR = Math.max(0, parseFloat(q.get('phase')) || 0);   // forecast build-out rate; 0 = snap at every anchor
       if (q.get('reach') !== null) SHORT_REACH = Math.max(0, parseInt(q.get('reach'), 10) || 0);           // Tier 2 re-plug reach, in floors
@@ -7118,6 +8270,8 @@
       }
       // the slider is the whole point of arriving here, so surface it straight away
       openChatPanel(true);   // the header toggles, so a click could just as well close it
+      // ?mode=analysis waits for the timeline: the stage counts what the timeline says changes
+      if (ANALYSIS_FROM_URL) setAnalysis(true);
     })();
 
     // Which core scheme to open on. Deliberately here: the site panel above has already set
@@ -7137,7 +8291,7 @@
     (function loop() { requestAnimationFrame(loop); if (controls) controls.update(); renderer.render(scene, camera); })();
 
     // ── headless-verification debug hook (read-only introspection; no behaviour change) ──
-    window.__DEBUG__ = { get camera() { return camera; }, get controls() { return controls; }, get scene() { return scene; }, get SHORT_PLACE() { return SHORT_PLACE; }, get meshes() { return meshes; }, get RENDER_MODE() { return RENDER_MODE; }, get STRUCT_SYS() { return STRUCT_SYS; }, get SKIN_ON() { return SKIN_ON; }, get MOVE_OFFSETS() { return MOVE_OFFSETS; }, get SELECTED() { return SELECTED; }, get CODE_CHECK() { return CODE_CHECK; }, get CODE_ENFORCE() { return CODE_ENFORCE; }, get PROGRAM_MODE() { return PROGRAM_MODE; }, get ADDED_BLOCKS() { return ADDED_BLOCKS; }, get PALETTE() { return PALETTE; }, applyMoveOffsets, setSelected, checkCompliance, computeLayout, addProgramBlock, setProgramMode: v => document.getElementById('seg-program').querySelector(`button[data-v="${v}"]`).click(),
+    window.__DEBUG__ = { get camera() { return camera; }, get controls() { return controls; }, get scene() { return scene; }, get SHORT_PLACE() { return SHORT_PLACE; }, get SHORT_DIAG() { return SHORT_DIAG; }, get CONSOL_DIAG() { return STRUCT_DIAG_CONSOL; }, get STRUCT_DIAG() { return STRUCT_DIAG; }, get meshes() { return meshes; }, get RENDER_MODE() { return RENDER_MODE; }, get STRUCT_SYS() { return STRUCT_SYS; }, get SKIN_ON() { return SKIN_ON; }, get MOVE_OFFSETS() { return MOVE_OFFSETS; }, get SELECTED() { return SELECTED; }, get CODE_CHECK() { return CODE_CHECK; }, get CODE_ENFORCE() { return CODE_ENFORCE; }, get PROGRAM_MODE() { return PROGRAM_MODE; }, get ADDED_BLOCKS() { return ADDED_BLOCKS; }, get PALETTE() { return PALETTE; }, applyMoveOffsets, setSelected, checkCompliance, computeLayout, addProgramBlock, setProgramMode: v => document.getElementById('seg-program').querySelector(`button[data-v="${v}"]`).click(),
       get LAST_LAYOUT() { return LAST_LAYOUT; }, get LAST_ORIENT() { return LAST_ORIENT; },
       get SITE_APPROACH() { return SITE_APPROACH; }, get SITE_APPROACH_SRC() { return SITE_APPROACH_SRC; }, get CORE_FACING() { return CORE_FACING; },
       get SITE_ON() { return SITE_ON; }, setSiteLayer: v => { SITE_ON = !!v; build(); return SITE_ON; },
