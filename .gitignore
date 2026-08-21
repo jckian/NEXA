@@ -11,6 +11,7 @@ node_modules/
 
 # ── Heavy media / renders (not suited to GitHub) ─
 my-video/
+nexa-video/
 forVideo/
 *.mp4
 *.mov

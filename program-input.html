@@ -53,10 +53,12 @@
     body.review-active { overflow: auto; }
 
     /* ── TOP MARK ── */
+    /* above the site-forecast overlay (z 40), below the analysing veil (z 60): the mark is
+       the one thing on screen in all three views, so it never gets covered by one of them */
     #brand {
       position: fixed; top: 32px; left: 40px;
       display: flex; align-items: center; gap: 10px;
-      z-index: 30;
+      z-index: 45;
     }
     #brand-mark {
       width: 32px; height: 18px; flex-shrink: 0;   /* 437x246 at NEXA-site.html's 18 px nav height */
@@ -164,6 +166,17 @@
       color: var(--ink-lo);
       letter-spacing: 0.08em;
       margin-left: 4px;
+    }
+
+    /* The wizard says which step you are on. The other two views said nothing at all, so a
+       draft and the scenario list looked like the same page with different content. Same
+       corner, same type as the step counter: a name for where you are, nothing more.
+       Written by showView(); z-index matches #brand so the overlay does not cover it. */
+    #view-label {
+      position: fixed; top: 36px; right: 40px; z-index: 45;
+      display: none;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+      color: var(--ink-lo); text-transform: lowercase;
     }
 
     /* ── MAIN DIALOG ── */
@@ -475,12 +488,6 @@
 
     #hint { margin-top: 14px; font-size: 11px; color: var(--ink-lo); font-family: var(--mono); letter-spacing: 0.04em; max-width: 600px; }
 
-    #ver {
-      position: fixed; bottom: 28px; left: 40px;
-      font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--ink-lo); z-index: 5;
-    }
-    body.review-active #ver { display: none; }
 
     @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -493,25 +500,62 @@
       padding: 110px 40px 150px;
     }
     #review-inner { max-width: 1020px; margin: 0 auto; }
-    #review-title { font-size: clamp(26px, 3.2vw, 38px); font-weight: 300; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 8px; }
+    #review-title { font-size: clamp(26px, 3.2vw, 38px); font-weight: 300; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 20px; }
     #review-title em { font-style: normal; }
-    #review-sub { font-size: 12px; color: var(--ink-mid); margin-bottom: 26px; }
+    /* only on a draft that came out of a scenario: which one, and a way back to the list.
+       This block sits on the blue field, so it uses the --ink scale, not --text */
+    #rv-origin {
+      display: none; margin: 0 0 18px;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; color: var(--ink-lo);
+    }
+    #rv-origin b { font-weight: 500; color: var(--ink); }
+    #rv-origin a {
+      margin-left: 12px; color: var(--ink-mid); cursor: pointer;
+      border-bottom: 1px solid var(--ink-border);
+    }
+    #rv-origin a:hover { color: var(--ink); border-bottom-color: var(--ink-border-hi); }
+    #rv-tabs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 24px; }
+    /* the raw-text fold: sits at the end of the tab strip. Reads as a real way in, not a
+       hint, so it carries the same weight as the tabs beside it. */
+    #rv-raw-toggle {
+      margin-left: auto;
+      display: inline-flex; align-items: center; gap: 9px;
+      background: rgba(255,255,255,0.07); border: 1px solid var(--ink-border-hi); color: var(--ink);
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 9px 18px; cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    #rv-raw-toggle:hover { background: rgba(255,255,255,0.14); border-color: var(--surface); }
+    #rv-raw-toggle.open { background: var(--ink); border-color: var(--ink); color: var(--accent); }
+    #rv-raw-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    #rv-raw-toggle em { font-style: normal; font-size: 15px; line-height: 0; color: var(--short); }
+    #rv-raw-toggle em:empty { display: none; }
 
     #floors { display: flex; flex-direction: column; gap: 8px; }
 
+    /* One table: the floor on the left, then a column per band. The columns are the same
+       three the pill colours already named, so the eye stops sorting them by hue. */
+    .floor-head {
+      display: grid; grid-template-columns: 92px 1fr 1fr 1.25fr 56px 138px; gap: 14px;
+      padding: 0 17px 3px;
+      font-family: var(--mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-lo);
+    }
     .floor-card {
       background: var(--surface); border: 1px solid var(--border-hi);
       padding: 12px 16px;
-      display: grid; grid-template-columns: 88px 1fr 190px; gap: 16px;
+      display: grid; grid-template-columns: 92px 1fr 1fr 1.25fr 56px 138px; gap: 14px;
       align-items: start;
     }
-    @media (max-width: 820px) { .floor-card { grid-template-columns: 60px 1fr; } .share-col { grid-column: 2; } }
+    .add-col { padding-top: 2px; }
+    .cell-cap { display: none; }   /* the head carries the captions until the row stacks */
 
-    .floor-label { padding-top: 3px; }
-    .floor-label .lv { font-family: var(--mono); font-size: 15px; font-weight: 500; color: var(--text-hi); }
-    .floor-label .lv-sub { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-lo); margin-top: 2px; }
+    .floor-label {
+      padding-top: 3px;
+      font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--text-hi);
+    }
 
-    .pills { display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; }
+    .pills { display: flex; flex-wrap: wrap; gap: 5px; align-content: flex-start; min-width: 0; }
+    .floor-card .pill { padding: 3px 10px; }
     .pill {
       display: inline-flex; align-items: baseline; gap: 7px;
       padding: 4px 12px; border-radius: 14px; border: 1px solid;
@@ -526,8 +570,20 @@
     .pill.add   { background: transparent; border-style: dashed; border-color: var(--border-hi); color: var(--text-lo); }
     .pill.add:hover { color: var(--accent); border-color: rgba(23,47,199,0.35); }
 
+    @media (max-width: 900px) {
+      .floor-head { display: none; }
+      .floor-card { grid-template-columns: 1fr; gap: 10px; }
+      .cell-cap {
+        display: block; width: 100%;
+        font-family: var(--mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-lo);
+      }
+      .pills:not(:has(.pill)) { display: none; }   /* an empty band says nothing when stacked */
+      .floor-card .share-head .share-cap { display: inline; }  /* no head to carry it down here */
+    }
+
     .share-col { padding-top: 3px; }
     .share-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+    .share-head .share-cap { display: none; }   /* printed once in .floor-head */
     .share-head .share-pct { font-family: var(--mono); font-size: 10px; color: var(--text-mid); }
     .share-head .share-cap { font-family: var(--mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-lo); }
     .share-bar { position: relative; height: 4px; background: rgba(20,24,32,0.07); border-radius: 2px; overflow: visible; }
@@ -571,8 +627,22 @@
     .if-btn.danger { background: transparent; color: var(--err); border: 1px solid rgba(209,55,63,0.4); }
     .if-lab { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-lo); }
 
-    /* ── RAW TEXT PANEL ── */
-    #raw-panel { display: none; margin-top: 18px; }
+    /* ── RAW TEXT PANEL ──
+       Sits under the floor cards in the same pane, ruled off so it reads as the other view
+       of the same program rather than a second program. */
+    #raw-panel { display: none; margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--ink-border); }
+    #raw-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 9px; }
+    #raw-head .rh-t { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-lo); }
+    #raw-head .rh-sub { font-size: 11.5px; color: var(--ink-mid); }
+    #raw-head .rh-up {
+      margin-left: auto; align-self: center;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: none; border: 1px solid var(--ink-border); color: var(--ink-mid);
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 5px 11px; cursor: pointer;
+    }
+    #raw-head .rh-up:hover { border-color: var(--ink-border-hi); color: var(--ink); }
+    #raw-head .rh-up svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
     #raw-text {
       width: 100%; height: 300px; resize: vertical;
       background: var(--surface); border: 1px solid var(--border-hi);
@@ -582,6 +652,12 @@
     #raw-text:focus { border-color: rgba(23,47,199,0.35); box-shadow: 0 0 0 3px rgba(23,47,199,0.08); }
     #raw-actions { display: flex; gap: 12px; align-items: center; margin-top: 8px; }
     #raw-errors { font-family: var(--mono); font-size: 10.5px; color: var(--err); margin-top: 8px; line-height: 1.6; }
+    #raw-note { font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; color: var(--ink-lo); }
+    #raw-actions .if-btn { background: var(--surface); color: var(--accent); border: 1px solid var(--surface); }
+    #raw-actions .if-btn:hover { opacity: 1; box-shadow: 0 0 0 2px rgba(255,255,255,0.25); }
+    #raw-actions .if-btn.ghost { background: transparent; color: var(--ink-mid); border-color: var(--ink-border); }
+    #raw-actions .if-btn.ghost:hover { color: var(--ink); border-color: var(--ink-border-hi); box-shadow: none; }
+    #btn-raw-revert { display: none; }
 
     /* ── PROGRAM FORECAST (review stage) ──
        Same year axis the Site Forecast entry gets, derived from this program instead of a
@@ -655,6 +731,10 @@
     .pf-stand.supported { background: rgba(23,47,199,0.08); border-color: rgba(23,47,199,0.35); color: var(--accent); }
     .pf-stand.unsupported { background: var(--short-dim); border-color: rgba(230,112,51,0.45); color: #b25620; }
     .pf-for, .pf-agn, .pf-ctxrow { font-size: 11.5px; line-height: 1.55; margin-top: 3px; }
+    .pf-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+    .pf-chip { font-size: 10.5px; line-height: 1.5; padding: 2px 8px; border-radius: 10px;
+      border: 1px solid rgba(23,47,199,0.22); background: var(--accent-dim); color: var(--accent); }
+    .pf-chip.neg { border-color: rgba(230,112,51,0.45); background: var(--short-dim); color: #b25620; }
     .pf-for { color: var(--text-mid); }
     .pf-agn { color: #b25620; }
     .pf-ctxrow { color: var(--text-lo); }
@@ -815,6 +895,7 @@
     /* The methodology block is what the panel rests on, so it is kept in full and folded
        away rather than cut: open it and every claim is qualified, closed and the figures
        above are not competing with a page of grey type. */
+    .pf-foot { font-size: 11.5px; line-height: 1.6; color: var(--text-lo); margin-top: 16px; }
     .pf-fold { margin-top: 14px; border-top: 1px solid var(--border-hi); padding-top: 10px; }
     .pf-fold > summary, .pf-more > summary, .pf-set > summary {
       list-style: none; cursor: pointer; font-family: var(--mono); font-size: 8.5px;
@@ -860,15 +941,8 @@
     .ft-stat { display: flex; flex-direction: column; gap: 1px; }
     .ft-stat .k { font-family: var(--mono); font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-lo); }
     .ft-stat .v { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--text-hi); }
-    #btn-raw-toggle {
-      margin-left: auto;
-      font-family: var(--mono); font-size: 11px; letter-spacing: 0.03em;
-      background: transparent; border: 1px solid var(--border-hi); border-radius: 3px;
-      color: var(--text-mid); padding: 9px 14px; cursor: pointer;
-      transition: color 0.15s, border-color 0.15s;
-    }
-    #btn-raw-toggle:hover { color: var(--accent); border-color: rgba(23,47,199,0.35); }
     #btn-restart {
+      margin-left: auto;
       font-family: var(--mono); font-size: 11px; letter-spacing: 0.03em;
       background: transparent; border: 1px solid var(--border-hi); border-radius: 3px;
       color: var(--text-mid); padding: 9px 14px; cursor: pointer;
@@ -882,6 +956,11 @@
     .btn-back-arrow-light svg { stroke: var(--text-mid); }
     .btn-back-arrow-light:hover { background: var(--accent-dim); border-color: rgba(23,47,199,0.35); opacity: 1; }
     .btn-back-arrow-light:hover svg { stroke: var(--accent); }
+    /* the arrow alone went to two different places depending on an invisible variable, so it
+       carries the name of the one it is going to */
+    #btn-back-review { width: auto; gap: 8px; padding: 0 13px 0 10px; }
+    #bb-dest { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; color: var(--text-mid); }
+    #btn-back-review:hover #bb-dest { color: var(--accent); }
     #btn-build {
       font-family: var(--font); font-size: 13px; font-weight: 500; color: #F5F5F5;
       background: var(--accent); border: none; padding: 11px 24px; cursor: pointer;
@@ -890,14 +969,19 @@
     #btn-build:hover { opacity: 0.85; }
 
     /* ══════════════ SITE FORECAST entry ══════════════ */
+    /* This is the door to the whole intel layer and it used to be a line of small caps at
+       the bottom of the dialog, which reads as a footnote. Same words, drawn as a control,
+       in the shape the demo-site chips above it already use. */
     #forecast-link {
       display: none; /* shown by script only when NEXA/intel/data/site-*.js loaded */
-      margin-top: 30px;
+      margin-top: 30px; padding: 7px 15px;
+      border: 1px solid var(--ink-border); border-radius: 20px;
       font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
       text-transform: uppercase; color: var(--ink-mid);
       cursor: pointer; user-select: none;
+      transition: background 0.14s, border-color 0.14s, color 0.14s;
     }
-    #forecast-link:hover { color: var(--ink); }
+    #forecast-link:hover { background: var(--ink-hover-dim); border-color: var(--ink-border-hi); color: var(--ink); }
     body.review-active #forecast-link { display: none !important; }
 
     #forecast {
@@ -1041,6 +1125,9 @@
     <span id="step-num">01 / 05</span>
   </div>
 
+  <!-- Where you are, for the two views that have no step pips. Written by showView(). -->
+  <div id="view-label"></div>
+
   <!-- Wizard dialog -->
   <div id="dialog">
     <div id="answered"></div>
@@ -1124,40 +1211,66 @@
   <!-- Review stage: floor card editor -->
   <div id="review">
     <div id="review-inner">
-      <p id="review-title">Draft <em>program</em> — floor by floor</p>
-      <p id="review-sub">Orange = SHORT (plug-in) · blue = LONG · yellow = circulation</p>
+      <p id="review-title">Draft <em>program</em></p>
+      <!-- Which scenario this draft came out of. Empty for a wizard-built one. -->
+      <p id="rv-origin"></p>
 
       <!-- Which lines below came from the address, and from what figure. Empty when the
            site step was skipped. Filled by renderReview() from wiz.siteBrief. -->
+      <!-- The floor cards and the raw text are two views of ONE program, so they sit in one
+           pane: edit the cards, or paste a program file over them. The forecast is what that
+           program becomes later, so it is the stage after, not a third thing to scroll past. -->
+      <!-- The raw text is the escape hatch, not the main view, so it sits folded behind this
+           icon and opens only when asked. -->
+      <div id="rv-tabs">
+        <button class="fc-tab active" data-rv="floors">Draft program</button>
+        <button class="fc-tab" data-rv="forecast">Program forecast →</button>
+        <button id="rv-raw-toggle" type="button" title="Write or load your own program text">
+          <svg viewBox="0 0 18 18"><path d="M9 12V3M5.5 6.5L9 3l3.5 3.5M3.5 12v2.5h11V12"></path></svg>
+          <span>upload yours</span>
+          <em id="rv-raw-flag"></em>
+        </button>
+      </div>
+
       <div id="site-basis"></div>
 
       <div id="floors"></div>
 
-      <!-- What this program becomes over time. Filled by renderProgramForecast(); the same
-           events are handed to the massing view's year slider on Build. -->
-      <div id="prog-forecast"></div>
-
       <div id="raw-panel">
+        <div id="raw-head">
+          <span class="rh-t">Raw text</span>
+          <span class="rh-sub">Same program as the cards above. Edit it, or load a program file.</span>
+          <button id="btn-raw-upload" class="rh-up" title="Load a program .txt file">
+            <svg viewBox="0 0 18 18"><path d="M9 12V3M5.5 6.5L9 3l3.5 3.5M3.5 12v2.5h11V12"></path></svg>
+            upload
+          </button>
+          <input type="file" id="raw-file" accept=".txt,text/plain" hidden>
+        </div>
         <textarea id="raw-text" spellcheck="false"></textarea>
         <div id="raw-actions">
           <button id="btn-raw-apply" class="if-btn">Apply</button>
+          <button id="btn-raw-revert" class="if-btn ghost">Revert</button>
+          <span id="raw-note"></span>
         </div>
         <div id="raw-errors"></div>
       </div>
+
+      <!-- What this program becomes over time. Filled by renderProgramForecast(); the same
+           events are handed to the massing view's year slider on Build. -->
+      <div id="prog-forecast"></div>
     </div>
   </div>
 
   <!-- Sticky footer (review stage only) -->
   <div id="footer-bar">
     <div id="footer-inner">
-      <button class="btn-send btn-back-arrow-light" id="btn-back-review" title="Back — keeps this draft">
-        <svg viewBox="0 0 18 18"><path d="M14 9H4M8 5L4 9l4 4"></path></svg>
+      <button class="btn-send btn-back-arrow-light" id="btn-back-review" title="Back. This draft is kept.">
+        <svg viewBox="0 0 18 18"><path d="M14 9H4M8 5L4 9l4 4"></path></svg><span id="bb-dest">wizard</span>
       </button>
       <div class="ft-stat"><span class="k">Total GFA</span><span class="v" id="ft-gfa">—</span></div>
       <div class="ft-stat"><span class="k">Levels</span><span class="v" id="ft-range">—</span></div>
       <div class="ft-stat"><span class="k">Long / Short</span><span class="v" id="ft-split">—</span></div>
       <div class="ft-stat"><span class="k">8'-6" floors</span><span class="v" id="ft-shortfloors">—</span></div>
-      <button id="btn-raw-toggle">▸ raw text</button>
       <button id="btn-restart" title="Discard this draft and restart the wizard">↺ start over</button>
       <button id="btn-build">Build massing →</button>
     </div>
@@ -1185,7 +1298,6 @@
 
   <datalist id="vocab-list"></datalist>
 
-  <div id="ver">SCI-Arc SP26 · Program Agent</div>
 
 <!-- NEXA Intel data (optional — a missing file only leaves that site out; no file at all
      leaves the Site Forecast entry hidden). Adding a site = add its two tags here. -->
@@ -1437,9 +1549,12 @@
   ];
 
   // Step type → the siteBrief reason that filled it in (the `k` siteBrief's say() writes).
-  // Only these four steps carry a site-set answer; parking, ground retail and the plug-in
-  // band are set inside the generator and have no question of their own.
-  const SITE_FILLED = { chips: 'type', number: 'GFA', floors: 'floors', multi: 'activities' };
+  // Only these steps carry a site-set answer; parking, ground retail and the plug-in band are
+  // set inside the generator and have no question of their own.
+  // 'floors' is deliberately absent (user 260821). Its reason reads "12,000 m² over a plate of
+  // 1,400 m², which is 70% of the lot" — and the GFA in it is sitting three lines above in the
+  // answered list. The site still sets the floor count; it just does not explain it back.
+  const SITE_FILLED = { chips: 'type', number: 'GFA', multi: 'activities' };
 
   let step = 0;
   const selectedActivities = new Set();
@@ -1454,6 +1569,32 @@
   // Set by submit() (wizard) and by applyScenario() (forecast); persisted in the draft.
   let reviewOrigin = 'wizard';
   let openForecast = null; // assigned by initSiteForecast when intel data is present
+  // Assigned by initSiteForecast too. The Site Forecast entry used to stand at the bottom of
+  // every wizard step reading "site forecast · 2 sites" — a door to a layer that has something
+  // to say about exactly two addresses in Los Angeles, advertised on every screen to everyone
+  // else as a dead end. It now stays down until the reader goes into one of those two sites,
+  // and this is what puts it up.
+  let revealForecastLink = () => {};
+  // Which addresses the intel layer covers: the Demo site chips ARE those two sites, so the list
+  // is read off them rather than written out a second time here and left to drift. Exact address
+  // match, loosened only for case, spacing and punctuation — no fuzzy geocode guessing.
+  function isIntelAddress(q) {
+    const norm = t => String(t || '').toLowerCase().replace(/[\s,.]+/g, ' ').trim();
+    const a = norm(q);
+    if (!a) return false;
+    return [...document.querySelectorAll('#site-demos .sd-chip')].some(b => norm(b.dataset.addr) === a);
+  }
+
+  // Which view is on screen, and where the site-forecast overlay's close button lands.
+  // Closing it always claimed "back to wizard", which dumped you into the wizard with a live
+  // draft sitting behind it. It now returns to whatever it was opened over.
+  let curView = 'wizard';
+  let fcReturn = 'wizard';
+  function setFcReturn(where) {
+    fcReturn = where;
+    const b = document.getElementById('fc-close');
+    if (b) b.textContent = where === 'review' ? '✕ back to draft' : '✕ back to wizard';
+  }
 
   const qEl = document.getElementById('question');
   const chipsEl = document.getElementById('chips');
@@ -1507,6 +1648,19 @@
     if (anHideTimer) clearTimeout(anHideTimer);
     anHideTimer = setTimeout(() => { anEl.classList.remove('on'); anHideTimer = null; }, wait);
   }
+  // Straight off, no minimum: for a screen that is already stale by the time anyone sees it.
+  function analyzingHide() {
+    clearTimeout(anWatchdog);
+    if (anHideTimer) { clearTimeout(anHideTimer); anHideTimer = null; }
+    anEl.classList.remove('on');
+  }
+
+  // The Back button, from the massing page. This document is not reloaded on that trip: the
+  // browser hands back the bfcache copy exactly as it was left, which is mid-handover, with
+  // "building the massing" over the whole page and no script still running to take it down.
+  // The draft underneath is intact and the overlay is the only thing wrong, so the one event
+  // that fires on a restore takes it off. Nothing else about the page needs re-running.
+  window.addEventListener('pageshow', e => { if (e.persisted) analyzingHide(); });
 
   // pips are built once from steps.length so a new step needs no markup change
   const stepNumEl = document.getElementById('step-num');
@@ -1694,6 +1848,7 @@
       qEl.classList.add('hidden');
       btnActivities.style.display = 'none';
       reviewOrigin = 'wizard';
+      wiz.scenarioName = null;  // this draft is the wizard's, not a scenario's
       // The overlay goes up first and the draft is generated a frame later, or the synchronous
       // solve would eat the frame the overlay was meant to appear in and nothing would show.
       analyzing('drafting the program');
@@ -1952,15 +2107,19 @@
     return fetch(url, Object.assign({}, opts, { signal: ctl.signal })).finally(() => clearTimeout(t));
   }
 
+  // Both geocoders are asked at the same time and the Census answer is still preferred: it
+  // matches a US street address to a rooftop, where Nominatim often lands on the street. The
+  // fallback used to start only after the first one had failed, which put the whole of a slow
+  // or blocked Census call in front of it for nothing.
   async function geocodeAddress(addr) {
-    try {
-      const u = `${SITE_EP.census}?address=${encodeURIComponent(addr)}&benchmark=Public_AR_Current&format=json`;
-      const j = await (await fetchT(u)).json();
-      const m = j.result && j.result.addressMatches && j.result.addressMatches[0];
-      if (m) return { lat: m.coordinates.y, lng: m.coordinates.x, label: m.matchedAddress, source: 'US Census Geocoder' };
-    } catch (e) {}
-    const u2 = `${SITE_EP.nominatim}?q=${encodeURIComponent(addr)}&format=json&limit=1`;
-    const j2 = await (await fetchT(u2)).json();
+    const censusP = fetchT(`${SITE_EP.census}?address=${encodeURIComponent(addr)}&benchmark=Public_AR_Current&format=json`)
+      .then(r => r.json()).catch(() => null);
+    const osmP = fetchT(`${SITE_EP.nominatim}?q=${encodeURIComponent(addr)}&format=json&limit=1`)
+      .then(r => r.json()).catch(() => null);
+    const j = await censusP;
+    const m = j && j.result && j.result.addressMatches && j.result.addressMatches[0];
+    if (m) return { lat: m.coordinates.y, lng: m.coordinates.x, label: m.matchedAddress, source: 'US Census Geocoder' };
+    const j2 = await osmP;
     if (j2 && j2[0]) return { lat: +j2[0].lat, lng: +j2[0].lon, label: j2[0].display_name, source: 'Nominatim / OSM' };
     throw new Error('address not found by either geocoder');
   }
@@ -2025,7 +2184,10 @@
   const FT_PER_M = 3.280839895;
 
   async function findNeighboursGIS(pt) {
-    const j = await agsPointQuery(LARIAC, pt, '&distance=110&units=esriSRUnit_Meter&returnGeometry=true', 6000);
+    // 260818: 110 m → 550 m. Five times the reach means about twenty-five times the outlines,
+    // so the deadline goes up with it: the old 6 s was set against a single block and a 550 m
+    // query downtown returns hundreds of polygons.
+    const j = await agsPointQuery(LARIAC, pt, '&distance=550&units=esriSRUnit_Meter&returnGeometry=true', 14000);
     if (j.error) throw new Error(j.error.message || 'LARIAC layer error');
     return (j.features || [])
       .filter(f => f.geometry && f.geometry.rings && f.geometry.rings[0] && f.geometry.rings[0].length > 2)
@@ -2046,21 +2208,26 @@
     'https://overpass-api.de/api/interpreter',
     'https://overpass.kumi.systems/api/interpreter',
   ];
+  // Overpass is the slow leg of every OSM call on this page: the public mirrors queue, and a
+  // query that is never going to be answered still burns the whole deadline. The mirrors used
+  // to be tried one after the other, so a bad minute cost 9 s on the first and 9 s again on
+  // the second before the caller gave up with nothing. They are raced now: the first usable
+  // answer wins and a total failure costs one deadline, not one per mirror.
+  async function overpass(q, ms) {
+    const tries = OVERPASS.map(base =>
+      fetchT(base + '?data=' + encodeURIComponent(q), null, ms || 8000)
+        .then(r => { if (!r.ok) throw new Error('overpass ' + r.status); return r.json(); }));
+    try { return await Promise.any(tries); } catch (e) { return null; }
+  }
   async function findNeighboursOSM(pt) {
-    const q = `[out:json][timeout:25];(way(around:100,${pt.lat},${pt.lng})["building"];);out geom;`;
-    let j = null;
-    for (const base of OVERPASS) {
-      try {
-        const r = await fetchT(base + '?data=' + encodeURIComponent(q), null, 9000);
-        if (!r.ok) continue;
-        j = await r.json();
-        break;
-      } catch (e) { /* try the next mirror */ }
-    }
+    const q = `[out:json][timeout:25];(way(around:500,${pt.lat},${pt.lng})["building"];);out geom;`;
+    const j = await overpass(q, 12000);
     if (!j) return null;                     // null = the call failed, [] = genuinely none
     return (j.elements || [])
       .filter(e => e.geometry && e.geometry.length > 2)
-      .slice(0, 90)
+      // the cap rises with the radius (90 → 600). Left at 90 it would quietly hand back one
+      // block's worth of a five-block query, and the drawing would look arbitrarily cropped.
+      .slice(0, 600)
       .map(e => {
         const t = e.tags || {};
         const lv = parseFloat(t['building:levels']);
@@ -2149,12 +2316,9 @@
   async function findRoadsOSM(pt) {
     // `out geom` carries the tags too, so class costs nothing extra here
     const q = `[out:json][timeout:25];(way(around:150,${pt.lat},${pt.lng})["highway"];);out geom;`;
-    for (const base of OVERPASS) {
-      try {
-        const r = await fetchT(base + '?data=' + encodeURIComponent(q), null, 8000);
-        if (!r.ok) continue;
-        const j = await r.json();
-        return (j.elements || [])
+    const j = await overpass(q, 8000);
+    if (!j) return null;
+    return (j.elements || [])
           .filter(e => e.geometry && e.geometry.length > 1)
           .map(e => {
             const t = e.tags || {}, hw = t.highway || '';
@@ -2166,9 +2330,6 @@
               src: 'OSM',
             };
           });
-      } catch (e) { /* next mirror */ }
-    }
-    return null;
   }
 
   // ── movement generators (M6b) ────────────────────────────────────────────────────────────
@@ -2187,34 +2348,28 @@
       `node(around:${r},${ll})[amenity~"^(restaurant|cafe|bar|fast_food|cinema|theatre|marketplace|college|university|school)$"];` +
       `node(around:${r},${ll})[shop];` +
       `);out tags center;`;
-    for (const base of OVERPASS) {
-      try {
-        const res = await fetchT(base + '?data=' + encodeURIComponent(q), null, 9000);
-        if (!res.ok) continue;
-        const j = await res.json();
-        const out = [];
-        for (const e of j.elements || []) {
-          const t = e.tags || {}, lat = e.lat ?? (e.center && e.center.lat), lng = e.lon ?? (e.center && e.center.lon);
-          if (typeof lat !== 'number' || typeof lng !== 'number') continue;
-          let kind = null;
-          if (/^(station|halt|tram_stop)$/.test(t.railway || '') || t.station) kind = 'rail';
-          else if (t.highway === 'bus_stop') kind = 'bus';
-          else if (t.highway === 'crossing') kind = 'crossing';
-          else if (t.shop) kind = 'retail';
-          else if (/college|university|school/.test(t.amenity || '')) kind = 'institution';
-          else if (t.amenity) kind = 'food';
-          if (!kind) continue;
-          // `kind` is M6's vocabulary and must not gain values: its weights and caps are
-          // tuned per kind, and a new bucket would change the frontage scores. The raw tag
-          // rides alongside so the program forecast can read composition more finely
-          // (cinema and theatre both land in `food` above, which is too coarse for that).
-          out.push({ ll: [+lng.toFixed(6), +lat.toFixed(6)], kind, name: t.name || null,
-            tag: t.amenity || (t.shop ? 'shop:' + t.shop : null) || t.railway || t.highway || null });
-        }
-        return out;
-      } catch (e) { /* next mirror */ }
+    const j = await overpass(q, 8000);
+    if (!j) return null;                      // null = the call failed, [] = genuinely nothing
+    const out = [];
+    for (const e of j.elements || []) {
+      const t = e.tags || {}, lat = e.lat ?? (e.center && e.center.lat), lng = e.lon ?? (e.center && e.center.lon);
+      if (typeof lat !== 'number' || typeof lng !== 'number') continue;
+      let kind = null;
+      if (/^(station|halt|tram_stop)$/.test(t.railway || '') || t.station) kind = 'rail';
+      else if (t.highway === 'bus_stop') kind = 'bus';
+      else if (t.highway === 'crossing') kind = 'crossing';
+      else if (t.shop) kind = 'retail';
+      else if (/college|university|school/.test(t.amenity || '')) kind = 'institution';
+      else if (t.amenity) kind = 'food';
+      if (!kind) continue;
+      // `kind` is M6's vocabulary and must not gain values: its weights and caps are
+      // tuned per kind, and a new bucket would change the frontage scores. The raw tag
+      // rides alongside so the program forecast can read composition more finely
+      // (cinema and theatre both land in `food` above, which is too coarse for that).
+      out.push({ ll: [+lng.toFixed(6), +lat.toFixed(6)], kind, name: t.name || null,
+        tag: t.amenity || (t.shop ? 'shop:' + t.shop : null) || t.railway || t.highway || null });
     }
-    return null;                              // null = the call failed, [] = genuinely nothing
+    return out;
   }
 
   async function findRoads(pt) {
@@ -2257,6 +2412,7 @@
       `<div class="sb-row"><span class="sb-k">${escapeHtml(r.k)}</span>` +
       `<span class="sb-v"><b>${escapeHtml(r.v)}</b><span class="sb-why">${escapeHtml(r.why)}</span></span></div>`).join('');
     return '<div class="sb-block"><div class="sb-head">program set from this site</div>' + rows +
+      (b.ringPending ? '<div class="sb-note">Still reading what is around the parcel. Parking, ground retail, the plug-in band and the activity mix land here when it does. You can carry on.</div>' : '') +
       (b.note ? `<div class="sb-note">${escapeHtml(b.note)}</div>` : '') + '</div>';
   }
 
@@ -2283,7 +2439,7 @@
     }
     sitePanel.className = '';
     sitePanel.innerHTML = rows.join('') + briefHtml(site.brief) +
-      '<div class="sp-note">Reported tier. Verify against ZIMAS before citing. What the site sets below are defaults: every one of them is asked again, and the answer you type is what builds.</div>';
+      '<div class="sp-note">Reported tier, verify in ZIMAS. These are defaults; what you type is what builds.</div>';
     sitePanel.style.display = 'block';
   }
 
@@ -2468,6 +2624,10 @@
     }
 
     // ── ring composition, counted once and read by the four rules below ──
+    // undefined = the ring is still in flight, null = the query failed, [] = genuinely nothing
+    // around. The first is not a finding and must not be written up as one: the rules below
+    // simply do not fire yet, and this function is called again when the ring lands.
+    const ringPending = site.generators === undefined;
     const gens = site.generators;
     const kind = {}, mix = {};
     if (gens) for (const g of gens) {
@@ -2545,6 +2705,8 @@
       b.activities = [...new Set(acts)];
       say('activities', b.activities.join(', '),
         use.map(x => `${x.n} ${x.k}`).join(', ') + ` mapped within ${GEN_RADIUS} m, which is what the plug-in floors join`);
+    } else if (ringPending) {
+      b.ringPending = true;                  // said once, by briefHtml, not four times over
     } else {
       b.activities = DEFAULT_ACTS.slice();
       say('activities', b.activities.join(', '),
@@ -2552,7 +2714,7 @@
         ', so this is the default mix and not a reading of the site. Change it on the activities step.');
     }
 
-    return b.reasons.length || b.note ? b : null;
+    return b.reasons.length || b.note || b.ringPending ? b : null;
   }
 
   // LA County Assessor use text → the transition DB's `from` vocabulary. Deliberately
@@ -2632,7 +2794,7 @@
       .sort((a, b) => TIER_RANK[a.likelihood] - TIER_RANK[b.likelihood]);
     if (!st.fromKey) {
       out.push('<div class="sf-note">The assessor use' + (st.site.parcel && st.site.parcel.useDesc ? ' (' + esc(st.site.parcel.useDesc) + ')' : '') +
-        ' does not map to an entry in the program-transition DB. Pick the closest current use above to see where this building type usually goes next.</div>');
+        ' is not in the transition DB. Pick the closest current use above.</div>');
     } else if (!matches.length) {
       out.push('<div class="sf-note">No transitions recorded from this use.</div>');
     } else {
@@ -2666,23 +2828,18 @@
             `<button class="sf-use" data-i="${i}">use this${gfa ? ' →' : ' →'}</button>` +
           '</div>');
       });
-      out.push('<div class="sf-note">Likelihood tiers and their basis come from the NEXA Intel program-transition DB (M3), not from this parcel. They describe how this building type usually changes, not what is entitled here.</div>');
-      if (sig) out.push('<div class="sf-note">District signals come from a hand-compiled set for ' +
-        esc(sig.set.meta.district || sig.key) + ', ' + (sig.set.items || []).length + ' items, ' +
-        (sig.age == null ? 'compile date unreadable' : 'compiled ' + sig.age + ' days ago') + '. ' +
-        'Policy, press and published district reporting. Not a measurement of attention or footfall, and no social-media data is in it. ' +
-        (sig.stale ? 'This set is over ' + SIG_STALE_DAYS + ' days old. ' : '') +
-        'Full citations sit in the program forecast at the end of the wizard.</div>');
+      // One line each. All three used to spell out their provenance here AND again in the
+      // program forecast at the end of the wizard, where the full citations live; this step is
+      // for picking a direction, so it carries the label and the count, not the essay.
+      out.push('<div class="sf-note">Tiers come from the transition DB, not from this parcel.</div>');
+      if (sig) out.push('<div class="sf-note">Signals · ' + (sig.set.items || []).length + ' published items for ' +
+        esc(sig.set.meta.district || sig.key) + ', ' + (sig.age == null ? 'compile date unreadable' : sig.age + ' days old') +
+        '. Claims, not measurements.' + (sig.stale ? ' Past ' + SIG_STALE_DAYS + ' days: re-check.' : '') + '</div>');
       if (dyn) {
         const mets = dyn.set.metrics || [], ranks = mets.filter(dynRanks).length;
-        out.push('<div class="sf-note">Market movement comes from a hand-compiled set for ' +
-          esc(dyn.set.meta.district || dyn.key) + ': ' + mets.length + ' metrics covering footfall, events, ' +
-          'leasing, demography and the market cycle, of which ' + ranks + ' carry the two dated ' +
-          'observations it takes to argue a direction. The rest are printed but rank nothing. ' +
-          'Every figure was measured at district scale or larger, never at this parcel, and no ' +
-          'social-media data is in it. ' +
-          (dyn.stale ? 'This set is over ' + DYN_STALE_DAYS + ' days old. ' : '') +
-          'Full series and citations sit in the program forecast at the end of the wizard.</div>');
+        out.push('<div class="sf-note">Movement · ' + ranks + ' of ' + mets.length + ' metrics rank a direction, ' +
+          esc(dyn.set.meta.district || dyn.key) + '. District scale, never this parcel.' +
+          (dyn.stale ? ' Past ' + DYN_STALE_DAYS + ' days: re-check.' : '') + '</div>');
       }
     }
     if (zi && zi.note) out.push('<div class="sf-note" style="margin-top:6px;">' + esc(zi.note) + '</div>');
@@ -2745,9 +2902,15 @@
   }
 
   let siteBusy = false;
+  // Settles when the surroundings of the current site have landed (or failed). Build awaits
+  // it, so the massing view is still never handed a site with the ring missing.
+  let ringDone = Promise.resolve();
   async function lookupSite() {
     const q = inputSite.value.trim();
     if (!q || siteBusy) return;
+    // A Demo site chip fills this field and calls straight through here, so putting the check on
+    // the address rather than on the click covers the chip and a hand-typed address at once.
+    if (isIntelAddress(q)) revealForecastLink();
     siteBusy = true;
     btnSite.disabled = true;
     sitePanel.className = 'busy';
@@ -2776,6 +2939,18 @@
       renderSitePanel(site);
 
       const zPt = (site.parcel && site.parcel.centroid) || { lat: g.lat, lng: g.lng };
+
+      // The ring around the parcel is started HERE and waited for at the bottom, so it runs
+      // under the zoning call instead of after it. Volumes + linework for the two massing-view
+      // context modes, and the movement generators the program rules read. Independent:
+      // whichever resolves is available, and the viewer says which mode has no data.
+      const ringP = Promise.all([
+        findNeighbours(zPt).catch(() => null),
+        findLotLines(zPt).catch(() => null),
+        findRoads(zPt).catch(() => null),
+        findGenerators(zPt).catch(() => null),
+      ]);
+
       analyzing('reading the zoning');
       try {
         site.zoning = await findZoning(zPt);
@@ -2784,29 +2959,15 @@
         site.zoningNote = 'zoning layer unreachable';
       }
 
-      // Context ring is fetched BEFORE the site is committed, so what reaches the massing
-      // view is never missing it. Safe to do inline now that it is a fast county GIS call
-      // with its own 6 s deadline; the earlier version awaited Overpass with no deadline
-      // and could freeze the whole step.
-      // volumes + linework for the two massing-view context modes. Independent: whichever
-      // resolves is available, and the viewer says which mode has no data.
-      analyzing('reading the surroundings');
-      const [nb, lots, roads, gens] = await Promise.all([
-        findNeighbours(zPt).catch(() => null),
-        findLotLines(zPt).catch(() => null),
-        findRoads(zPt).catch(() => null),
-        findGenerators(zPt).catch(() => null),
-      ]);
-      site.neighbours = nb;
-      site.lots = lots;
-      site.roads = roads;
-      site.generators = gens;                 // M6b: rail/bus/crossing/retail/food/institution
-
       wiz.site = site;
       renderSitePanel(site);
-      siteContinue.style.display = 'inline-block';
 
       const zoneInfo = interpretZone(site.zoning && site.zoning.code);
+      // What the address permits is known now. What surrounds it is still in the air, and it
+      // travels on Overpass, which is regularly ten seconds and sometimes never answers. The
+      // step used to hold the panel, the Continue button and the whole wizard behind that for
+      // as long as it took, and a failed ring meant the user waited the full deadline to be
+      // handed the defaults anyway. Both halves are still fetched; only the first one blocks.
       // carried into the massing view so it can state the drawn GFA against what the lot
       // permits. farAssumed = the code gave no FAR and 3 is a placeholder, which the viewer
       // must say out loud rather than present as a limit.
@@ -2816,10 +2977,13 @@
       // rides on the payload so the massing view and a reloaded draft can both say why the
       // program looks the way it does.
       analyzing('setting the program from the site');
-      wiz.siteBrief = siteBrief(site, zoneInfo);
-      site.brief = wiz.siteBrief;
-      applySiteBrief(wiz.siteBrief);
-      renderSitePanel(site);
+      const writeBrief = () => {
+        wiz.siteBrief = siteBrief(site, zoneInfo);
+        site.brief = wiz.siteBrief;
+        applySiteBrief(wiz.siteBrief);        // only ever fills a step the user has not answered
+        renderSitePanel(site);
+      };
+      writeBrief();                           // the zoning half: type, GFA, floors
       forecastState = {
         site, zoneInfo,
         far: (zoneInfo && zoneInfo.far) || 3,
@@ -2829,6 +2993,18 @@
       renderForecast();
       btnSite.disabled = false;
       siteBusy = false;
+      siteContinue.style.display = 'inline-block';
+
+      // and the ring, whenever it lands. Build waits on this if it is somehow still running.
+      ringDone = ringP.then(([nb, lots, roads, gens]) => {
+        site.neighbours = nb;
+        site.lots = lots;
+        site.roads = roads;
+        site.generators = gens;               // M6b: rail/bus/crossing/retail/food/institution
+        if (wiz.site !== site) return;        // a second lookup overtook this one
+        writeBrief();                         // parking, ground retail, band share, activities
+        renderForecast();
+      }).catch(() => {});
     } catch (e) {
       wiz.site = null;
       forecastState = null;
@@ -3560,6 +3736,8 @@
   let editingIdx = null;     // index into entries[] currently being edited
   let addingLevel = null;    // level whose add-form is open
   let rawOpen = false;
+  // The raw text is folded away until the reader asks for it with the tab-strip icon.
+  let rawShown = false;
 
   const dialogEl = document.getElementById('dialog');
   const stepIndicatorEl = document.getElementById('step-indicator');
@@ -3568,8 +3746,10 @@
   const rawPanel = document.getElementById('raw-panel');
   const rawText = document.getElementById('raw-text');
   const rawErrors = document.getElementById('raw-errors');
-  const btnRawToggle = document.getElementById('btn-raw-toggle');
   const btnRawApply = document.getElementById('btn-raw-apply');
+  const btnRawRevert = document.getElementById('btn-raw-revert');
+  const rawNote = document.getElementById('raw-note');
+  let rawEdited = false;   // typed into and not yet applied — fillRaw() leaves it alone
   const btnBuild = document.getElementById('btn-build');
 
   const VOCAB = [
@@ -3604,6 +3784,8 @@
   // Display is 1-indexed (ground = L1); internal e.level stays 0-indexed.
   function levelLabel(lv) { return lv >= 0 ? 'L' + (lv + 1) : 'B' + (-lv); }
   function levelSub(lv) { return lv > 0 ? 'floor ' + (lv + 1) : lv === 0 ? 'ground' : 'basement'; }
+  // what the floor is called in the draft table. One line, said the way a person says it.
+  function floorName(lv) { return lv > 0 ? 'Floor ' + (lv + 1) : lv === 0 ? 'Ground' : 'Basement ' + (-lv); }
   function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
   // Defaults to the live draft. The argument is for probing a generated program that has not
@@ -4429,7 +4611,7 @@
   function renderProgramForecast() {
     const host = document.getElementById('prog-forecast');
     if (!host) return;
-    if (!entries.length) { host.style.display = 'none'; return; }
+    if (!entries.length) { pfReady = false; host.style.display = 'none'; return; }
     const p = predictEvolution();
     const esc = escapeHtml;
     const DB = (window.NEXA_INTEL && window.NEXA_INTEL.transitions) || [];
@@ -4530,7 +4712,7 @@
             '<span class="cb-v">' + r.n + '</span></div>' +
             (t ? '<div class="pf-cite" style="margin:1px 0 6px 142px">thinnest · served by ' + t.acts.map(esc).join(', ') + '</div>' : '');
         }).join('') +
-        '<div class="pf-cite" style="margin-top:7px">This is what is mapped, not a count of what exists and not a measure of demand. OSM maps these categories at very different rates, and no free source in this pipeline carries footfall or trade area. Treat it as a prompt to check, not a finding.</div>';
+        '<div class="pf-cite" style="margin-top:7px">What is mapped, not a census and not demand. A prompt to check, not a finding.</div>';
     }
     if (c) {
       // Every leg of the lookup fails on its own, so the block renders whatever came back and
@@ -4562,7 +4744,7 @@
       }
       if (c.neighbours) cells.push('<div class="ctx-cell"><label>Neighbours</label><div class="ctx-v">' + c.neighbours.n + ' buildings</div>' +
         '<div class="ctx-b">' + (c.neighbours.medianM ? 'median ' + c.neighbours.medianM + ' m, tallest ' + c.neighbours.tallestM + ' m (lidar)' : 'no measured heights') + '</div></div>');
-      body.push(sec('01', 'The parcel and its ring', 'Measured. Counts of what is mapped and figures read off the code, before anything is concluded from them.') +
+      body.push(sec('01', 'The parcel and its ring', 'Measured. Counts and code figures.') +
         '<div class="pf-ctx"><div class="ctx-grid">' + cells.join('') + '</div>' + ringHtml + '</div>');
     } else if (!wiz.site) {
       body.push(sec('01', 'The parcel and its ring', 'No address was given.') +
@@ -4570,14 +4752,14 @@
     }
 
     body.push(sec('02', 'What changes, and when',
-      'One card per change, in the order it is filed. The likelihood tier comes from the transition DB; the site reads only order futures inside a tier.'));
+      'One card per change, in order.'));
 
     if (!p.events.length) body.push('<div class="pf-empty">' + esc(emptyReason(p)) + '</div>');
     // Measured 260729: with no plug-in program, scrubbing the whole timeline moves 0 of 127
     // rects and changes 0% of the rendered pixels. Every event is a Tier 1 conversion, which
     // keeps the room exactly where it is, so there is nothing for the massing to show. Say it
     // here rather than let it be discovered by staring at an unchanging model.
-    else if (!p.pool.length) body.push('<div class="pf-flat">This program has no plug-in (SHORT) program, so the timeline below changes what the rooms <b>are</b>, never where they are. The massing will look identical at every year; the change reads in the Change colour mode and in the counts. Add activities in the wizard to get program that actually re-plugs.</div>');
+    else if (!p.pool.length) body.push('<div class="pf-flat">No plug-in (SHORT) program, so the timeline changes what the rooms <b>are</b>, never where they are, and the massing looks identical at every year. Add activities in the wizard.</div>');
 
     for (const e of p.events) {
       const where = e.levels.length ? e.levels.map(levelLabel).join(', ') : 'all floors';
@@ -4587,20 +4769,24 @@
       const rows = ['<div class="pf-what">' + tier + '<b>' + esc(e.fromLabel) + '</b> → <b>' + esc(e.toType) + '</b></div>',
         '<div class="pf-where">' + esc(where) + ' · ' + (e.kind === 'long' ? 'permanent use, same rooms' : 'plug-in modules, re-placed') + '</div>'];
       if (e.basis) rows.push('<div class="pf-basis">' + esc(e.basis) + '</div>');
-      if (e.dur) rows.push('<div class="pf-cite">filed at year ' + e.year + ': ' +
-        (e.dur.own ? 'the ' + e.dur.n + ' dated conversion' + (e.dur.n === 1 ? '' : 's') + ' cited for ' + esc(e.dbFrom) + ' → ' + esc(e.dbTo) + ' took a median of ' + e.dur.yr + ' years'
-          : 'no dated example for this transition, so the DB-wide median of ' + e.dur.yr + ' years across ' + e.dur.n + ' conversions stands in') + '</div>');
+      if (e.dur) rows.push('<div class="pf-cite">year ' + e.year + ' · median ' + e.dur.yr + ' yr · ' +
+        (e.dur.own ? e.dur.n + ' cited case' + (e.dur.n === 1 ? '' : 's')
+          : 'no case for this transition, DB-wide across ' + e.dur.n) + '</div>');
       // The backing, folded under the claim it backs. A conversion card was carrying four
       // separate reads plus its examples and blockers, and at ten of them on one page the
       // claim itself stopped being findable. The three verdicts are lifted onto the summary
       // line, so what each read CONCLUDED is on screen and only its working is a click away.
       const tail = [], verdicts = [];
+      const supChips = (arr, cls, sign) => (arr && arr.length)
+        ? '<div class="pf-chips">' + arr.map(v => '<span class="pf-chip ' + cls + '">' + sign + ' ' + esc(v) + '</span>').join('') + '</div>'
+        : '';
       if (e.support) {
         if (e.support.standing) verdicts.push(e.support.standing + ' by what is around it');
         tail.push('<div class="pf-sup">' +
           (e.support.standing ? '<span class="pf-stand ' + esc(e.support.standing) + '">' + esc(e.support.standing) + ' by what is around it</span>' : '') +
-          (e.support.for.length ? '<div class="pf-for">for: ' + e.support.for.map(esc).join(' · ') + '</div>' : '') +
-          (e.support.against.length ? '<div class="pf-agn">against: ' + e.support.against.map(esc).join(' · ') + '</div>' : '') +
+          // for / against were two labelled word lists reading as prose. Same items, as chips:
+          // the sign carries the label, so 'for:' and 'against:' are not written out per card.
+          supChips(e.support.for, '', '+') + supChips(e.support.against, 'neg', '−') +
           ((e.support.notes || []).length ? '<div class="pf-cite">' + e.support.notes.map(esc).join('<br>') + '</div>' : '') + '</div>');
       }
       // The signal read stays its OWN block, never merged into the one above: one is measured
@@ -4650,7 +4836,7 @@
       const order = ['policy', 'civic', 'market', 'news', 'landmark', 'trend'];
       const chans = [...byChannel.keys()].sort((a, b) => order.indexOf(a) - order.indexOf(b));
       body.push(sec('03', 'What is being said and decided',
-        'Published claims about ' + (meta.district || S.key) + ', not counts of anything. They order futures inside a likelihood tier and never change one.') +
+        'Published claims, not counts.') +
         '<div class="pf-signals">' +
         '<div class="pf-basis" style="margin:0 0 9px">' + (S.set.items || []).length + ' compiled items, ' +
         (S.age == null ? 'compile date unreadable' : 'compiled ' + S.age + ' days ago') +
@@ -4710,15 +4896,14 @@
       }
       const order = [...byStream.keys()].sort((a, b) => STREAMS.indexOf(a) - STREAMS.indexOf(b));
       body.push(sec('04', 'Which way the district is moving',
-        'Numbers, but measured at district scale or larger, never at this parcel. A metric needs two dated observations before it may argue a direction at all.') +
+        'District scale, never this parcel.') +
         '<div class="pf-signals">' +
         '<div class="pf-basis" style="margin:0 0 9px">' + mets.length + ' compiled metrics across ' +
         byStream.size + ' streams, matched to this address at ' + D.dist + ' m from the set centre. ' +
         (newest ? 'Newest observation ' + esc(newest) + '. ' : '') +
         (D.age == null ? 'Compile date unreadable. ' : 'Compiled ' + D.age + ' days ago. ') +
         '<b>' + ranks + '</b> of them rank a future: the rest carry fewer than two dated ' +
-        'observations, and ' + gaps + ' are declared gaps with no number at all. One dated ' +
-        'number is a fact about today, not a direction of travel.' +
+        'observations, and ' + gaps + ' are declared gaps with no number at all.' +
         (D.stale ? ' <b>This set is over ' + DYN_STALE_DAYS + ' days old, so treat every series as a lead to re-check.</b>' : '') +
         '</div>' +
         // The two-observation rule, drawn. The sentence above states it; this makes the
@@ -4764,12 +4949,17 @@
     // Folded, not cut. Every line here qualifies a figure above it and none of them may be
     // dropped; open they were a screen of grey type competing with the findings, closed they
     // are one click from any reader who wants to know what the panel is not claiming.
+    // Printed once, for the whole panel. Every section used to carry its own version of this
+    // in its subtitle, which is how a page ends up arguing with itself in four places.
+    body.push('<div class="pf-foot">Counts are what is mapped; claims are published, not measured. ' +
+      'Neither changes a likelihood tier: the DB sets it, the site reads only order futures inside it.</div>');
     body.push('<details class="pf-fold"><summary>What these figures are, and are not · ' +
       notes.length + ' note' + (notes.length === 1 ? '' : 's') + '</summary>' +
       '<div class="pf-note">' + notes.map(esc).join('<br>') + '</div></details>');
 
     host.innerHTML = out.join('') + '<div class="pf-body">' + body.join('') + '</div>';
-    host.style.display = 'block';
+    pfReady = true;
+    host.style.display = reviewTab === 'forecast' ? 'block' : 'none';
 
     const churnEl = document.getElementById('pf-churn');
     if (churnEl) churnEl.addEventListener('change', () => {
@@ -4782,6 +4972,66 @@
     });
   }
 
+  // ── REVIEW STAGE TABS ────────────────────────────────────────────────────────────────
+  // Two stages, not three panes. The floor cards and the raw text are the SAME program in
+  // two notations, so they share one pane: read the cards, or paste a program file over
+  // them. The forecast is what that program turns into later, so it is the stage after it.
+  // No block moved out of #review-inner and no id changed, so renderReview /
+  // renderProgramForecast / applyRaw still write to exactly what they wrote to before.
+  // The Forecast tab hides itself when there is no forecast, rather than opening on nothing.
+  let reviewTab = 'floors', basisReady = false, pfReady = false;
+  function setReviewTab(t) {
+    if (t === 'raw') t = 'floors';   // the raw text is part of the draft pane now
+    if (t === 'forecast' && !pfReady) t = 'floors';
+    reviewTab = t;
+    // each pane's shown value is its own CSS display, not a blanket 'block': #floors is a
+    // flex column, and #prog-forecast / #raw-panel are display:none in the stylesheet.
+    const show = (id, v, on) => { const el = document.getElementById(id); if (el) el.style.display = on ? v : 'none'; };
+    show('site-basis', '', t === 'floors' && basisReady);
+    show('floors', '', t === 'floors');
+    show('raw-panel', 'block', t === 'floors' && rawShown);
+    show('prog-forecast', 'block', t === 'forecast' && pfReady);
+    rawOpen = t === 'floors' && rawShown;
+    if (rawOpen) fillRaw();
+    const strip = document.getElementById('rv-tabs');
+    if (strip) {
+      strip.querySelectorAll('button[data-rv]').forEach(b => b.classList.toggle('active', b.dataset.rv === t));
+      const fc = strip.querySelector('[data-rv="forecast"]');
+      if (fc) fc.style.display = pfReady ? '' : 'none';
+    }
+    paintRawToggle(t);
+  }
+
+  // The icon sits on the draft pane only, and carries a dot while text is typed but not
+  // applied, so folding the panel away cannot hide unapplied work.
+  function paintRawToggle(t) {
+    const btn = document.getElementById('rv-raw-toggle');
+    if (!btn) return;
+    btn.style.display = t === 'floors' ? '' : 'none';
+    btn.classList.toggle('open', rawShown);
+    const flag = document.getElementById('rv-raw-flag');
+    if (flag) flag.textContent = (!rawShown && rawEdited) ? '•' : '';
+  }
+
+  // Open or close the raw panel. Opening refills it from the cards and scrolls to it, so the
+  // click always lands on something visible.
+  function setRawShown(on) {
+    rawShown = !!on;
+    setReviewTab(reviewTab);
+    if (rawShown) {
+      const panel = document.getElementById('raw-panel');
+      if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+  {
+    const strip = document.getElementById('rv-tabs');
+    if (strip) strip.addEventListener('click', e => {
+      if (e.target.closest('#rv-raw-toggle')) { setRawShown(!rawShown); return; }
+      const b = e.target.closest('button[data-rv]');
+      if (b) setReviewTab(b.dataset.rv);
+    });
+  }
+
   function renderReview() {
     const st = computeStats();
     // Only a wizard-generated draft was built by these rules. A forecast scenario carries its
@@ -4789,29 +5039,44 @@
     const basisEl = document.getElementById('site-basis');
     const showBasis = wiz.siteBrief && reviewOrigin === 'wizard';
     basisEl.innerHTML = showBasis ? briefHtml(wiz.siteBrief) : '';
-    basisEl.style.display = showBasis ? 'block' : 'none';
+    basisReady = !!showBasis;
+    renderOriginLine();
     const levels = [...new Set(entries.map(e => e.level))].sort((a, b) => b - a); // top floor first
 
-    let html = '';
+    // printed once, not on every row. Below 900px the row stacks and each cell prints its
+    // own caption instead, so the head hides there.
+    // Long and short first, the core after them. The two program bands are what the reader is
+    // deciding about and what the short-share column at the end is measured on; the core is the
+    // fixed cost that comes with the floor, so it reads better once, at the end, than as the
+    // first thing between the floor number and the program.
+    let html = `<div class="floor-head">
+      <div></div><div>long</div><div>short</div><div>stairs</div><div></div><div>short share</div>
+    </div>`;
     for (const lv of levels) {
       const pf = st.perFloor.get(lv) || { tot: 0, shrt: 0 };
       const share = pf.tot > 0 ? pf.shrt / pf.tot : 0;
       const isSF = pf.tot > 0 && share > SHORT_THRESHOLD;
 
-      let pills = '';
+      // one column per band. Which column a row lands in is read from its TYPE by
+      // pillClass, the same call the colour came from, so nothing new decides it here.
+      const col = { circ: '', long: '', short: '' };
       entries.forEach((e, idx) => {
         if (e.level !== lv) return;
-        pills += `<span class="pill ${pillClass(e)}" data-idx="${idx}">${escapeHtml(e.type)}<b>${e.area} m²</b></span>`;
+        col[pillClass(e)] += `<span class="pill ${pillClass(e)}" data-idx="${idx}">${escapeHtml(e.type)}<b>${e.area} m²</b></span>`;
       });
-      pills += `<span class="pill add" data-add-level="${lv}">+ add</span>`;
 
       let form = '';
       if (editingIdx !== null && entries[editingIdx] && entries[editingIdx].level === lv) form = inlineEditorHtml(entries[editingIdx]);
       else if (addingLevel === lv) form = addFormHtml(lv);
 
+      // the add pill keeps its own cell: a program's band follows from the type you enter,
+      // so parking it inside one of the three would promise a choice it does not make
       html += `<div class="floor-card" data-level="${lv}">
-        <div class="floor-label"><div class="lv">${levelLabel(lv)}</div><div class="lv-sub">${levelSub(lv)}</div></div>
-        <div class="pills">${pills}</div>
+        <div class="floor-label">${floorName(lv)}</div>
+        <div class="pills"><span class="cell-cap">long</span>${col.long}</div>
+        <div class="pills"><span class="cell-cap">short</span>${col.short}</div>
+        <div class="pills"><span class="cell-cap">stairs</span>${col.circ}</div>
+        <div class="add-col"><span class="pill add" data-add-level="${lv}" title="add a program to this floor">+ add</span></div>
         <div class="share-col">
           <div class="share-head"><span class="share-cap">short share</span><span class="share-pct">${Math.round(share * 100)}%</span></div>
           <div class="share-bar"><div class="share-fill" style="width:${Math.min(100, share * 100)}%"></div><div class="share-tick"></div></div>
@@ -4866,10 +5131,20 @@
       document.getElementById('add-cancel').onclick = () => { addingLevel = null; renderReview(); };
     }
     renderProgramForecast();   // the timeline follows the program, so it re-reads on every edit
+    setReviewTab(reviewTab);   // renderProgramForecast has just settled pfReady
     saveDraft();
   }
 
-  function syncRaw() { if (rawOpen) { rawText.value = serialize(entries); rawErrors.innerHTML = ''; } }
+  // The cards and the textarea are on screen together, so entries can change under text the
+  // reader typed and has not applied. Typed text is never overwritten: the cards keep their
+  // own truth, the note says the two have drifted, and Apply or Revert decides which wins.
+  function fillRaw(force) {
+    if (rawEdited && !force) { rawNote.textContent = 'edited. Apply to use it, or Revert'; return; }
+    rawText.value = serialize(entries);
+    rawEdited = false; rawNote.textContent = ''; rawErrors.innerHTML = '';
+    btnRawRevert.style.display = 'none';
+  }
+  function syncRaw() { if (rawOpen) fillRaw(); }
 
   // ── draft persistence: Back from the massing page reloads this page from scratch,
   //    so review state must survive in localStorage or every retry re-runs the wizard ──
@@ -4909,23 +5184,63 @@
     addingLevel = null; // an empty or invalid add form is discarded, never blocks Build
   }
 
+  // ── ONE VIEW SWITCHER ────────────────────────────────────────────────
+  // The page holds three full-screen views. They used to swap by raw display writes in seven
+  // places, each with its own idea of what the other two should be doing, which is how the
+  // overlay could close onto the wizard while a draft was still live. This owns all four
+  // writes plus the review-active class; nothing else touches them. loadStep()'s row toggles
+  // are inside the wizard and are not a view change.
+  function showView(name) {
+    curView = name;
+    dialogEl.style.display = name === 'wizard' ? 'flex' : 'none';
+    stepIndicatorEl.style.display = name === 'wizard' ? 'flex' : 'none';
+    reviewEl.style.display = name === 'review' ? 'block' : 'none';
+    const fcEl = document.getElementById('forecast');
+    if (fcEl) fcEl.style.display = name === 'forecast' ? 'block' : 'none';
+    document.body.classList.toggle('review-active', name === 'review');
+    // the wizard names the step it is on; the other two said nothing about where you were
+    const lab = document.getElementById('view-label');
+    if (lab) {
+      const t = name === 'review' ? 'draft program' : name === 'forecast' ? 'site forecast' : '';
+      lab.textContent = t;
+      lab.style.display = t ? 'block' : 'none';
+    }
+    updateBackLabel();
+  }
+
+  // review's back arrow goes to one of two places. It says which one.
+  function updateBackLabel() {
+    const el = document.getElementById('bb-dest');
+    if (el) el.textContent = (reviewOrigin === 'forecast' && openForecast) ? 'scenarios' : 'wizard';
+  }
+
+  // A scenario draft used to be indistinguishable from a wizard draft: same title, no trace
+  // of the scenario it came out of. Hidden entirely on a wizard-built one.
+  function renderOriginLine() {
+    const el = document.getElementById('rv-origin');
+    if (!el) return;
+    const show = reviewOrigin === 'forecast' && wiz.scenarioName;
+    el.innerHTML = show
+      ? 'from site forecast · <b>' + escapeHtml(wiz.scenarioName) + '</b>' +
+        (openForecast ? '<a id="rv-origin-back">change scenario</a>' : '')
+      : '';
+    el.style.display = show ? 'block' : 'none';
+    const a = document.getElementById('rv-origin-back');
+    if (a) a.addEventListener('click', () => openForecast());
+  }
+
   function enterReview(regenerate = true) {
-    dialogEl.style.display = 'none';
-    stepIndicatorEl.style.display = 'none';
-    reviewEl.style.display = 'block';
-    document.body.classList.add('review-active');
+    showView('review');
     if (regenerate) entries = generateEntries(wiz.buildingType, wiz.gfa, wiz.floorsAbove, wiz.basementLevels, wiz.activities, wiz.siteBrief);
+    reviewTab = 'floors';   // a new draft opens on the cards, never on the raw text
+    rawShown = false;       // and with the raw text folded back up
     renderReview();
   }
 
   // ── raw text panel (escape hatch) ──
-  btnRawToggle.addEventListener('click', () => {
-    rawOpen = !rawOpen;
-    rawPanel.style.display = rawOpen ? 'block' : 'none';
-    btnRawToggle.textContent = (rawOpen ? '▾' : '▸') + ' raw text';
-    if (rawOpen) { rawText.value = serialize(entries); rawErrors.innerHTML = ''; }
-  });
-
+  // Lives under the floor cards in the draft pane. Two ways in: type over what is there, or
+  // load a .txt written elsewhere. Both end at applyRaw(), which is the only thing that
+  // replaces the entries, so a bad file leaves the draft standing and prints its line numbers.
   function applyRaw() {
     const lines = rawText.value.split('\n');
     const parsed = [];
@@ -4945,20 +5260,62 @@
     entries = parsed;
     editingIdx = null; addingLevel = null;
     rawErrors.innerHTML = '';
+    rawEdited = false;                  // applied: the cards and the text agree again
     rawText.value = serialize(entries); // canonicalise
     renderReview();
     return true;
   }
   btnRawApply.addEventListener('click', applyRaw);
+  btnRawRevert.addEventListener('click', () => fillRaw(true));
+  rawText.addEventListener('input', () => {
+    rawEdited = true;
+    rawNote.textContent = 'not applied yet';
+    btnRawRevert.style.display = '';
+    paintRawToggle(reviewTab);
+  });
+
+  // ── load a program file ──
+  // The picker only fills the textarea and runs the same Apply the button runs; nothing here
+  // trusts the file. The input is reset so picking the same file twice still fires.
+  {
+    const upBtn = document.getElementById('btn-raw-upload');
+    const upIn = document.getElementById('raw-file');
+    if (upBtn && upIn) {
+      upBtn.addEventListener('click', () => upIn.click());
+      upIn.addEventListener('change', () => {
+        const f = upIn.files && upIn.files[0];
+        upIn.value = '';
+        if (!f) return;
+        const rd = new FileReader();
+        rd.onerror = () => { rawErrors.textContent = 'could not read ' + f.name; };
+        rd.onload = () => {
+          setReviewTab('floors');   // the draft pane owns the textarea; land there before writing it
+          setRawShown(true);        // a loaded file must be visible, applied or not
+          rawText.value = String(rd.result || '').replace(/\r?\n/g, '\n');
+          rawErrors.innerHTML = '';
+          // marked edited first, so a file that fails validation stays on screen to be fixed
+          // instead of being wiped by the next render
+          rawEdited = true; rawNote.textContent = 'loaded ' + f.name; btnRawRevert.style.display = '';
+          if (!applyRaw()) rawErrors.innerHTML = '<b>' + escapeHtml(f.name) + '</b> was not applied:<br>' + rawErrors.innerHTML;
+          else rawNote.textContent = 'loaded ' + f.name;
+        };
+        rd.readAsText(f);
+      });
+    }
+  }
 
   // ── build ──
-  btnBuild.addEventListener('click', () => {
+  btnBuild.addEventListener('click', async () => {
+    // The surroundings no longer hold the site step up, so on a very fast run they can still
+    // be in flight here. This is the one place that must not sail without them: the massing
+    // view draws the context ring from what it is handed.
+    if (wiz.site && wiz.site.generators === undefined) { analyzing('reading the surroundings'); await ringDone; }
     // raw dirtiness must be judged BEFORE committing forms, or a just-committed
     // edit would make the (stale) textarea look dirty and applyRaw would revert it
-    const rawDirty = rawOpen && rawText.value.trim() !== serialize(entries).trim();
+    const rawDirty = rawText.value.trim() !== '' && rawText.value.trim() !== serialize(entries).trim();
     commitInlineEdit();
     commitAddForm();
-    if (rawDirty && !applyRaw()) { renderReview(); return; } // bad raw text blocks Build, errors shown
+    if (rawDirty && !applyRaw()) { setRawShown(true); renderReview(); return; } // bad raw text blocks Build, errors shown
     renderReview(); syncRaw();
     localStorage.setItem('programInputText', serialize(entries));
     // The timeline travels with the program: the sequential evolution as conversion rules,
@@ -5010,11 +5367,8 @@
   //    wizard-sourced draft   → back to the last wizard step, answers intact.
   document.getElementById('btn-back-review').addEventListener('click', () => {
     commitInlineEdit(); commitAddForm(); saveDraft(); // don't lose an open edit on the way out
-    reviewEl.style.display = 'none';
-    document.body.classList.remove('review-active');
     if (reviewOrigin === 'forecast' && openForecast) { openForecast(); return; }
-    dialogEl.style.display = 'flex';
-    stepIndicatorEl.style.display = 'flex';
+    showView('wizard');
     loadStep(steps.length - 1); // re-ask the last question; Continue rebuilds the draft
   });
 
@@ -5058,7 +5412,6 @@
     if (!keys.length) return;
 
     const link = document.getElementById('forecast-link');
-    const panel = document.getElementById('forecast');
     const titleEl = document.getElementById('fc-title');
     const tabsEl = document.getElementById('fc-tabs');
     const spineEl = document.getElementById('fc-spine');
@@ -5074,7 +5427,10 @@
     };
 
     link.textContent = '▸ site forecast' + (keys.length === 1 ? ' · ' + nameOf(keys[0]) : ' · ' + keys.length + ' sites');
-    link.style.display = 'inline-block';
+    revealForecastLink = () => { link.style.display = 'inline-block'; };
+    // a restored draft, or stepping back to the site step, can arrive with one of them already
+    // looked up — the entry was earned on that earlier visit and should still be there
+    if (wiz.site && isIntelAddress(wiz.site.query)) revealForecastLink();
 
     // site tabs (hidden when only one site is loaded)
     tabsEl.innerHTML = keys.length > 1
@@ -5236,27 +5592,18 @@
       entries = parsed;
       wiz.buildingType = 'forecast-' + (sc.id || 'scenario');
       reviewOrigin = 'forecast'; // so review's "← back" returns here, not into the wizard
-      panel.style.display = 'none';
+      // named in the draft, and carried in wiz so a reload still knows which scenario it is
+      wiz.scenarioName = sc.name || ('scenario ' + (sc.id || ''));
       enterReview(false); // render the scenario draft — user edits, then Build hands off as usual
       saveDraft();
     }
 
     // exposed so the review stage's "← back" can reopen this panel (see btn-back-review)
-    openForecast = () => {
-      panel.style.display = 'block';
-      reviewEl.style.display = 'none';
-      document.body.classList.remove('review-active');
-    };
+    // the draft stays live behind it, so closing has to come back to the draft, not the wizard
+    openForecast = () => { setFcReturn('review'); showView('forecast'); };
 
-    link.addEventListener('click', () => { panel.style.display = 'block'; });
-    document.getElementById('fc-close').addEventListener('click', () => {
-      panel.style.display = 'none';
-      // the wizard is behind the overlay unless a draft is already in review
-      if (!document.body.classList.contains('review-active')) {
-        dialogEl.style.display = 'flex';
-        stepIndicatorEl.style.display = 'flex';
-      }
-    });
+    link.addEventListener('click', () => { setFcReturn('wizard'); showView('forecast'); });
+    document.getElementById('fc-close').addEventListener('click', () => showView(fcReturn));
 
     // URL hooks (demo links + headless verification):
     //   ?site=<key>              select the site (default: first loaded)
@@ -5265,13 +5612,24 @@
     const q = new URLSearchParams(location.search);
     const wanted = q.get('site');
     renderSite(keys.includes(wanted) ? wanted : keys[0]);
+    // ?site= / ?forecast= is someone asking for one of these sites by name, so the entry comes
+    // up with them — otherwise closing the overlay would leave no way back into it
+    if (wanted !== null || q.get('forecast') !== null) revealForecastLink();
 
     const fcq = q.get('forecast');
-    if (fcq === '1' || fcq === 'open') panel.style.display = 'block';
+    // ?forecast=1 normally opens over the wizard, but restoreDraft ran before this and may
+    // already have put a draft on screen — closing must not strand it
+    if (fcq === '1' || fcq === 'open') { setFcReturn(curView === 'review' ? 'review' : 'wizard'); showView('forecast'); }
     else if (fcq) {
       const sc = scenarios.find(s => String(s.id).toLowerCase() === fcq.toLowerCase());
       if (sc) applyScenario(sc);
     }
+
+    // restoreDraft runs before this block, so a restored scenario draft was rendered while
+    // openForecast was still null. Now that it exists, the back label and the provenance
+    // line can name where they go.
+    updateBackLabel();
+    renderOriginLine();
   })();
 
   // test hook (read-only accessors for the headless verification pipeline)
