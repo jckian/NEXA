@@ -21,18 +21,11 @@ forVideo/
 !NEXA/deck/scenario-260730.mp4
 !NEXA/deck/nexa-30s.mp4
 
-# RENDER is huge; keep only the one image the site needs. It lives in RENDER/VORO/ since
-# 260727, and git will not look inside an excluded directory, so VORO/ has to be un-ignored
-# before its contents can be excluded again.
-RENDER/*
-!RENDER/VORO/
-RENDER/VORO/*
-!RENDER/VORO/TOWER-1.png
+# RENDER is huge and nothing public loads from it any more.
+RENDER/
 
 # ── Old / retired branding & backups ─────────────
-# Anchored: an unanchored "VORO/" also matches RENDER/VORO/, which holds the one render
-# the public site loads.
-/VORO/
+VORO/
 BACKUP/
 
 # ── Research scaffolding & dev tooling (local only) ─
@@ -54,28 +47,26 @@ nexa-llm.js
 
 # ── NEXA: keep the site + loaded data, drop planning docs ─
 NEXA/*.md
+NEXA/hero/
 NEXA/intel/*.md
 NEXA/intel/prompts/
 NEXA/intel/data/*.md
+# print + video production sources for the deck; the site plays the clips, not these
+NEXA/deck/kit-leaflet/
+NEXA/deck/*-9x16-poster.jpg
+NEXA/deck/*-script.md
 
 # ── references: keep only what the platform + README use ─
 references/*
 !references/ProgramFormat.txt
 !references/TPAC-PROGRAM-DISTRIBUTION.txt
 !references/53W53-PROGRAM-DISTRIBUTION.txt
-!references/System Workflow- FOR GITHUB.png
-!references/UI-massing.png
-!references/UI-structure.png
+!references/system-workflow.png
 !references/screenshot/
 references/screenshot/*
-!references/screenshot/step-brief.png
-!references/screenshot/step-massing.png
-!references/screenshot/step-structure.png
-!references/website-placeholder/
-references/website-placeholder/*
-!references/website-placeholder/F2-carre-03-bis.jpg
-!references/website-placeholder/F2-carre-11.jpg
-!references/website-placeholder/F2-carre-12.jpg
+!references/screenshot/wizard.png
+!references/screenshot/massing.png
+!references/screenshot/structure.png
 
 # ── Runtime artifacts ────────────────────────────
 pythonFiles/fileTransfer/
@@ -102,3 +93,10 @@ scratchpad/
 
 # ── Reel / video build (local only) ──────────────
 reel/
+# 9:16 cuts of the two apps, built for the reel and not part of the platform
+program-input-9x16.html
+program-massing-shortfloor-9x16.html
+
+# ── Local docs / backups that are not the platform ─
+*.bak
+*.pdf
