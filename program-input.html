@@ -5427,7 +5427,12 @@
     };
 
     link.textContent = '▸ site forecast' + (keys.length === 1 ? ' · ' + nameOf(keys[0]) : ' · ' + keys.length + ' sites');
-    revealForecastLink = () => { link.style.display = 'inline-block'; };
+    // Entry hidden for now (260826): looking up one of the intel addresses no longer puts the
+    // link up. The layer itself is untouched — ?site= / ?forecast= still open the overlay and
+    // still show the link, so closing it has a way back. Set this to false to restore.
+    const FORECAST_ENTRY_HIDDEN = true;
+    const showForecastLink = () => { link.style.display = 'inline-block'; };
+    revealForecastLink = FORECAST_ENTRY_HIDDEN ? () => {} : showForecastLink;
     // a restored draft, or stepping back to the site step, can arrive with one of them already
     // looked up — the entry was earned on that earlier visit and should still be there
     if (wiz.site && isIntelAddress(wiz.site.query)) revealForecastLink();
@@ -5614,7 +5619,7 @@
     renderSite(keys.includes(wanted) ? wanted : keys[0]);
     // ?site= / ?forecast= is someone asking for one of these sites by name, so the entry comes
     // up with them — otherwise closing the overlay would leave no way back into it
-    if (wanted !== null || q.get('forecast') !== null) revealForecastLink();
+    if (wanted !== null || q.get('forecast') !== null) showForecastLink();
 
     const fcq = q.get('forecast');
     // ?forecast=1 normally opens over the wizard, but restoreDraft ran before this and may
