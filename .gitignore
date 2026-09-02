@@ -93,9 +93,8 @@ scratchpad/
 
 # ── Reel / video build (local only) ──────────────
 reel/
-# 9:16 cuts of the two apps, built for the reel and not part of the platform
-program-input-9x16.html
-program-massing-shortfloor-9x16.html
+# the 9:16 cuts of the two apps are published too, so a phone gets a portrait
+# version of the wizard and the visualizer instead of the desktop layout
 
 # ── Local docs / backups that are not the platform ─
 *.bak

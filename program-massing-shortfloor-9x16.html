@@ -23,7 +23,7 @@
     })();
   </script>
 
-  <title>Program Massing — SHORT-floor variant (8'-6" plug-in storeys)</title>
+  <title>Program Massing — SHORT-floor variant (8'-6" plug-in storeys) · 9:16</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -77,20 +77,17 @@
        Border plus blur is the whole separation. The `--shadow` token went with it, so a new
        element cannot pick one up by habit. */
     .panel { position: fixed; background: var(--panel-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); z-index: 10; backdrop-filter: blur(16px); }
-    /* Left column: the layout controls and the program list, one panel. Adaptive use used to be
-       a second tab down here; it is a tab of the RIGHT column now, beside the numbers it moves. */
+    /* Left column: Layout · Program and Adaptive use are two tabs of one stack, same left edge,
+       same width, and only one of them is open at a time (the #right-stack idiom, mirrored). */
     #left-stack { position: fixed; top: 70px; left: 20px; bottom: 20px; width: 248px; display: flex; flex-direction: column; gap: 10px; z-index: 11; pointer-events: none; }
     #left-stack > * { pointer-events: auto; }
     /* The panel itself never scrolls: the layout controls are fixed under the header and the
        program list below them takes the rest of the column and scrolls on its own. */
-    #left-panel { position: static; width: 100%; flex: 0 0 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
-    #left-body { display: flex; flex-direction: column; min-height: 0; flex: 0 0 auto; }
+    #left-panel { position: static; width: 100%; flex: 0 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+    #left-panel > #layout-section { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }
+    #left-body { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }
     #layout-body { flex: none; }
-    /* The program card is the one that takes what the column has left: the floor list is 90 rows
-       on a full building and it is the only thing down here that can use the room. */
-    #program-panel { position: static; width: 100%; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
-    #program-panel.collapsed { flex: none; overflow: visible; }
-    #prog-section { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }
+    #prog-section { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; border-top: 1px solid var(--border-dim); margin-top: 8px; }
     /* With its body closed the Layout panel is just a tab header, and a tab header must never be
        the thing that gives up room to the panel below it. Measured 260730: it was being squeezed
        from 35 px to 15 px and clipped, while Program and Adaptive sat at their full 38 px. */
@@ -100,24 +97,15 @@
     .acc-head.open { color: var(--text-hi); }
     .acc-head .chev { font-size: 9px; letter-spacing: 0; transition: transform 0.15s; }
     .acc-head.open .chev { transform: rotate(180deg); }
-    /* Full height, because the Adaptive use tab and the year readout moved over here and the year
-       sits at the foot of the column. pointer-events off on the stack itself, so the empty run
-       between the panels and the year is still canvas to drag (the #left-stack idiom). */
-    #right-stack { position: fixed; top: 20px; right: 20px; bottom: 20px; width: 248px; display: flex; flex-direction: column; gap: 10px; z-index: 10; pointer-events: none; }
-    #right-stack > * { pointer-events: auto; }
+    #right-stack { position: fixed; top: 20px; right: 20px; width: 248px; display: flex; flex-direction: column; gap: 12px; max-height: calc(100vh - 40px); z-index: 10; }
     /* One panel, three folds (Statistics · Code check · Export), one open at a time — the same
        accordion the left column uses. Two stacked panels meant the export checkboxes pushed the
        statistics off a short screen, so reading a number meant scrolling a column. */
-    #right-panel, #code-panel, #export-panel { position: static; width: 100%; min-height: 0; flex: 0 1 auto; overflow-y: auto; }
-    #right-panel .acc-head, #code-panel .acc-head, #export-panel .acc-head { padding: 14px 16px 10px; }
-    /* The three right-hand cards do not fold, so their headers are labels: nothing to click, no
-       hover, and no chevron pointing at a fold that is not there. */
-    #right-panel .acc-head, #code-panel .acc-head, #export-panel .acc-head { cursor: default; pointer-events: none; }
-    #right-panel .chev, #code-panel .chev, #export-panel .chev { display: none; }
-    /* Code check is off the column (260821). The card is hidden, not removed: checkCompliance still
-       runs and still writes into #code-violations, so nothing downstream of it changes and putting
-       it back is one line. */
-    #code-panel { display: none; }
+    #right-panel { position: static; width: 100%; min-height: 0; flex: 0 1 auto; overflow-y: auto; }
+    /* Chatbot, Statistics, Code check and Export are four cards in the column now, so the
+       stack lays each of them out instead of .panel positioning itself. */
+    #right-stack > .panel { position: static; width: 100%; min-height: 0; flex: 0 1 auto; overflow-y: auto; }
+    #right-panel .acc-head { padding: 14px 16px 10px; }
     .panel h2 { font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-lo); padding: 14px 16px 10px; font-weight: 600; }
     .panel-section { border-top: 1px solid var(--border-dim); }
     .ctrl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; padding: 4px 16px 12px; }
@@ -145,10 +133,6 @@
     #stats { padding: 4px 16px 14px; }
     /* Site leads the panel, so it carries the divider below it rather than above */
     #site-section { border-bottom: 1px solid var(--border-dim); }
-    /* Structure mode drops the whole Site card, address block and storey height alike: nothing in
-       the parcel sizes a member, and the frame is read against the program, not the lot.
-       !important because both the handoff and the Turnover stage set that panel's display inline. */
-    body.structure-on #left-panel { display: none !important; }
     #site-info { padding: 4px 16px 14px; }
     .site-row { font-size: 10px; color: var(--text-mid); margin-bottom: 6px; line-height: 1.45; }
     .site-row .sk { display: block; font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-lo); font-weight: 600; margin-bottom: 1px; }
@@ -205,27 +189,44 @@
     }
     #analysis-stage.on { display: block; animation: an-stage-in 0.24s ease both; }
     @keyframes an-stage-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-    /* Two columns, and the split is the argument: LEFT is what was measured off the program and
-       the rates the reader sets, RIGHT is only what those two produce. So nothing derived is ever
-       printed beside something typed. The rates had a middle column of their own until 260821;
-       they read better at the foot of the left column, under the sentence they cannot move.
-       No sticky on the left column any more: it holds the rate inputs now, and a sticky column
-       taller than the viewport puts its own bottom out of reach. */
+    /* Three columns, and the order is the argument: MEASURED off the program, ASSUMED by the
+       reader, then DERIVED from the two. Each column holds exactly one of those and nothing
+       else, so which kind a figure is never has to be stated in words.
+       Areas rather than raw columns, because the collapse is not a straight stack: at the
+       middle width the derived column keeps its own full-height column beside the other two,
+       and only below that does everything fall into one. */
     #analysis-inner {
       max-width: 1440px; margin: 0 auto;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
-      grid-template-areas: "left right";
-      gap: clamp(26px, 3vw, 56px); align-items: start;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.78fr) minmax(0, 1.22fr);
+      grid-template-areas: "left mid right";
+      gap: clamp(24px, 2.8vw, 52px); align-items: start;
     }
     #an-left { grid-area: left; }
+    #an-mid { grid-area: mid; }
     #an-right { grid-area: right; }
-    /* nothing rests on a rate yet (no timeline, or a stale one), so there is no second column to
-       hold the first one to half the page */
+    /* `top` here is measured from the scrollport, and the scrollport already starts under the
+       stage's own padding, so repeating the padding value in `top` pushed the column a second
+       padding down before anything had even scrolled. 16px is clear of the mode switch, which
+       is fixed over the stage rather than inside it. */
+    #an-left { position: sticky; top: 16px; }
+    /* in its own column the table starts at the top: the rule above it was a divider from the
+       block it used to sit under */
+    #an-mid .an-rates { margin-top: 0; padding-top: 0; border-top: none; }
+    /* nothing rests on a rate yet (no timeline, or a stale one), so there are no other columns
+       to hold the first one to a third of the page */
     #analysis-inner.solo { grid-template-columns: 1fr; grid-template-areas: "left"; }
-    #analysis-inner.solo #an-left { max-width: 760px; }
+    #analysis-inner.solo #an-left { position: static; max-width: 760px; }
+    @media (max-width: 1280px) {
+      #analysis-inner {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+        grid-template-areas: "left right" "mid right";
+        gap: clamp(22px, 3vw, 40px);
+      }
+    }
     @media (max-width: 940px) {
-      #analysis-inner { grid-template-columns: 1fr; grid-template-areas: "left" "right"; gap: 26px; }
+      #analysis-inner { grid-template-columns: 1fr; grid-template-areas: "left" "mid" "right"; gap: 26px; }
+      #an-left { position: static; }
     }
     .an-step-mark {
       font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
@@ -314,19 +315,15 @@
     .an-rt input:focus { border-color: var(--blue); }
     .an-note { font-size: 12.5px; line-height: 1.65; color: var(--text-mid); margin-top: 16px; }
     .an-note b { color: var(--text-hi); font-weight: 500; }
+    .an-caveat { font-size: 11.5px; line-height: 1.65; color: var(--text-lo); margin-top: 12px; }
     @media (max-width: 780px) { #analysis-stage { padding-left: 20px; padding-right: 20px; } }
     /* the model's furniture belongs to the model: the last step is not the place to keep
        offering a chat line and a code check */
     body.analysis-on #chat-bar,
     body.analysis-on #left-stack,
     body.analysis-on #right-stack,
-    body.analysis-on #compass { display: none; }
-    /* The mark stays. It is the page's name, not a control, and the last step of the walk is the
-       one a reader is most likely to be shown out of context. The stage is drawn over everything
-       at z-index 13, so the block is lifted above it; the way back to the wizard is a control and
-       goes with the rest of the furniture. */
-    body.analysis-on #title-block { z-index: 14; }
-    body.analysis-on #to-program { display: none; }
+    body.analysis-on #compass,
+    body.analysis-on #title-block { display: none; }
     /* Viewport compass, bottom right. Same card as everything else — panel fill, one hairline
        border, blur, no shadow — and one bar tall, so it lines up with the chat bar beside it.
        pointer-events off: it sits over a canvas the whole screen wide that is dragged to orbit,
@@ -366,65 +363,22 @@
     #viewbar #vb-sub-row > .vb-sub.on { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0) scale(1); }
     #viewbar .vb-sub { width: auto; gap: 2px; }
     #viewbar .vb-sub button { flex: 0 0 auto; padding: 0 clamp(11px, 1.9vh, 22px); font-size: clamp(6.5px, 0.8vh, 9px); gap: clamp(2px, 0.35vh, 5px); }
-    /* The three schemes carry no caption, so the button is sized around its icon instead of
-       around a word. Scoped to #seg-core: Steel and RC still read as words. */
-    #viewbar #seg-core button { padding: 0; width: calc(var(--floor-h) - clamp(6px, 0.9vh, 12px)); }
-    #viewbar #seg-core svg { width: clamp(15px, 2.2vh, 26px); height: clamp(15px, 2.2vh, 26px); }
     #viewbar .vb-sub svg { width: clamp(11px, 1.6vh, 19px); height: clamp(11px, 1.6vh, 19px); }
     #viewbar .vb-sub button:hover { color: var(--orange); background: rgba(230, 112, 51, 0.12); }
     #viewbar .vb-sub button.active { color: #fff; background: var(--orange); }
     @media (prefers-reduced-motion: reduce) { #viewbar #vb-sub-row, #viewbar #vb-sub-row > .vb-sub { transition-duration: 0.01s; } }
-    /* ── attention hints ──
-       Two controls carry the walk and neither announces itself: the three schemes under Massing,
-       and Play on the timeline. Each sends out three rings when it first matters and then stops
-       for good. A hint that never ends is decoration. Drawn with box-shadow, which spreads
-       outside the pill without moving anything next to it. */
-    @keyframes nx-hint-play {
-      0%   { box-shadow: 0 0 0 0 rgba(230, 112, 51, 0.55); transform: scale(1); }
-      45%  { transform: scale(1.14); }
-      70%  { box-shadow: 0 0 0 10px rgba(230, 112, 51, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(230, 112, 51, 0); transform: scale(1); }
-    }
-    /* the options row takes the orange it is already drawn in, so the two rows do not pulse in
-       the same colour one under the other */
-    @keyframes nx-hint-sub {
-      0%   { box-shadow: 0 0 0 0 rgba(230, 112, 51, 0.42); border-color: var(--orange); }
-      70%  { box-shadow: 0 0 0 14px rgba(230, 112, 51, 0); border-color: var(--border-dim); }
-      100% { box-shadow: 0 0 0 0 rgba(230, 112, 51, 0); border-color: var(--border-dim); }
-    }
-    #viewbar .vb-sub.hint { animation: nx-hint-sub 1.2s ease-out 3; }
-    #tl-play.hint { animation: nx-hint-play 1.1s ease-out 3; }
-    /* The dot has landed. The button takes the colour over from it and blinks three times on its
-       own: an orange control that is already lit reads as the next thing to press, where a ring
-       around a blue one only says look here. */
-    @keyframes nx-lead-play {
-      0%   { box-shadow: 0 0 0 0 rgba(230, 112, 51, 0.6); transform: scale(1); }
-      35%  { transform: scale(1.16); }
-      70%  { box-shadow: 0 0 0 13px rgba(230, 112, 51, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(230, 112, 51, 0); transform: scale(1); }
-    }
-    #tl-play.lead { background: var(--orange); color: #fff; border-color: var(--orange); animation: nx-lead-play 1.15s ease-out 3; }
-    /* The way in, drawn: a dot leaves the Turnover button and curves down to Play. Its own fixed
-       overlay, so neither column reflows and nothing under it is clickable. */
-    #turn-lead { position: fixed; inset: 0; z-index: 30; pointer-events: none; }
-    #turn-lead path { fill: none; stroke: var(--orange); stroke-width: 1.5; stroke-linecap: round; opacity: 0.45; }
-    #turn-lead circle { fill: var(--orange); }
-    @media (prefers-reduced-motion: reduce) { #viewbar .vb-sub.hint, #tl-play.hint { animation: none; } #tl-play.lead { animation: none; } #turn-lead { display: none; } }
     /* narrow screens squeeze the sides only */
     @media (max-width: 1100px) { #viewbar button { padding: 0 clamp(10px, 1.6vh, 18px); } #viewbar .vb-sub button { padding: 0 clamp(7px, 1.2vh, 13px); } }
     /* Not a panel: the play button and the year, straight on the background at the foot of the
        column. margin-top:auto pushes it down. The three core options used to sit under it; they
        are in the view bar now, under Massing. */
-    /* The year stands on the same line as the chat bar: the stack's floor and the bar's floor are
-       both 20px, so no bottom margin is the alignment. It cleared the compass when it lived in the
-       right column; on the Turnover stage it is in the LEFT column and the dial is nowhere near it. */
-    #year-badge { display: none; position: static; width: 100%; flex: none; margin-top: auto; margin-bottom: 0; align-items: center; gap: 8px; padding-left: 2px; }
+    #year-badge { display: none; position: static; width: 100%; flex: none; margin-top: auto; align-items: center; gap: 8px; padding-left: 2px; }
     #year-badge.open { display: flex; }
     #year-badge .lab, #year-badge b { font-size: 44px; line-height: 1; font-weight: 600; color: var(--blue); letter-spacing: -0.01em; }
     #year-badge b { font-variant-numeric: tabular-nums; }
     /* The caption under the three options: which one the wizard handoff picked, and the score
        every option got. Hidden unless a pick actually ran, so the sample path looks unchanged. */
-    #core-pick { display: none; width: 100%; flex: none; margin-top: auto; padding: 0 10px; }
+    #core-pick { display: none; width: 100%; flex: none; padding: 0 10px; }
     #core-pick.on { display: block; }
     #core-pick .cp-head { font-size: 7px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-lo); margin-bottom: 5px; }
     #core-pick .cp-row { display: flex; align-items: baseline; gap: 6px; font-size: 8.5px; letter-spacing: 0.04em; color: var(--text-lo); line-height: 1.75; }
@@ -434,32 +388,19 @@
     #core-pick .cp-row.on b { color: var(--blue); }
     #core-pick .cp-note { font-size: 7.5px; letter-spacing: 0.05em; color: var(--text-lo); line-height: 1.6; margin-top: 4px; opacity: 0.75; }
     /* ── Adaptive-use chat + timeline ── */
-    /* Adaptive use is a tab of the right column: one header, one body, opening and closing on its
-       own. It used to share an accordion with Layout · Program, which meant opening the timeline
-       folded away a panel on the far side of the screen. */
+    /* Program and Adaptive use are two separate tabs of the left column, same as Layout: one
+       header each, one body each, and only one of the three open at a time. */
     .acc-tab { position: static; width: 100%; flex: none; display: flex; align-items: center; gap: 8px; text-align: left; background: var(--panel-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 13px 16px; backdrop-filter: blur(16px); font-family: inherit; font-size: 8px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-lo); cursor: pointer; }
     .acc-tab:hover { color: var(--text-mid); }
     .acc-tab.open { color: var(--text-hi); border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom-color: transparent; margin-bottom: -10px; }
-    /* The Turnover tab belongs to the Turnover stage and to nothing else. Hidden until the stage
-       is up (dockTurnover shows it), so Massing and Structure are not carrying a fold that only
-       repeats a button in the mode row. Declared here, not in script, so it never flashes. */
-    #chat-toggle { display: none; }
-    /* On the stage the column is read bottom-up: the tab, the rules, the slider, and then the year
-       the slider sets, standing on the same line as the chat bar. The auto margin moves to the tab
-       so the whole group drops to the floor of the column and the slider is one line above the
-       number — the year keeps its own auto margin off the stage, where it stands alone. */
-    body.turnover-on #chat-toggle { margin-top: auto; }
-    body.turnover-on #year-badge { margin-top: 0; }
-    /* An open tab is as tall as it needs to be and no taller than half the page: the rule list runs
-       to twenty rows and an uncapped panel ran the height of the column, which put a field of white
-       between the greeting and the rules. flex 0 1 auto = size to content, shrink if it does not
-       fit; the lists inside scroll (#prog-list, #chat-log). */
-    #chat-panel { position: static; width: 100%; flex: 0 1 auto; min-height: 0; max-height: 50vh; display: none; flex-direction: column; }
+    .acc-tab .dot { color: var(--orange); }
+    /* An open tab is as tall as it needs to be, and no taller than the column has room for: it
+       runs down to the year readout when the list is long (the old 560 px cap left a gap on a tall
+       screen), and stays short when there is little in it. flex 0 1 auto = size to content, shrink
+       if it does not fit; the lists inside scroll (#prog-list, #chat-log). */
+    #chat-panel { position: static; width: 100%; flex: 0 1 auto; min-height: 0; display: none; flex-direction: column; }
     #chat-panel.open { display: flex; border-top-left-radius: 0; border-top-right-radius: 0; }
-    /* Sizes to the log and the rule list, never past them. It used to stretch, which is where the
-       field of white under the rules came from: the card was capped, the view filled the cap, and
-       the two lists inside it were shorter than that. */
-    #chat-view { display: flex; flex-direction: column; min-height: 0; flex: 0 1 auto; }
+    #chat-view { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }
     #prog-list { flex: 1 1 auto; overflow-y: auto; min-height: 60px; padding: 4px 14px 6px; }
     /* One row per floor, closed until clicked: a full building is 90 rows and nobody reads them
        all at once. The floor's own area stays on the header, so the list is useful shut. */
@@ -494,7 +435,7 @@
     .prog-total { flex: 1 1 auto; display: flex; justify-content: space-between; font-size: 10px; color: var(--text-mid); }
     .prog-total b { color: var(--text-hi); font-variant-numeric: tabular-nums; }
     .prog-foot .btn { margin: 0; width: auto; flex-shrink: 0; }
-    .chat-time { padding: 8px 14px 10px; border-top: 1px solid var(--border-dim); }
+    .chat-time { padding: 2px 14px 10px; border-bottom: 1px solid var(--border-dim); }
     .chat-time-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-lo); margin-bottom: 4px; }
     .chat-time-row b { color: var(--text-hi); font-size: 13px; letter-spacing: 0; font-variant-numeric: tabular-nums; text-transform: none; }
     /* The timeline as a drawing: one hairline, a tick standing on it at every year a rule fires,
@@ -513,12 +454,10 @@
     #chat-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; margin-top: -5.5px; border-radius: 999px; background: var(--orange); border: none; }
     #chat-slider::-moz-range-thumb { width: 12px; height: 12px; border: none; border-radius: 999px; background: var(--orange); }
     /* demo playback: the timeline runs itself */
-    /* Sized to the 44px year beside it: at 30px it read as a bullet in front of a headline, and
-       it is the one control on this stage that does something on its own. */
     #tl-play {
-      width: 46px; height: 46px; align-self: center; flex-shrink: 0;
+      width: 30px; height: 30px; align-self: center; flex-shrink: 0;
       border: 1px solid var(--border-dim); border-radius: 50%; background: rgba(23,47,199,0.08);
-      color: var(--blue); font-family: inherit; font-size: 16px; line-height: 1;
+      color: var(--blue); font-family: inherit; font-size: 11px; line-height: 1;
       cursor: pointer; padding: 0; flex-shrink: 0;
     }
     #tl-play:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
@@ -539,7 +478,7 @@
     #chat-ctx b { color: var(--text-mid); font-variant-numeric: tabular-nums; }
     /* the greeting went, so an empty log is just a hole: collapse it and let the rules fill the panel */
     #chat-log:empty { display: none; }
-    #chat-log { flex: 0 1 auto; overflow-y: auto; min-height: 0; padding: 10px 14px; display: flex; flex-direction: column; gap: 7px; }
+    #chat-log { flex: 1 1 auto; overflow-y: auto; min-height: 0; padding: 10px 14px; display: flex; flex-direction: column; gap: 7px; }
     .chat-msg { font-size: 10.5px; line-height: 1.55; padding: 7px 10px; border-radius: var(--radius-md); max-width: 93%; }
     .chat-msg.you { align-self: flex-end; background: rgba(23,47,199,0.08); }
     .chat-msg.bot { align-self: flex-start; background: rgba(230,112,51,0.10); }
@@ -556,10 +495,7 @@
        tab reaches the year readout and the rules scroll inside it */
     /* capped: a long rule list (the demo timeline files 20+) used to squeeze the log until the
        first message opened already scrolled. The rules scroll inside their own half instead. */
-    /* Capped against the viewport, not against the card: a percentage of a height the card was
-       still working out resolved to nothing, so the list asked for its full twenty rows and the
-       card ran to its own cap around it. */
-    #chat-rules { border-top: 1px solid var(--border-dim); padding: 9px 14px 5px; flex: 0 1 auto; min-height: 0; max-height: 30vh; overflow-y: auto; }
+    #chat-rules { border-top: 1px solid var(--border-dim); padding: 9px 14px 5px; flex: 1 1 auto; min-height: 0; max-height: 45%; overflow-y: auto; }
     .chat-rule { display: flex; align-items: center; gap: 8px; font-size: 9.5px; color: var(--text-mid); margin-bottom: 5px; }
     .chat-rule.pending { opacity: 0.42; }
     /* the two colours the 3D uses in Change mode: orange = the kit re-plugged, blue = a room
@@ -600,14 +536,226 @@
     #chat-send:hover { background: var(--blue); }
     #chat-send svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     ::-webkit-scrollbar { width: 7px; } ::-webkit-scrollbar-thumb { background: rgba(23,47,199,0.25); border-radius: 4px; }
+    /* ══════════════ 9:16 PORTRAIT ══════════════
+       The 1080x1920 cut of program-massing-shortfloor.html. Same model, same controls, same
+       script: this re-places the furniture and sizes it for a tall screen.
+
+       The desktop layout puts a 248 px column down each side of the model. Portrait stacks
+       instead: one line across the top (the mark on the left, the mode switch on the right),
+       the model through the middle, and both panel columns docked along the bottom in a band
+       no deeper than a quarter of the page.
+
+       Panel sizes are set by `zoom` rather than by re-declaring every rule: the panels are
+       built out of 8-11 px type and rewriting each value would be a second stylesheet to keep
+       in sync. The offsets inside the zoomed elements are therefore written in the zoomed
+       system: at 1.1, 18 px reads as 20 px on screen. The view bar is NOT zoomed — its
+       sub-row is measured and translated in JS, and a zoom under that maths moves the pill
+       off its own button — so its sizes are written out.
+
+       Guarded on orientation, so a landscape screen still gets the desktop layout. */
+    @media (orientation: portrait) {
+
+      /* The dock takes 30% of the page (576 px of 1920, user 260820 — it was capped at a quarter
+         before). Everything in the dock is sized off it: both columns take it as their height, so
+         the extra room goes to whichever card is open and to the floor list. */
+      :root {
+        --dock-h: 30vh; --dock-zoom: 1.1;
+        /* ONE margin for the whole page: the mark, the mode switch and both dock columns all
+           stand this far from their edge, so the four margins measure the same on screen. The
+           dock is zoomed, so its offsets are divided by the zoom to land on the same number of
+           screen pixels — writing 20px inside a 1.1 zoom would read as 22. */
+        --edge: 20px;
+      }
+
+      /* ── the top line: mark left, mode switch right ──
+         Both are 39 px tall and both start at 40, so they read as one band across the top
+         with the model between them. */
+      #title-block { zoom: 1; top: var(--edge); left: var(--edge); height: 39px; align-items: center; gap: 12px; }
+      #title-block .mark { height: 24px; }
+      #to-program { height: 30px; padding: 0 14px; font-size: 9px; gap: 7px; }
+      #to-program svg { width: 13px; height: 13px; }
+
+      /* Right, not centred: the middle of the top belongs to the model. At 39 px the icon
+         cannot stand over its label, so the buttons read across instead: icon, then word. */
+      #viewbar { top: var(--edge); left: auto; right: var(--edge); transform: none; align-items: flex-end; gap: 7px; }
+      #viewbar .vb-group { height: 39px; padding: 3px; }
+      #viewbar #vb-sub-row { height: 39px; }
+      #viewbar button { flex-direction: row; padding: 0 20px; font-size: 10px; gap: 8px; }
+      #viewbar svg { width: 16px; height: 16px; }
+      #viewbar .vb-sub button { padding: 0 15px; font-size: 9px; gap: 6px; }
+      #viewbar .vb-sub svg { width: 14px; height: 14px; }
+      /* The three massing schemes are drawings of themselves — a plate with its cores marked —
+         so the word under each one says a second time what the icon already says. Icons only;
+         every button keeps its title, so hovering still names the scheme. Structure's two keep
+         their words: steel and RC are not told apart by a small square. */
+      #viewbar #seg-core button span { display: none; }
+      #viewbar #seg-core button { padding: 0 13px; gap: 0; }
+      #viewbar #seg-core svg { width: 18px; height: 18px; }
+
+      /* ── the dock: both columns run along the bottom, side by side ──
+         Both take the SAME fixed height, not a cap: a cap leaves each column as tall as
+         whatever is in it, so the short one hugs the bottom while the tall one starts far
+         above it and the two read as two loose cards over the model instead of one base. A
+         fixed height also lets each column hand its spare room to the list inside it — with
+         a max-height alone the tabs under the left panel ran past the bottom of the dock. */
+      #left-stack {
+        zoom: var(--dock-zoom);
+        top: auto; bottom: calc(var(--edge) / 1.1); left: calc(var(--edge) / 1.1); gap: 6px;
+        width: 300px; height: calc(var(--dock-h) / 1.1);
+      }
+      #right-stack {
+        zoom: var(--dock-zoom);
+        top: auto; bottom: calc(var(--edge) / 1.1); right: calc(var(--edge) / 1.1); gap: 6px;
+        width: 300px; height: calc(var(--dock-h) / 1.1);
+      }
+      /* The right column runs from the top of the dock to its floor, so the two columns measure
+         the same height: the shut headers stack under the chat line and the OPEN card takes
+         whatever is left, instead of the whole group hugging the bottom on a short card.
+         A shut card is a header — there is nothing in it to scroll, and `overflow-y: auto` on it
+         put a scrollbar beside a single line of type. Only the open card scrolls, and only if its
+         own content is taller than the room the dock has left. */
+      #right-stack { justify-content: flex-start; }
+      #right-stack > .panel { flex: 0 0 auto; overflow: visible; }
+      /* the same on the left: the open panel takes the room the column has, so the tab under it
+         rests on the floor of the dock and the two columns end level. A collapsed panel is a
+         header and keeps the flex: none the base sheet gives it. */
+      #left-stack > #left-panel:not(.collapsed) { flex: 1 1 auto; }
+      #left-stack > #chat-panel.open { flex: 1 1 auto; }
+      #right-stack > .panel:has(> .acc-head.open) { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+      #add-palette {
+        zoom: var(--dock-zoom);
+        top: auto; bottom: calc(var(--edge) / 1.1); right: calc(var(--edge) / 1.1);
+        width: 300px; height: calc(var(--dock-h) / 1.1);
+      }
+      /* Evolve / Futures is off in the portrait cut (user 260821). The handover shows it only
+         when the wizard sends both readings, and the timeline panel in a 30% dock has no room to
+         explain what the two words mean. !important because the script reveals it with an inline
+         style; the switch is hidden, not removed, so TL_MODE and the slider behave as they did. */
+      #tl-mode { display: none !important; }
+      /* And the core-pick caption under the Timeline tab ("PICKED FOR THIS SITE", the three
+         schemes and their footprints). It only appears on a site handover, it is the one block in
+         the dock that is not a control, and it hangs off the bottom of the left column. The pick
+         itself is untouched — the scheme the site chose is still lit in the view bar. */
+      #core-pick, #core-pick.on { display: none; }
+
+      /* a quarter-page dock has no room for a 44 px numeral */
+      /* The year is what the Timeline tab is for, and the dock has room for it at 30% — it stands
+         at the foot of the left column, the largest thing in the dock. */
+      #year-badge .lab, #year-badge b { font-size: 40px; }
+
+      /* Opening the Timeline collapses Layout · Program, but the Site block is a sibling of that
+         fold, not part of it, so a screen of parcel figures stayed above the year slider. On the
+         Timeline the site is not the subject. Inline `display:block` is written by the script when
+         a site resolves, hence !important. */
+      #left-stack:has(#chat-panel.open) #site-section { display: none !important; }
+
+      /* ── the chat line and the compass, in the panel ──
+         The chat bar used to float over the model on its own and the compass sat in a corner.
+         Both are in the right column now, on one row above Code check: the line you type in,
+         and north on the end of it. The bar keeps its shape, at the size of the fields in the
+         Layout panel opposite. */
+      /* The chat line is not a card. It has no panel behind it and it does not take a
+         slot in the column: it is pinned to the top-right corner of the dock, over the top of
+         whichever fold is open, so the column underneath starts at Statistics. */
+      /* It rides in the column as its first item rather than being pinned over it. Pinned, it was
+         absolutely positioned inside a FLEX container, and an abspos child of a flex container is
+         laid out against the content box — so `top: 0` landed under the padding that was reserving
+         room for it, 38.5 px below the top of the left panel opposite. As a plain item it needs no
+         reserved room and its top IS the top of the column. */
+      #chat-panel-r {
+        position: static; width: 100%; flex: 0 0 auto;
+        background: none; border: none; border-radius: 0; overflow: visible;
+        backdrop-filter: none; -webkit-backdrop-filter: none;
+      }
+      #chat-body { padding: 0; }
+      #chat-row { display: flex; align-items: center; gap: 7px; padding: 0; }
+      #chat-bar {
+        position: static; transform: none; z-index: auto;
+        flex: 1 1 auto; min-width: 0; width: auto; height: 28px;
+        padding: 0 3px 0 11px; gap: 5px;
+        /* white, not the pale blue tint the panel fields use: this one sits unboxed on the
+           top edge of the dock with the model behind it, so it has to read as a field in its own
+           right rather than as a row of some card */
+        background: #fff; border-color: var(--border-dim);
+        backdrop-filter: none; -webkit-backdrop-filter: none;
+      }
+      #chat-input { font-size: 11px; padding: 0; }
+      #chat-send { width: 22px; height: 22px; }
+      #chat-send svg { width: 11px; height: 11px; }
+      #compass {
+        position: static; flex: 0 0 auto;
+        width: 28px; height: 28px; border-color: var(--border-dim);
+        backdrop-filter: none; -webkit-backdrop-filter: none;
+      }
+      #compass .cmp-lab { font-size: 11px; }   /* the dial is half its old size; the N is not */
+
+      /* ── the dock is a quarter of the page, so the padding inside it pays for rows ──
+         Every value here is space between things, never the things themselves: headers,
+         fields and rows keep their type and lose their margins. The floor list is what the
+         room goes to — at the desktop paddings it was down to two lines. */
+      .panel h2, .acc-head, #right-panel .acc-head { padding: 9px 12px 6px; }
+      .acc-tab { padding: 9px 12px; }
+      .ctrl-grid { gap: 6px; padding: 2px 12px 8px; }
+      .ctrl-field { gap: 2px; }
+      .ctrl-field input, .ctrl-field select { padding: 4px 7px; }
+      .seg button { padding: 4px 4px; }
+      .btn { padding: 7px; margin: 0 12px 9px; width: calc(100% - 24px); }
+      #stats, #legend, #site-info { padding: 2px 12px 9px; }
+      .stat-row { margin-bottom: 3px; }
+      .stat-total { margin-top: 4px; padding-top: 5px; }
+      #prog-list { padding: 2px 12px 4px; }
+      .prog-lv { padding: 5px 0 4px; }
+      .prog-foot { padding: 6px 12px 8px; gap: 5px; }
+      #code-violations { padding: 2px 12px 9px !important; }
+
+      /* The hover label is placed by the script at `clientX + 14`, in viewport pixels. Under a
+         zoom the browser multiplies that length too, so the label drifted away from the cursor by
+         a fifth of however far across the window it was — at the right-hand edge, 200 px away.
+         Sized directly instead. The second line carries an inline font-size, hence !important. */
+      #tooltip { font-size: 12px; padding: 7px 12px; }
+      #tooltip span { font-size: 11px !important; }
+      #drop-overlay span { font-size: 26px; }
+
+      /* ── analysis stage: three columns will not fit 1080, so it reads as one ── */
+      #analysis-stage { padding: 170px 64px 90px; }
+      #analysis-inner {
+        max-width: 100%;
+        grid-template-columns: 1fr; grid-template-areas: "left" "mid" "right"; gap: 40px;
+      }
+      #an-left { position: static; }
+      #analysis-inner.solo #an-left { max-width: 100%; }
+      .an-step-mark { font-size: 14px; letter-spacing: 0.2em; margin-bottom: 14px; }
+      #an-title { font-size: 62px; margin-bottom: 12px; }
+      .an-lede { font-size: 22px; }
+      .an-figs { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; margin-bottom: 26px; }
+      .an-cell { padding: 22px 23px; }
+      .an-v { font-size: 38px; }
+      .an-k { font-size: 13px; margin-top: 11px; }
+      .an-sub { font-size: 16px; }
+      .an-share { margin-top: 30px; }
+      .an-share .sh-t { height: 19px; }
+      .an-share .sh-k, .an-share .sh-churn { font-size: 15px; }
+      .an-cf-h, .an-rates-h { font-size: 13px; }
+      .an-cf-row { grid-template-columns: 200px 1fr 110px; gap: 16px; }
+      .an-cf-k, .an-cf-v, .an-cf-gap { font-size: 16px; }
+      .an-cf-gap { padding-left: 216px; }
+      .an-cf-t { height: 21px; }
+      .an-rt th { font-size: 12px; }
+      .an-rt td { font-size: 17px; padding: 9px 0; }
+      .an-rt td.n { width: 140px; }
+      .an-rt td.u { font-size: 13px; }
+      .an-rt input { width: 122px; height: 38px; font-size: 17px; }
+      .an-note { font-size: 17px; }
+      .an-caveat { font-size: 15px; }
+    }
   </style>
 </head>
 
 <body>
   <div id="canvas-container"></div>
   <div id="title-block">
-    <a class="tb-mark" href="program-input.html?new=1" title="Start a new program"><img class="mark" alt="NEXA" src="data:image/png;base64,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" /></a>
-    <a id="to-program" href="program-input.html" title="Back to the program. The draft is kept.">
+    <a class="tb-mark" href="program-input-9x16.html?new=1" title="Start a new program"><img class="mark" alt="NEXA" src="data:image/png;base64,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" /></a>
+    <a id="to-program" href="program-input-9x16.html" title="Back to the program. The draft is kept.">
       <svg viewBox="0 0 18 18"><path d="M14 9H4M8 5L4 9l4 4"></path></svg>program
     </a>
   </div>
@@ -622,24 +770,26 @@
   </script>
 
   <div id="left-stack">
-  <!-- Two cards, not one. The site is set once and the program is worked on all the way through,
-       so they fold apart: closing the floor list leaves the site controls where they were. -->
   <div id="left-panel" class="panel">
-      <button class="acc-head open" id="acc-layout" aria-expanded="true">Site <span class="chev">&#9650;</span></button>
+    <!-- Site context from the wizard's address lookup. Hidden unless localStorage carries
+         one; it is reference information and sizes nothing in the model. Sits first so it
+         is visible without scrolling the panel. -->
+    <div id="site-section" style="display:none;">
+      <h2>Site</h2>
+      <div id="site-info"></div>
+    </div>
+
+    <!-- One panel, two parts: the layout controls sit fixed at the top, the program list scrolls
+         under them. They are the same job — what the building is made of — so they stopped being
+         two tabs you had to swap between. -->
+    <div id="layout-section">
+      <button class="acc-head open" id="acc-layout" aria-expanded="true">Layout &middot; Program <span class="chev">&#9650;</span></button>
       <div id="left-body">
-      <!-- Site context from the wizard's address lookup. Hidden unless localStorage carries one;
-           it is reference information and sizes nothing in the model. The card header names it,
-           so it carries no heading of its own. -->
-      <div id="site-section" style="display:none;">
-        <div id="site-info"></div>
-      </div>
       <div class="ctrl-grid" id="layout-body">
         <div class="ctrl-field full"><label>Full flr (ft)</label><input type="number" id="ctl-fh" value="12.75" step="0.25" /></div>
         <div class="ctrl-field full"><label>Approach bearing · <span id="ap-val">not set</span></label><input type="range" id="ctl-approach" min="0" max="345" step="15" value="0" /></div>
         <div class="ctrl-field full"><label>Site rotation · <span id="gr-val">0°</span></label><input type="range" id="ctl-grid" min="-90" max="90" step="1" value="0" /></div>
-        <!-- Hidden 260821: the switch is off the Layout panel, not out of the build. The buttons stay in
-             the DOM so seg() still binds them and __DEBUG__.setProgramMode still clicks one. -->
-        <div class="ctrl-field full" id="program-mode-field" style="display:none;"><label>Program Mode</label>
+        <div class="ctrl-field full"><label>Program Mode</label>
           <div class="seg" id="seg-program"><button data-v="off" class="active">Off</button><button data-v="on">On</button></div>
         </div>
         <div id="move-controls" style="display:none;">
@@ -653,23 +803,65 @@
         </div>
       </div>
 
+      <!-- Program: the year-0 program exactly as the wizard handed it over, editable. Every edit
+           rewrites BASE_PROGRAM and re-packs the frame, which is the only thing allowed to. One
+           collapsible menu per floor — the list is 90 rows on a full building, so nothing opens
+           until it is asked for. -->
+      <div id="prog-section">
+        <div id="prog-list"></div>
+        <div class="prog-foot">
+          <div class="prog-total"><span>Total GFA</span><b id="prog-total">0 m&sup2;</b></div>
+          <button class="btn ghost small" id="prog-reset">Reset to input</button>
+        </div>
       </div>
-  </div>
-
-  <!-- Program: the year-0 program exactly as the wizard handed it over, editable. Every edit
-       rewrites BASE_PROGRAM and re-packs the frame, which is the only thing allowed to. One
-       collapsible menu per floor — the list is 90 rows on a full building, so nothing opens
-       until it is asked for. -->
-  <div id="program-panel" class="panel">
-    <button class="acc-head open" id="acc-program" aria-expanded="true">Program <span class="chev">&#9650;</span></button>
-    <div id="prog-section">
-      <div id="prog-list"></div>
-      <div class="prog-foot">
-        <div class="prog-total"><span>Total GFA</span><b id="prog-total">0 m&sup2;</b></div>
-        <button class="btn ghost small" id="prog-reset">Reset to input</button>
       </div>
     </div>
+
   </div>
+
+    <!-- Timeline: plain-language "in N years this becomes that" scenarios. Parsed locally
+         (no API); each accepted sentence is a conversion rule replayed by the timeline slider,
+         so the massing itself reacts to the year. The slider lives here, with the rules it runs.
+         Named for what is in it — a year slider and the rules that fire on it — rather than for
+         the idea behind it. -->
+    <button id="chat-toggle" class="acc-tab" aria-expanded="false">Timeline</button>
+    <div id="chat-panel" class="panel">
+      <div class="chat-time">
+        <!-- Two readings of the same handover, shown only when the wizard sends both: one
+             building evolving (conversion rules) or the recorded transitions as parallel
+             whole-program futures. They cannot share a slider, so they share a switch. -->
+        <div class="seg" id="tl-mode" style="display:none;margin-bottom:8px;">
+          <button data-m="evolution" class="active" title="One building over time">Evolve</button><button data-m="futures" title="Parallel futures">Futures</button>
+        </div>
+        <!-- the year itself is not here: it is the big readout at the foot of the column -->
+        <div class="chat-time-row">
+          <span id="chat-horizon"></span>
+        </div>
+        <!-- one line, with a tick standing on it at every year something happens -->
+        <div class="tl-track"><div id="chat-ticks"></div><input type="range" id="chat-slider" min="0" max="10" step="1" value="0" /></div>
+        <!-- What this year did, in numbers. A Tier 1 conversion keeps the room, so the massing
+             can look identical while 16 rooms have changed use; this row is the signal that
+             does not depend on the colour mode. -->
+        <div id="chat-change"></div>
+        <!-- Site Forecast scenarios on the same axis as the chat rules; filled only when the
+             wizard hands a track over -->
+        <div id="chat-track" style="display:none;"></div>
+        <!-- The site reading the wizard used to order these futures. Composition of a 500 m
+             ring, not a catchment and not demand. -->
+        <div id="chat-ctx"></div>
+      </div>
+      <div id="chat-view">
+        <div id="chat-log"></div>
+        <div id="chat-rules"></div>
+      </div>
+    </div>
+
+    <!-- The year, big and unboxed, sitting straight on the core options at the foot of the column.
+         It is the one number a presenter reads out, so it is not a 13 px label in a panel. -->
+    <div id="year-badge">
+      <button id="tl-play" title="Play the timeline">&#9654;</button>
+      <span class="lab">Year</span><b id="chat-year">0</b>
+    </div>
 
     <!-- Why the lit scheme is lit. The three buttons now stand under Massing in the view bar;
          this stays here, where a sentence has the width to be read. Filled by renderCorePick()
@@ -678,59 +870,68 @@
 
   </div>
 
-  <!-- The chat itself, under the model: one line to type in and an arrow to send. The reply and
-       the rule it files land in the Adaptive use tab, which sending opens if it is closed. -->
-  <div id="chat-bar">
-    <input id="chat-input" type="text" autocomplete="off" placeholder="in 8 years turn L3 into housing" />
-    <button id="chat-send" title="Send">
-      <svg viewBox="0 0 18 18"><path d="M9 15V3M4 8l5-5 5 5" /></svg>
-    </button>
-  </div>
-
-  <!-- Which way is north, on a dial that stays the same size at every zoom. The rose turns, the
-       card does not; the N rides the needle and is repositioned rather than rotated, so it is
-       upright at every heading instead of upside down half the time. -->
-  <div id="compass">
-    <svg viewBox="0 0 64 64" aria-hidden="true">
-      <!-- Authored in SITE GROUND coordinates on a unit ring: -y is north, +y south, +x east.
-           The matrix set on it every frame is the camera's own map from that plane to the screen,
-           so the dial lies flat on the ground with the model instead of facing the viewer. The
-           starting matrix is the top-down case, which is what it looks like before the first
-           frame lands. -->
-      <g id="cmp-rose" transform="matrix(21 0 0 21 32 32)">
-        <circle class="cmp-ring" cx="0" cy="0" r="1" vector-effect="non-scaling-stroke" />
-        <path class="cmp-n" d="M0 -0.8 L0.17 0 L-0.17 0 Z" />
-        <path class="cmp-s" d="M0 0.68 L0.17 0 L-0.17 0 Z" />
-        <line class="cmp-tick" x1="0.86" y1="0" x2="1" y2="0" vector-effect="non-scaling-stroke" />
-        <line class="cmp-tick" x1="0" y1="0.86" x2="0" y2="1" vector-effect="non-scaling-stroke" />
-        <line class="cmp-tick" x1="-0.86" y1="0" x2="-1" y2="0" vector-effect="non-scaling-stroke" />
-      </g>
-      <circle class="cmp-hub" cx="32" cy="32" r="1.1" />
-      <!-- The one thing that does NOT lie on the ground. A letter squashed into the ground plane
-           is unreadable at a low orbit and upside down behind the model; it is put at a fixed
-           radius in the projected north direction and left upright. -->
-      <text class="cmp-lab" id="cmp-n" x="32" y="5.5">N</text>
-    </svg>
-  </div>
-
   <div id="right-stack">
-  <!-- Three cards, not one card with folds inside it: Statistics, Code check and Export each
-       carry their own header and open on it, one at a time. Every id inside a body is untouched,
-       so renderStats, the code check and the mode switch still write to what they wrote to
-       before. -->
+  <!-- Four cards, not one card with folds inside it: Chatbot, Statistics, Code check and
+       Export each carry their own header and open on it, one at a time. Every id inside a
+       body is untouched, so renderStats, the code check and the mode switch still write to
+       exactly what they wrote to before. -->
+  <!-- The chat line is not a fold: it is the one control in this column you type into, so it
+       stands open at the top of the dock and stays there whichever card below it is open. -->
+  <div id="chat-panel-r" class="panel">
+    <div id="chat-body">
+      <!-- The chat line and the compass, one row. In the portrait cut both live in the panel
+           rather than floating over the model: a line to type in, an arrow to send, and north on
+           the end of it. The reply and the rule it files still land in the Adaptive use tab,
+           which sending opens. -->
+      <div id="chat-row">
+      <div id="chat-bar">
+        <input id="chat-input" type="text" autocomplete="off" placeholder="in 8 years turn L3 into housing" />
+        <button id="chat-send" title="Send">
+          <svg viewBox="0 0 18 18"><path d="M9 15V3M4 8l5-5 5 5" /></svg>
+        </button>
+      </div>
+      <!-- Which way is north, on a dial that stays the same size at every zoom. The rose turns, the
+           card does not; the N rides the needle and is repositioned rather than rotated, so it is
+           upright at every heading instead of upside down half the time. -->
+      <div id="compass">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <!-- Authored in SITE GROUND coordinates on a unit ring: -y is north, +y south, +x east.
+               The matrix set on it every frame is the camera's own map from that plane to the screen,
+               so the dial lies flat on the ground with the model instead of facing the viewer. The
+               starting matrix is the top-down case, which is what it looks like before the first
+               frame lands. -->
+          <g id="cmp-rose" transform="matrix(21 0 0 21 32 32)">
+            <circle class="cmp-ring" cx="0" cy="0" r="1" vector-effect="non-scaling-stroke" />
+            <path class="cmp-n" d="M0 -0.8 L0.17 0 L-0.17 0 Z" />
+            <path class="cmp-s" d="M0 0.68 L0.17 0 L-0.17 0 Z" />
+            <line class="cmp-tick" x1="0.86" y1="0" x2="1" y2="0" vector-effect="non-scaling-stroke" />
+            <line class="cmp-tick" x1="0" y1="0.86" x2="0" y2="1" vector-effect="non-scaling-stroke" />
+            <line class="cmp-tick" x1="-0.86" y1="0" x2="-1" y2="0" vector-effect="non-scaling-stroke" />
+          </g>
+          <circle class="cmp-hub" cx="32" cy="32" r="1.1" />
+          <!-- The one thing that does NOT lie on the ground. A letter squashed into the ground plane
+               is unreadable at a low orbit and upside down behind the model; it is put at a fixed
+               radius in the projected north direction and left upright. -->
+          <text class="cmp-lab" id="cmp-n" x="32" y="5.5">N</text>
+        </svg>
+      </div>
+      </div>
+    </div>
+  </div>
+
   <div id="right-panel" class="panel">
-    <button class="acc-head open" id="acc-stats" aria-expanded="true">Statistics <span class="chev">&#9650;</span></button>
+    <button class="acc-head" id="acc-stats" aria-expanded="false">Statistics <span class="chev">&#9650;</span></button>
     <div id="stats"></div>
   </div>
 
   <div id="code-panel" class="panel">
-    <button class="acc-head open" id="acc-code" aria-expanded="true">Code check &middot; CBC 10/11B <span class="chev">&#9650;</span></button>
+    <button class="acc-head" id="acc-code" aria-expanded="false">Code check &middot; CBC 10/11B <span class="chev">&#9650;</span></button>
     <div id="code-violations" style="padding:4px 16px 14px;"></div>
   </div>
 
   <!-- Export keeps its own id so the mode switch still finds it. -->
   <div id="export-panel" class="panel">
-      <button class="acc-head open" id="acc-export" aria-expanded="true"><span id="export-title">Export &middot; Massing</span> <span class="chev">&#9650;</span></button>
+      <button class="acc-head" id="acc-export" aria-expanded="false"><span id="export-title">Export &middot; Massing</span> <span class="chev">&#9650;</span></button>
       <div id="export-body">
     <div id="export-massing">
       <div class="struct-chk-grid" style="grid-template-columns:1fr;padding-top:4px;">
@@ -766,53 +967,7 @@
       <button class="btn" id="exp-structure">Export structure (.obj)</button>
     </div>
       </div>
-  </div>
-
-    <!-- Adaptive use: plain-language "in N years this becomes that" scenarios. Parsed locally
-         (no API); each accepted sentence is a conversion rule replayed by the timeline slider,
-         so the massing itself reacts to the year. The slider lives here, with the rules it runs. -->
-    <button id="chat-toggle" class="acc-tab" aria-expanded="false">Turnover</button>
-    <div id="chat-panel" class="panel">
-      <div id="chat-view">
-        <div id="chat-log"></div>
-        <div id="chat-rules"></div>
-      </div>
-      <!-- The slider sits at the FOOT of the panel, a line above the year it sets: the two used to
-           be at opposite ends of the column with the whole rule list between them. -->
-      <div class="chat-time">
-        <!-- Two readings of the same handover, shown only when the wizard sends both: one
-             building evolving (conversion rules) or the recorded transitions as parallel
-             whole-program futures. They cannot share a slider, so they share a switch. -->
-        <div class="seg" id="tl-mode" style="display:none;margin-bottom:8px;">
-          <button data-m="evolution" class="active" title="One building over time">Evolve</button><button data-m="futures" title="Parallel futures">Futures</button>
-        </div>
-        <!-- the year itself is not here: it is the big readout at the foot of the column -->
-        <div class="chat-time-row">
-          <span id="chat-horizon"></span>
-        </div>
-        <!-- one line, with a tick standing on it at every year something happens -->
-        <div class="tl-track"><div id="chat-ticks"></div><input type="range" id="chat-slider" min="0" max="10" step="1" value="0" /></div>
-        <!-- What this year did, in numbers. A Tier 1 conversion keeps the room, so the massing
-             can look identical while 16 rooms have changed use; this row is the signal that
-             does not depend on the colour mode. -->
-        <div id="chat-change"></div>
-        <!-- Site Forecast scenarios on the same axis as the chat rules; filled only when the
-             wizard hands a track over -->
-        <div id="chat-track" style="display:none;"></div>
-        <!-- The site reading the wizard used to order these futures. Composition of a 500 m
-             ring, not a catchment and not demand. -->
-        <div id="chat-ctx"></div>
-      </div>
     </div>
-
-    <!-- The year, big and unboxed, straight on the background at the foot of the right column,
-         under the tab that moves it. It is the one number a presenter reads out, so it is not a
-         13 px label in a panel. -->
-    <div id="year-badge">
-      <button id="tl-play" title="Play the timeline">&#9654;</button>
-      <span class="lab">Year</span><b id="chat-year">0</b>
-    </div>
-
   </div>
 
   <div id="tooltip"></div>
@@ -823,16 +978,16 @@
        so stepping back to Massing finds the view exactly where it was left. -->
   <div id="analysis-stage">
     <div id="analysis-inner">
-      <!-- Left: what was measured, and the rates the reader sets. Where you are in the walk, the
-           claim, the sentence the claim rests on, the one bar read straight off the program, and
-           the five numbers underneath that are nobody's measurement.
-           Right: everything derived from those two. The split is the same line the page has
-           always been about, now drawn as a single column edge. -->
+      <!-- Left: what was measured, and nothing else. Where you are in the walk, the claim, the
+           sentence the claim rests on, and the one bar that is read straight off the program.
+           Right: everything derived from a rate somebody typed. The split is the same line the
+           page has always been about, now drawn as a column edge. -->
       <div id="an-left">
         <div class="an-step-mark">Site · Program · Massing · <b>Analysis</b></div>
         <h1 id="an-title">Why this matters</h1>
         <div id="an-body"></div>
       </div>
+      <div id="an-mid"></div>
       <div id="an-right"></div>
     </div>
   </div>
@@ -848,13 +1003,6 @@
       <button data-seg="mode" data-v="solid" class="active" title="Program volumes">
         <svg viewBox="0 0 18 18"><path d="M9 2L16 5.5V12.5L9 16L2 12.5V5.5Z" /><path d="M9 2V9M2 5.5L9 9L16 5.5" /></svg>
         <span>Massing</span>
-      </button>
-      <!-- The building over time: the timeline, the rules it replays, and the year. A STAGE like
-           Analysis rather than a render mode, but one that does not cover the model, because
-           watching the massing change is the whole of what it is for. -->
-      <button data-seg="mode" data-v="turnover" title="What changes, and when">
-        <svg viewBox="0 0 18 18"><path d="M15.2 7.2A6.4 6.4 0 0 0 3.7 5.4" /><path d="M3.1 2.3V5.6H6.4" /><path d="M2.8 10.8A6.4 6.4 0 0 0 14.3 12.6" /><path d="M14.9 15.7V12.4H11.6" /></svg>
-        <span>Turnover</span>
       </button>
       <button data-seg="mode" data-v="structure" title="Frame, slabs and the plug-in kit">
         <svg viewBox="0 0 18 18"><rect x="2" y="2" width="14" height="14" rx="1.5" /><line x1="2" y1="2" x2="16" y2="16" /><line x1="16" y1="2" x2="2" y2="16" /></svg>
@@ -874,17 +1022,17 @@
          ?sys= and the tests are untouched. -->
     <div id="vb-sub-row">
       <div class="vb-group vb-sub on" id="seg-core">
-        <!-- No captions on these three: each icon is a plan of the scheme it sets, with the core
-             drawn where that scheme puts it, so the word underneath was a second label for a
-             picture that already said it. The title carries the name on hover. -->
-        <button data-v="compact" class="active" title="Compact · a compact pair of cores" aria-label="Compact">
+        <button data-v="compact" class="active" title="A compact pair of cores">
           <svg viewBox="0 0 18 18"><rect x="2" y="3" width="14" height="12" rx="1" /><rect x="3.5" y="4.5" width="3" height="9" rx="0.6" fill="currentColor" stroke="none" /></svg>
+          <span>Compact</span>
         </button>
-        <button data-v="pinwheel" title="Pinwheel · two cores set pinwheel" aria-label="Pinwheel">
+        <button data-v="pinwheel" title="Two cores set pinwheel">
           <svg viewBox="0 0 18 18"><rect x="2" y="3" width="14" height="12" rx="1" /><rect x="3.5" y="4.5" width="3" height="4" rx="0.6" fill="currentColor" stroke="none" /><rect x="11.5" y="9.5" width="3" height="4" rx="0.6" fill="currentColor" stroke="none" /></svg>
+          <span>Pinwheel</span>
         </button>
-        <button data-v="inset" title="Centre · one core in the middle" aria-label="Centre">
+        <button data-v="inset" title="One core in the centre">
           <svg viewBox="0 0 18 18"><rect x="2" y="3" width="14" height="12" rx="1" /><rect x="7" y="6.5" width="4" height="5" rx="0.6" fill="currentColor" stroke="none" /></svg>
+          <span>Centre</span>
         </button>
       </div>
       <div class="vb-group vb-sub" id="seg-struct-sys">
@@ -2371,17 +2519,6 @@
     // building's extreme column lines instead of each volume's own.
     let CANT_EDGE = true;
     let CANT_EDGE_SCOPE = 'volume';   // 'volume' | 'building'
-    // The two braced faces are picked per STOREY BAND of the volume, not once for its whole
-    // height (260819, STRUCTURE-CANTILEVER-BRACE-PLAN-2). A cantilevered volume that steps
-    // inward as it rises has no single pair of outside lines, and choosing among the lines that
-    // could carry a brace over the FULL height walked the SAMPLE box's diagonal two column bays
-    // inboard, floating it inside the massing. ?cband=0 restores the whole-height pick.
-    let CANT_BAND = true;
-    // 260819, PLAN-3: vertically aligned volumes are merged into face stacks and braced ONCE,
-    // one diagonal per end bay from the bottom of the stack to its top — the WoZoCo box read at
-    // the scale of the whole stacked massing rather than of one recorded run. The band pick above
-    // is the fallback at ?cstack=0; it braces correctly per storey but nothing spans.
-    let CANT_STACK = true;
     // Spine deep beam, off (260819). The 260817 spine ran core to core on the two column lines
     // flanking the gallery, one per aligned volume top. The user's call is that the steel scheme
     // carries no spine: the cores are braced volumes and the cantilevers are hung off the skin,
@@ -3074,64 +3211,6 @@
           return out;
         };
         const bayKs = n => (n <= 1 ? [0] : [0, n - 1]);   // outermost bay at each end; n<=2 means all of them
-        // ── FACE STACKS (260819, PLAN-3) ─────────────────────────────────────────────────────
-        // The user's rule is that a diagonal spans the MASSING: volumes stacked vertically merge
-        // and share one brace, as the WoZoCo box does. Two things kept stacked volumes apart —
-        // the record collector matches by group TOP (records on one line at different heights stay
-        // separate) and sameVolume below requires height OVERLAP (a box standing on a box is a
-        // different group). Neither is touched: posts, ties and hanger geometry all hang off them.
-        // This is a second structure, built on top of `all`, used by the diagonal path only.
-        //
-        // Records merge into a face stack when they are on the SAME plane, share at least one whole
-        // column bay in plan, and abut or overlap in height within one module. A genuine gap of a
-        // storey with nothing hung in it does NOT bridge: a diagonal through open air is scenery.
-        const makeStack = recs => {
-          const ys = [];
-          for (const t of recs) for (const y of t.ys) if (!ys.some(v => Math.abs(v - y) <= TOL)) ys.push(y);
-          ys.sort((a, b) => a - b);
-          const st = { axisIsX: recs[0].axisIsX, fixedW: recs[0].fixedW, recs, ys,
-                       ylo: ys[0], yhi: ys[ys.length - 1],
-                       a: Math.min(...recs.map(t => t.a)), b: Math.max(...recs.map(t => t.b)),
-                       // the volume grouping below tests height on zb/ztop, exactly as the record
-                       // version did — the stack only relaxes it, it does not redefine it
-                       zb: Math.min(...recs.map(t => t.zb)), ztop: Math.max(...recs.map(t => t.ztop)),
-                       flagged: recs.some(t => t.flagged), edge: false, step: 0, drawn: 0, bays: [] };
-          if (recs.length === 1) { st.bays = recs[0].panels.map(p => ({ lo: p.lo, len: p.len, n: p.n, tipAtHi: p.tipAtHi })); return st; }
-          // The two ends of a merged diagonal have to stand where a post stands at BOTH its floors,
-          // and the records in a stack need not share a node grid. So the member lives in the
-          // INTERSECTION of their reaches, snapped to whole column bays.
-          const lo = Math.max(...recs.map(t => t.a)), hi = Math.min(...recs.map(t => t.b));
-          const len = hi - lo, nb = len > 1e-6 ? Math.round(len / bay) : 0;
-          if (nb < 1) { st.noSharedBay = true; return st; }   // no complete shared bay: caller splits it
-          // lean is read off the deepest record's panel that overlaps the shared reach most
-          const deepest = recs.slice().sort((x, y) => y.ys.length - x.ys.length)[0];
-          const ov = p => Math.min(p.hi, hi) - Math.max(p.lo, lo);
-          const pick = deepest.panels.slice().sort((p, q) => ov(q) - ov(p))[0];
-          st.bays = [{ lo, len, n: nb, tipAtHi: pick ? pick.tipAtHi : true }];
-          return st;
-        };
-        const buildStacks = () => {
-          const su = all.map((_, i) => i);
-          const sfind = i => { while (su[i] !== i) i = su[i] = su[su[i]]; return i; };
-          const sameStack = (a, b) => a.axisIsX === b.axisIsX &&
-            Math.abs(a.fixedW - b.fixedW) <= TOL &&                                        // same plane
-            Math.min(a.b, b.b) - Math.max(a.a, b.a) >= bay - TOL &&                         // a whole shared bay in plan
-            a.ys[0] <= b.ys[b.ys.length - 1] + M + TOL && b.ys[0] <= a.ys[a.ys.length - 1] + M + TOL;   // abut or overlap
-          for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++)
-            if (sameStack(all[i], all[j])) { const ra = sfind(i), rb = sfind(j); if (ra !== rb) su[ra] = rb; }
-          const map = new Map();
-          for (let i = 0; i < all.length; i++) { const r = sfind(i); if (!map.has(r)) map.set(r, []); map.get(r).push(all[i]); }
-          const out = [];
-          for (const recs of map.values()) {
-            const st = makeStack(recs);
-            // no shared bay to stand a merged member in: the stack falls back to its records, each
-            // braced over its own height as before. Recorded on the census, never silent.
-            if (st.noSharedBay) for (const t of recs) { const one = makeStack([t]); one.noSharedBay = true; out.push(one); }
-            else out.push(st);
-          }
-          return out;
-        };
-        const stackDrawn = st => st.bays.reduce((acc, b) => acc + bayKs(b.n).length * segsFor(st.ys, b.len / b.n).length, 0);
         // §1B — the lines recorded above are single planes. Group them back into cantilevered
         // VOLUMES: same axis, lines within one column bay of each other, overlapping reach,
         // overlapping height. Union-find, because "adjacent" is transitive across a 3-line box.
@@ -3166,159 +3245,21 @@
           if (!e) globalEdge.set(k, { lo: t.fixedW, hi: t.fixedW });
           else { e.lo = Math.min(e.lo, t.fixedW); e.hi = Math.max(e.hi, t.fixedW); }
         }
-        // ── BAND PICK (260819) ───────────────────────────────────────────────────────────────
-        // The storeys of a group, as the bands between consecutive floor lines anywhere in it.
-        // Ys within TOL of each other are the same line: the lines of one volume share the level
-        // grid, but they are computed per plane and land a hair apart.
-        const bandsOf = g => {
-          const Y = [];
-          for (const t of g) for (const y of t.ys) if (!Y.some(v => Math.abs(v - y) <= TOL)) Y.push(y);
-          Y.sort((a, b) => a - b);
-          const out = [];
-          for (let i = 0; i + 1 < Y.length; i++) out.push({ lo: Y[i], hi: Y[i + 1] });
-          return out;
-        };
-        // A line is live in a band when that band sits inside the height the line actually has
-        // floors over. A face one floor line tall is live in no band, so it can never be picked —
-        // which is why the band pick needs no `braceable` pre-filter, and why it never walks
-        // inboard to find a line that is tall enough: it only asks what is outermost HERE.
-        const liveIn = (t, b) => t.panels.length > 0 && b.lo >= t.ys[0] - TOL && b.hi <= t.ys[t.ys.length - 1] + TOL;
-        // What one line draws: the same members either way, over its runs (band pick) or over its
-        // whole height (?cband=0). Written once so the census and the drawing cannot disagree.
-        const drawnOf = t => !t.edge ? 0
-          : CANT_BAND ? (t.runs || []).reduce((a, r) => a + t.panels.reduce((b, p) => b + bayKs(p.n).length * segsFor(r.ys, p.len / p.n).length, 0), 0)
-                      : t.panels.reduce((a, p) => a + bayKs(p.n).length * segsFor(t.ys, p.len / p.n).length, 0);
         const cantDiag = [];
-        // ── STACK PICK (260819, PLAN-3) ──────────────────────────────────────────────────────
-        // Volumes are made of stacks, not records, and the height test is relaxed from "overlap"
-        // to "overlap or abut within a module", so a tower of aligned boxes is ONE volume. The two
-        // extreme planes of the volume brace, over the full height of their stack. No bands.
-        const stacks = CANT_STACK ? buildStacks() : [];
-        if (CANT_STACK) {
-          const braceableS = st => st.ys.length > 1 && st.bays.length > 0;
-          const su = stacks.map((_, i) => i);
-          const sfind = i => { while (su[i] !== i) i = su[i] = su[su[i]]; return i; };
-          const sameVolumeS = (a, b) => a.axisIsX === b.axisIsX &&
-            Math.abs(a.fixedW - b.fixedW) <= bay + TOL &&
-            a.a < b.b + TOL && b.a < a.b + TOL &&
-            a.zb < b.ztop + M + TOL && b.zb < a.ztop + M + TOL;   // overlap, or abut within a module
-          for (let i = 0; i < stacks.length; i++) for (let j = i + 1; j < stacks.length; j++)
-            if (sameVolumeS(stacks[i], stacks[j])) { const ra = sfind(i), rb = sfind(j); if (ra !== rb) su[ra] = rb; }
-          const vols = new Map();
-          for (let i = 0; i < stacks.length; i++) { const r = sfind(i); if (!vols.has(r)) vols.set(r, []); vols.get(r).push(stacks[i]); }
-          const globalEdgeS = new Map();
-          if (CANT_EDGE_SCOPE === 'building') for (const st of stacks) {
-            if (!braceableS(st)) continue;
-            const k = String(st.axisIsX), e = globalEdgeS.get(k);
-            if (!e) globalEdgeS.set(k, { lo: st.fixedW, hi: st.fixedW });
-            else { e.lo = Math.min(e.lo, st.fixedW); e.hi = Math.max(e.hi, st.fixedW); }
-          }
-          for (const v of vols.values()) {
-            let lo = Infinity, hi = -Infinity;
-            for (const st of v) if (braceableS(st)) { lo = Math.min(lo, st.fixedW); hi = Math.max(hi, st.fixedW); }
-            if (CANT_EDGE_SCOPE === 'building') {
-              const e = globalEdgeS.get(String(v[0].axisIsX));
-              if (e) { lo = e.lo; hi = e.hi; }
-            }
-            let before = 0, after = 0;
-            for (const st of v) {
-              st.edge = braceableS(st) && (Math.abs(st.fixedW - lo) <= TOL || Math.abs(st.fixedW - hi) <= TOL);
-              st.drawn = st.edge ? stackDrawn(st) : 0;
-              after += st.drawn;
-              for (const t of st.recs) for (const p of t.panels) before += Math.max(0, t.ys.length - 1) * p.n;
-            }
-            const ratio = after > 0 ? before / after : 0;
-            const step = ratio > 8 ? 2 : ratio > 3 ? 1 : 0;
-            for (const st of v) st.step = step;
-            const lines = [...new Set(v.map(st => +st.fixedW.toFixed(2)))].sort((a, b) => a - b);
-            const braced = [...new Set(v.filter(st => st.drawn > 0).map(st => +st.fixedW.toFixed(2)))].sort((a, b) => a - b);
-            // faces stay per RECORD so the old log shape still reads; the diagonals belong to the
-            // stack now, which is why a face's own drawn count is zero here and `stack` points at
-            // the stack that carries it.
-            const faces = [];
-            v.forEach((st, si) => st.recs.forEach(t => faces.push({ w: +t.fixedW.toFixed(2), floors: t.ys.length, edge: !!st.edge,
-                                      ylo: +t.ys[0].toFixed(2), yhi: +t.ys[t.ys.length - 1].toFixed(2),
-                                      bays: t.panels.map(p => p.n), drawn: 0, stack: si })));
-            faces.sort((a, b) => a.w - b.w || a.ylo - b.ylo);
-            const stackRecs = v.map(st => ({ w: +st.fixedW.toFixed(2), records: st.recs.length,
-                                      ylo: +st.ylo.toFixed(2), yhi: +st.yhi.toFixed(2), floors: st.ys.length,
-                                      ys: st.ys.map(y => +y.toFixed(2)),
-                                      bays: st.bays.map(b => ({ lo: +b.lo.toFixed(2), len: +b.len.toFixed(2), n: b.n })),
-                                      edge: !!st.edge, drawn: st.drawn,
-                                      storeysPerDiag: st.bays.map(b => { const sg = segsFor(st.ys, b.len / b.n); return sg.length ? Math.max(...sg.map(q => q[1] - q[0])) : 0; }),
-                                      ...(st.noSharedBay ? { noSharedBay: true } : {}) }))
-                              .sort((a, b) => a.w - b.w || a.ylo - b.ylo);
-            const rec = { axis: v[0].axisIsX ? 'X' : 'Z', lines, braced,
-                          span: +Math.max(...v.map(st => st.b - st.a)).toFixed(2),
-                          floors: Math.max(...v.map(st => st.ys.length)),
-                          before, after, ratio: +ratio.toFixed(2), step, faces, stacks: stackRecs };
-            // counted in PLANES, not stacks: a volume of three stacks on ONE column line has one
-            // face, and asking it for a second braced face is asking for a face it does not have
-            if (lines.length === 1) rec.singlePlane = true;
-            cantDiag.push(rec);
-            // LAT is back to per volume: the member spans the volume, so bracing is a fact about
-            // the volume again, not about one of its storeys.
-            const drawnPlanes = new Set(v.filter(st => st.drawn > 0).map(st => +st.fixedW.toFixed(2)));
-            if (CANT_EDGE && lines.length > 1 && after > 0 && drawnPlanes.size < 2)
-              CODE_CHECK.violations.push({ rule: 'LAT', level: 0, measured: drawnPlanes.size + ' braced face(s)',
-                threshold: '2 faces per cantilevered volume', unit: '', note: 'cantilevered volume braced on fewer than two faces' });
-          }
-        }
-        for (const g of (CANT_STACK ? [] : groups.values())) {
-          const bands = CANT_BAND ? bandsOf(g) : [];
-          const bandPlanes = [];   // per band: how many planes are live in it, and which of them draw
-          if (CANT_BAND) {
-            const edgeBands = new Map();
-            for (let bi = 0; bi < bands.length; bi++) {
-              const b = bands[bi];
-              const liveHere = g.filter(t => liveIn(t, b));
-              bandPlanes.push({ live: new Set(liveHere.map(t => +t.fixedW.toFixed(2))).size, drawn: new Set() });
-              if (!liveHere.length) continue;
-              // ?cbrace=building keeps its meaning one level down: the extremes of the whole
-              // building's live lines on this axis IN THIS BAND, rather than of this volume's.
-              const pool = CANT_EDGE_SCOPE === 'building'
-                ? all.filter(t => t.axisIsX === g[0].axisIsX && liveIn(t, b))
-                : liveHere;
-              let blo = Infinity, bhi = -Infinity;
-              for (const t of pool) { blo = Math.min(blo, t.fixedW); bhi = Math.max(bhi, t.fixedW); }
-              for (const t of liveHere) if (Math.abs(t.fixedW - blo) <= TOL || Math.abs(t.fixedW - bhi) <= TOL) {
-                if (!edgeBands.has(t)) edgeBands.set(t, []);
-                edgeBands.get(t).push(bi);
-              }
-            }
-            // Contiguous edge bands merge into one run, so a line that stays the outside over four
-            // storeys carries ONE member cut by segsFor, not four stacked ones. The cut rule and
-            // DIAG_MAX_RATIO are unchanged; they just run on the run's own floor lines.
-            for (const t of g) {
-              const bs = edgeBands.get(t) || [];
-              const runs = [];
-              for (let i = 0; i < bs.length; i++) {
-                let j = i;
-                while (j + 1 < bs.length && bs[j + 1] === bs[j] + 1) j++;
-                const rlo = bands[bs[i]].lo, rhi = bands[bs[j]].hi;
-                const sub = t.ys.filter(y => y >= rlo - TOL && y <= rhi + TOL);
-                if (sub.length > 1) runs.push({ ys: sub, b0: bs[i], b1: bs[j] });
-                i = j;
-              }
-              t.runs = runs;
-              t.edge = runs.length > 0;
-              const w = +t.fixedW.toFixed(2);
-              for (const r of runs) for (let bi = r.b0; bi <= r.b1; bi++) bandPlanes[bi].drawn.add(w);
-            }
-          }
+        for (const g of groups.values()) {
           let lo = Infinity, hi = -Infinity;
-          if (!CANT_BAND) {
-            for (const t of g) if (braceable(t)) { lo = Math.min(lo, t.fixedW); hi = Math.max(hi, t.fixedW); }
-            if (CANT_EDGE_SCOPE === 'building') {
-              const e = globalEdge.get(String(g[0].axisIsX));
-              if (e) { lo = e.lo; hi = e.hi; }
-            }
+          for (const t of g) if (braceable(t)) { lo = Math.min(lo, t.fixedW); hi = Math.max(hi, t.fixedW); }
+          if (CANT_EDGE_SCOPE === 'building') {
+            const e = globalEdge.get(String(g[0].axisIsX));
+            if (e) { lo = e.lo; hi = e.hi; }
           }
           let before = 0, after = 0;
           for (const t of g) {
-            if (!CANT_BAND) t.edge = Math.abs(t.fixedW - lo) <= TOL || Math.abs(t.fixedW - hi) <= TOL;
-            for (const p of t.panels) before += Math.max(0, t.ys.length - 1) * p.n;
-            after += drawnOf(t);
+            t.edge = Math.abs(t.fixedW - lo) <= TOL || Math.abs(t.fixedW - hi) <= TOL;
+            for (const p of t.panels) {
+              before += Math.max(0, t.ys.length - 1) * p.n;
+              if (t.edge) after += bayKs(p.n).length * segsFor(t.ys, p.len / p.n).length;
+            }
           }
           // SECTION. Cutting the member count this far concentrates the same in-plane shear into
           // what is left, and CAN_SEC = 0.14 was sized for the dense web. A group that loses more
@@ -3332,49 +3273,22 @@
           const braced = [...new Set(g.filter(t => t.edge).map(t => +t.fixedW.toFixed(2)))].sort((a, b) => a - b);
           // Per FACE as well as per volume: a volume's outermost line is not always its tallest,
           // and the acceptance test (a diagonal spans >= 2 storeys) is a per-face fact.
-          // storeys per diagonal is read on whatever the member actually spans: the run's own
-          // floor lines under the band pick, the whole line under ?cband=0
-          const spanYs = t => CANT_BAND ? (t.runs || []).map(r => r.ys) : [t.ys];
           const faces = g.map(t => ({ w: +t.fixedW.toFixed(2), floors: t.ys.length, edge: !!t.edge,
-                                      ylo: +t.ys[0].toFixed(2), yhi: +t.ys[t.ys.length - 1].toFixed(2),
                                       bays: t.panels.map(p => p.n),
-                                      drawn: drawnOf(t),
-                                      bands: (t.runs || []).map(r => [r.b0, r.b1]),
-                                      storeysPerDiag: t.panels.map(p => Math.max(0, ...spanYs(t).map(ys2 => { const sg = segsFor(ys2, p.len / p.n); return sg.length ? Math.max(...sg.map(q => q[1] - q[0])) : 0; }))) }))
+                                      drawn: t.edge ? t.panels.reduce((a, p) => a + bayKs(p.n).length * segsFor(t.ys, p.len / p.n).length, 0) : 0,
+                                      storeysPerDiag: t.panels.map(p => { const sg = segsFor(t.ys, p.len / p.n); return sg.length ? Math.max(...sg.map(q => q[1] - q[0])) : 0; }) }))
                           .sort((a, b) => a.w - b.w);
-          const rec = { axis: g[0].axisIsX ? 'X' : 'Z', lines, braced,
-                        span: +Math.max(...g.map(t => t.b - t.a)).toFixed(2),
-                        floors: Math.max(...g.map(t => t.ys.length)),
-                        before, after, ratio: +ratio.toFixed(2), step, faces };
-          if (CANT_BAND) {
-            rec.bandCount = bands.length;
-            rec.bandYs = bands.length ? [bands[0].lo, ...bands.map(b => b.hi)].map(v => +v.toFixed(2)) : [];
-            // One plane is all a single-line volume has; it is noted, not written up as a breach.
-            if (lines.length === 1) rec.singlePlane = true;
-          }
-          cantDiag.push(rec);
+          cantDiag.push({ axis: g[0].axisIsX ? 'X' : 'Z', lines, braced,
+                          span: +Math.max(...g.map(t => t.b - t.a)).toFixed(2),
+                          floors: Math.max(...g.map(t => t.ys.length)),
+                          before, after, ratio: +ratio.toFixed(2), step, faces });
           // Same rule as the perimeter braces (LAT): a volume left standing on one braced plane is
           // recorded, never quietly propped up by re-bracing a face inside the box. Counted on the
           // planes that actually carry a diagonal — a nominated end that draws none is not a brace.
-          if (CANT_BAND) {
-            // Per band now, because a stepped volume can be properly braced low down and standing
-            // on one plane higher up. Reported once per volume, collapsed to its worst band.
-            let worst = null;
-            for (let bi = 0; bi < bandPlanes.length; bi++) {
-              const bp = bandPlanes[bi];
-              if (bp.live < 2) continue;
-              if (!worst || bp.drawn.size < worst.n) worst = { bi, n: bp.drawn.size };
-            }
-            if (CANT_EDGE && worst && worst.n < 2)
-              CODE_CHECK.violations.push({ rule: 'LAT', level: 0, measured: worst.n + ' braced face(s)',
-                threshold: '2 faces per cantilevered volume', unit: '',
-                note: 'cantilevered volume braced on fewer than two faces in storey band ' + worst.bi });
-          } else {
-            const drawnPlanes = new Set(faces.filter(f => f.drawn > 0).map(f => f.w));
-            if (CANT_EDGE && lines.length > 1 && after > 0 && drawnPlanes.size < 2)
-              CODE_CHECK.violations.push({ rule: 'LAT', level: 0, measured: drawnPlanes.size + ' braced face(s)',
-                threshold: '2 faces per cantilevered volume', unit: '', note: 'cantilevered volume braced on fewer than two faces' });
-          }
+          const drawnPlanes = new Set(faces.filter(f => f.drawn > 0).map(f => f.w));
+          if (CANT_EDGE && lines.length > 1 && after > 0 && drawnPlanes.size < 2)
+            CODE_CHECK.violations.push({ rule: 'LAT', level: 0, measured: drawnPlanes.size + ' braced face(s)',
+              threshold: '2 faces per cantilevered volume', unit: '', note: 'cantilevered volume braced on fewer than two faces' });
         }
         if (STRUCT_DIAG) STRUCT_DIAG.cant = cantDiag;
         for (const t of all) {
@@ -3415,41 +3329,17 @@
                   addStrut(p0, p1, sc, c, label + ' diagonal', null, null);
                 }
               }
-            } else if (t.edge && !CANT_STACK) {
-              // End bays only, one member per run of storeys this plane is the outside of, same
-              // single lean as before (anchor end high, tip end low) so the load path still reads
-              // in one direction. Under ?cband=0 there is one run and it is the whole height.
-              for (const ry of (CANT_BAND ? (t.runs || []).map(r => r.ys) : [ys])) {
-                const segs = segsFor(ry, len / n);
-                for (const k of bayKs(n)) for (const sg of segs) {
-                  const yA = ry[sg[0]], yB = ry[sg[1]];
-                  const x0 = nodeAt(k), x1 = nodeAt(k + 1);
-                  const p0 = tipAtHi ? posAt(x0, yB) : posAt(x0, yA);
-                  const p1 = tipAtHi ? posAt(x1, yA) : posAt(x1, yB);
-                  addStrut(p0, p1, scD, c, label + ' diagonal', null, null);
-                }
+            } else if (t.edge) {
+              // End bays only, one member over the whole group height, same single lean as before
+              // (anchor end high, tip end low) so the load path still reads in one direction.
+              const segs = segsFor(ys, len / n);
+              for (const k of bayKs(n)) for (const sg of segs) {
+                const yA = ys[sg[0]], yB = ys[sg[1]];
+                const x0 = nodeAt(k), x1 = nodeAt(k + 1);
+                const p0 = tipAtHi ? posAt(x0, yB) : posAt(x0, yA);
+                const p1 = tipAtHi ? posAt(x1, yA) : posAt(x1, yB);
+                addStrut(p0, p1, scD, c, label + ' diagonal', null, null);
               }
-            }
-          }
-        }
-        // One member per end bay, bottom of the stack to its top, crossing every floor line in
-        // between — the WoZoCo stroke. Split only where DIAG_MAX_RATIO says it would stand more
-        // like a post than a brace, and the cut still lands on a floor line. Posts and ties were
-        // drawn above, per record, exactly as they always were.
-        if (CANT_EDGE && CANT_STACK) for (const st of stacks) {
-          if (!st.edge || !st.drawn) continue;
-          const c = st.flagged ? STRUCT.flag : STRUCT.trans;
-          const label = st.flagged ? 'cantilever brace (R3 tight)' : 'cantilever brace';
-          const scD = CAN_LADDER[Math.min(CAN_LADDER.length - 1, (st.flagged ? 1 : 0) + (st.step || 0))];
-          const posAt = (p, y) => st.axisIsX ? new THREE.Vector3(p, y, st.fixedW) : new THREE.Vector3(st.fixedW, y, p);
-          for (const b of st.bays) {
-            const nodeAt = k => b.lo + (b.len * k) / b.n;
-            for (const k of bayKs(b.n)) for (const sg of segsFor(st.ys, b.len / b.n)) {
-              const yA = st.ys[sg[0]], yB = st.ys[sg[1]];
-              const x0 = nodeAt(k), x1 = nodeAt(k + 1);
-              const p0 = b.tipAtHi ? posAt(x0, yB) : posAt(x0, yA);
-              const p1 = b.tipAtHi ? posAt(x1, yA) : posAt(x1, yB);
-              addStrut(p0, p1, scD, c, label + ' diagonal', null, null);
             }
           }
         }
@@ -7274,10 +7164,9 @@
 
       // ?core= or a click can light a scheme the ranking did not choose. Saying "picked for
       // this site" over a button the site did not pick is the one thing this caption must
-      // never do, so an overridden scheme gets no heading at all: the rows and the sentence
-      // under them already say which one ranks first.
+      // never do, so the heading follows what is actually lit.
       const overridden = CORE_OPTION !== CORE_PICK.chosen;
-      const head = overridden ? '' : 'Picked for this site';
+      const head = overridden ? 'How the three compare' : 'Picked for this site';
       const body = R.map(r => {
         const parts = [`score ${r.score.toFixed(2)}`];
         if (r.fit != null) parts.push(`${r.fit.toFixed(2)} on the lot`);
@@ -7301,7 +7190,7 @@
       }
       if (overridden) note += ` ${CORE_LABEL[CORE_PICK.chosen]} ranks first.`;
       el.className = 'on';
-      el.innerHTML = (head ? `<div class="cp-head">${head}</div>` : '') + body.join('') + `<div class="cp-note">${note}</div>`;
+      el.innerHTML = `<div class="cp-head">${head}</div>${body.join('')}<div class="cp-note">${note}</div>`;
     }
 
     const forecastAt = y => {
@@ -8108,93 +7997,67 @@
     }
 
     let openChatPanel = null;   // set by initChat; the handover and ?play=1 open the tab directly
-    // ── RIGHT COLUMN ──────────────────────────────────────────────────────────────────────
-    // Statistics, Code check and Export are three cards and all three stand open. They were an
-    // accordion: reading the code check meant folding the numbers away, and the column has the
-    // room for all of it. The headers are labels now — no click, no chevron. Ids inside each body
-    // are untouched, so renderStats, the code check and the mode switch still write to what they
-    // wrote to before.
+    // ── RIGHT COLUMN FOLDS ────────────────────────────────────────────────────────────────
+    // Statistics, Code check and Export, one open at a time, same idiom as the left column's
+    // accordion. Ids inside each fold are untouched: renderStats, the code check and the mode
+    // switch all still write to exactly what they wrote to before.
     (function initRightFolds() {
-      for (const [h, b] of [['acc-stats', 'stats'], ['acc-code', 'code-violations'], ['acc-export', 'export-body']]) {
-        const head = document.getElementById(h), body = document.getElementById(b);
-        if (!head || !body) continue;
-        head.classList.add('open');
-        head.setAttribute('aria-expanded', 'true');
-        body.style.display = '';
+      const secs = [['acc-stats', 'stats'], ['acc-code', 'code-violations'], ['acc-export', 'export-body']];
+      const open = key => {
+        for (const [h, b] of secs) {
+          const head = document.getElementById(h), body = document.getElementById(b);
+          if (!head || !body) continue;
+          const on = h === key;
+          head.classList.toggle('open', on);
+          head.setAttribute('aria-expanded', String(on));
+          body.style.display = on ? '' : 'none';
+        }
+      };
+      for (const [h] of secs) {
+        const head = document.getElementById(h);
+        if (head) head.addEventListener('click', () => open(head.classList.contains('open') ? null : h));
       }
+      open('acc-stats');   // Statistics is the card the dock opens on; the other two start shut
     })();
-
-    // ── attention hints ─────────────────────────────────────────────────────────────────────
-    // Two controls carry the walk and neither of them says so: the three schemes under Massing,
-    // and Play on the timeline. Each pulses three times at the moment it first matters, and is
-    // retired for the rest of the session as soon as it is used. Retiring it is the point: a
-    // marker that keeps blinking after you have understood it is noise. The mode row above them
-    // is deliberately NOT one of these (user 260821): it is the frame the walk happens in, and
-    // pulsing the frame and the control inside it at the same time points at nothing.
-    const HINT_SEL = { play: '#tl-play', core: '#seg-core' };
-    const HINT_DONE = {};
-    function hintPulse(key) {
-      if (HINT_DONE[key]) return;
-      const el = document.querySelector(HINT_SEL[key]); if (!el) return;
-      el.classList.remove('hint'); void el.offsetWidth;   // restart it if the tab is opened again mid-run
-      el.classList.add('hint');
-      el.addEventListener('animationend', () => el.classList.remove('hint'), { once: true });
-    }
-    function hintStop(key) {
-      HINT_DONE[key] = true;
-      const el = document.querySelector(HINT_SEL[key]); if (el) el.classList.remove('hint', 'lead');
-    }
 
     (function initChat() {
       const panel = document.getElementById('chat-panel');
       const toggle = document.getElementById('chat-toggle');
       const input = document.getElementById('chat-input');
-      // ── two columns, two independent folds ──
-      // Layout · Program is the left column; Adaptive use is the right one. They used to be tabs
-      // of one accordion, so opening the timeline folded away a panel on the far side of the
-      // screen. Layout and Program merged into a single panel (layout fixed on top, program
-      // scrolling under it), so 'layout' opens both. Its body is a div inside the panel;
-      // Adaptive use is a panel of its own, so it takes a class rather than a display style.
+      // ── the left column is one accordion: Layout · Program, then Adaptive use ──
+      // Two headers, two bodies, one open at a time. Layout and Program merged into a single
+      // panel (layout fixed on top, program scrolling under it), so 'layout' now opens both.
+      // Its body is a div inside the panel; Adaptive use is a panel of its own, so it takes a
+      // class rather than a display style.
       const layoutHead = document.getElementById('acc-layout'), layoutBody = document.getElementById('left-body');
-      const setLayout = on => {
-        layoutBody.style.display = on ? '' : 'none';
-        layoutHead.classList.toggle('open', on);
-        layoutHead.setAttribute('aria-expanded', String(on));
-        document.getElementById('left-panel').classList.toggle('collapsed', !on);
-      };
-      const setAdaptive = on => {
-        toggle.classList.toggle('open', on);
-        toggle.setAttribute('aria-expanded', String(on));
-        panel.classList.toggle('open', on);
+      const setTab = t => {
+        layoutBody.style.display = t === 'layout' ? '' : 'none';
+        layoutHead.classList.toggle('open', t === 'layout');
+        layoutHead.setAttribute('aria-expanded', String(t === 'layout'));
+        for (const [head, body, name] of [[toggle, panel, 'adaptive']]) {
+          head.classList.toggle('open', t === name);
+          head.setAttribute('aria-expanded', String(t === name));
+          body.classList.toggle('open', t === name);
+        }
         // the big year readout belongs to the timeline, so it comes and goes with it
-        document.getElementById('year-badge').classList.toggle('open', on);
+        document.getElementById('year-badge').classList.toggle('open', t === 'adaptive');
+        document.getElementById('left-panel').classList.toggle('collapsed', t !== 'layout');
         // the only greeting is the one question the page cannot answer for itself; the bar's
         // placeholder already shows the form a rule takes, so nothing else is said
-        if (on) { askBuildingType(); input.focus(); }
+        if (t === 'adaptive') { askBuildingType(); input.focus(); }
       };
       const isOpen = name => (name === 'layout' ? layoutBody.style.display !== 'none'
         : panel.classList.contains('open'));
-      openChatPanel = on => setAdaptive(!!on);   // the handover and ?play=1 open it directly
-      layoutHead.addEventListener('click', () => setLayout(!isOpen('layout')));
-      // Program is a card of its own now, with its own header. Same idiom, its own state: the two
-      // are not an accordion, either can be open while the other is shut.
-      const progHead = document.getElementById('acc-program'), progBody = document.getElementById('prog-section');
-      const setProgram = on => {
-        progBody.style.display = on ? '' : 'none';
-        progHead.classList.toggle('open', on);
-        progHead.setAttribute('aria-expanded', String(on));
-        document.getElementById('program-panel').classList.toggle('collapsed', !on);
-      };
-      progHead.addEventListener('click', () => setProgram(progBody.style.display === 'none'));
-      // The header is the stage's own fold: closing it steps off the stage, so the lit mode goes
-      // back to whatever is actually drawn underneath.
-      toggle.addEventListener('click', () => setTurnover(!isOpen('adaptive')));
+      const hit = name => setTab(isOpen(name) ? null : name);
+      openChatPanel = on => setTab(on ? 'adaptive' : 'layout');   // the handover and ?play=1 open it directly
+      layoutHead.addEventListener('click', () => hit('layout'));
+      toggle.addEventListener('click', () => hit('adaptive'));
       const send = () => {
         const v = input.value.trim(); if (!v) return;
         input.value = '';
         // the bar is under the model, the conversation and the rule it files are in the tab —
         // so sending brings the tab up, or the answer lands somewhere the user cannot see
-        if (!isOpen('adaptive')) setTurnover(true);
+        if (!isOpen('adaptive')) setTab('adaptive');
         // never echo an API key into the transcript
         say('you', escHtml(/^key\s+\S/i.test(v) ? 'key ••••••••' : v));
         chatHandle(v);
@@ -8208,9 +8071,8 @@
       });
       document.getElementById('chat-send').addEventListener('click', send);
       input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); send(); } });
-      document.getElementById('tl-play').addEventListener('click', () => { hintStop('play'); tlPlay(); });
+      document.getElementById('tl-play').addEventListener('click', () => tlPlay());
       document.getElementById('chat-slider').addEventListener('input', e => {
-        hintStop('play');       // the timeline has been found; stop pointing at it
         tlStop();               // dragging the slider is the user taking over
         SCEN_YEAR = parseInt(e.target.value, 10) || 0;
         document.getElementById('chat-year').textContent = SCEN_YEAR;
@@ -8343,12 +8205,14 @@
       // is the right: only what those two produce. So everything on the right is derived and
       // nothing derived is printed beside something typed, which is what keeps an assumption
       // from reading as a measurement. The rate table says in its own head which it is.
-      const host = document.getElementById('an-body'), side = document.getElementById('an-right');
+      const host = document.getElementById('an-body'), side = document.getElementById('an-right'),
+            midEl = document.getElementById('an-mid');
       if (!host) return;
       const a = analysisRead(), esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
       const inner = document.getElementById('analysis-inner');
       const solo = on => { if (inner) inner.classList.toggle('solo', on); };
       if (side) side.innerHTML = '';
+      if (midEl) midEl.innerHTML = '';
       solo(true);
       if (!a.has) {
         host.innerHTML = '<div class="an-lede">There is no timeline on this model yet, so there is nothing to ' +
@@ -8361,7 +8225,7 @@
         return;
       }
       solo(false);
-      const out = [], right = [];
+      const out = [], mid = [], right = [];
       // "Nothing below them is" was written for a single column and is now spatially false, so
       // the sentence names the page rather than a direction. The rest is the same three facts
       // with the padding taken out.
@@ -8435,7 +8299,7 @@
         // The heading carries it. The paragraph under it said the rates are placeholders, that the
         // platform measures areas rather than prices, and that the areas do not move when a rate
         // does — three sentences to say "these are yours to set", which the title says on its own.
-        out.push('<div class="an-rates"><div class="an-rates-h">Rates you set</div>' +
+        mid.push('<div class="an-rates"><div class="an-rates-h">Rates you set</div>' +
           '<table class="an-rt"><thead><tr><th>Rate</th><th class="n">Value</th><th></th></tr></thead><tbody>' +
           rate('an-build', 'New build', a.rates.build, 'USD/m²') +
           rate('an-demo', 'Demolition', a.rates.demo, 'USD/m²') +
@@ -8443,11 +8307,18 @@
           rate('an-ecb', 'Embodied, new', a.rates.ecBuild, 'kgCO2e/m²') +
           rate('an-ecc', 'Embodied, conversion', a.rates.ecConv, 'kgCO2e/m²') +
           '</tbody></table></div>');
+        right.push('<div class="an-note"><b>Against demolish-and-rebuild only</b>. Do nothing and the saving ' +
+          'is zero; do a lighter refit and it is smaller.</div>');
       } else {
         right.push('<div class="an-note">No permanent conversion falls inside the horizon, so there is nothing here to price.</div>');
       }
 
+      // The placeholder warning moved to the rate table, next to the fields it is about. What
+      // is left here is the one thing the table cannot say: what is deliberately NOT priced.
+      right.push('<div class="an-caveat">Re-lets are not priced: a tenancy change avoids no demolition.</div>');
+
       host.innerHTML = out.join('');
+      if (midEl) midEl.innerHTML = mid.join('');
       if (side) side.innerHTML = right.join('');
       for (const [id, key] of [['an-build', 'build'], ['an-demo', 'demo'], ['an-conv', 'convert'],
                                ['an-ecb', 'ecBuild'], ['an-ecc', 'ecConv']]) {
@@ -8472,117 +8343,18 @@
       if (ANALYSIS_ON) renderAnalysis();
     }
 
-    // Turnover is the other STAGE, and unlike Analysis it does not cover the model: the timeline's
-    // whole job is to change the massing while you watch it. So it draws nothing of its own. It
-    // puts the timeline panel on screen, takes it away again, and leaves RENDER_MODE, the camera
-    // and the scene untouched either way.
-    let TURNOVER_ON = false, TURNOVER_FROM_URL = false;
-    // Which mode button is lit. seg() does this itself on a click; this is for the paths that
-    // enter or leave the stage without one — the wizard handoff, ?play=1, typing a rule, and
-    // folding the panel away by its own header.
-    function litMode(v) {
-      const bar = document.getElementById('seg-mode'); if (!bar) return;
-      for (const b of bar.querySelectorAll('[data-seg="mode"]')) b.classList.toggle('active', b.dataset.v === v);
-    }
-    // Turnover takes the LEFT column. The timeline is what you read while the massing moves, so
-    // it stands where the program list stood instead of opposite it: the tab, its panel and the
-    // big year readout move as one group, and the Site and Program cards step aside for as long
-    // as the stage is up. Moving the nodes rather than restyling them keeps every listener, id
-    // and measurement intact, and closing the stage puts all three back in the right column.
-    // Off the stage the group is not just closed but gone: Turnover is a button in the mode row,
-    // and a second way in, parked in a column under Massing, is a card that says nothing.
-    function dockTurnover(on) {
-      const L = document.getElementById('left-stack'), R = document.getElementById('right-stack');
-      const group = ['chat-toggle', 'chat-panel', 'year-badge'].map(id => document.getElementById(id));
-      if (!L || !R || group.some(n => !n)) return;
-      for (const n of group) (on ? L : R).appendChild(n);
-      group[0].style.display = on ? 'flex' : 'none';
-      document.body.classList.toggle('turnover-on', on);
-      for (const id of ['left-panel', 'program-panel', 'core-pick']) {
-        const n = document.getElementById(id);
-        if (n) n.style.display = on ? 'none' : '';
-      }
-    }
-    function setTurnover(on, relight = true) {
-      TURNOVER_ON = !!on;
-      dockTurnover(TURNOVER_ON);
-      if (openChatPanel) openChatPanel(TURNOVER_ON);
-      updateSubRow();      // the stage sets nothing from the second row, so it goes away with the model
-      // relight is off when a click on the mode row got here: seg() has already lit the button,
-      // and RENDER_MODE still holds the value the click is about to replace.
-      if (relight) litMode(TURNOVER_ON ? 'turnover' : (ANALYSIS_ON ? 'analysis' : RENDER_MODE));
-      if (TURNOVER_ON) requestAnimationFrame(leadToPlay);   // the one thing in here that runs on its own
-    }
-
-    // ── the way in: Turnover → Play ──────────────────────────────────────────────────────────
-    // Pressing Turnover moves the timeline to the left column, and the control that runs it is a
-    // circle at the foot of that column — the far corner of the screen from the button just
-    // pressed. So a dot leaves that button, curves down the left side and lands on Play, which
-    // then pulses. It runs once per entry and not at all once Play has been used: same retire
-    // rule as the rings, and the same reduced-motion opt-out.
-    function leadToPlay() {
-      const play = document.getElementById('tl-play');
-      const src = document.querySelector('[data-seg="mode"][data-v="turnover"]') || document.getElementById('chat-toggle');
-      const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (HINT_DONE.play || !play || !src || still || !play.offsetParent) { hintPulse('play'); return; }
-      document.getElementById('turn-lead')?.remove();
-      const a = src.getBoundingClientRect(), b = play.getBoundingClientRect();
-      const x0 = a.left + a.width / 2, y0 = a.bottom + 6;
-      const x1 = b.left + b.width / 2, y1 = b.top + b.height / 2;
-      // one bend, thrown out past the near edge: the dot runs down the side the panel just moved
-      // to instead of straight across the model
-      const cx = Math.min(x0, x1) - Math.abs(x0 - x1) * 0.15, cy = y0 + (y1 - y0) * 0.72;
-      const NS = 'http://www.w3.org/2000/svg';
-      const svg = document.createElementNS(NS, 'svg');
-      svg.id = 'turn-lead';
-      svg.setAttribute('viewBox', '0 0 ' + innerWidth + ' ' + innerHeight);
-      const path = document.createElementNS(NS, 'path');
-      path.setAttribute('d', 'M' + x0 + ' ' + y0 + ' Q' + cx + ' ' + cy + ' ' + x1 + ' ' + y1);
-      const dot = document.createElementNS(NS, 'circle');
-      dot.setAttribute('r', '5');
-      svg.append(path, dot);
-      document.body.appendChild(svg);
-      const len = path.getTotalLength();
-      path.style.strokeDasharray = len;
-      path.style.strokeDashoffset = len;
-      const RUN = 950, t0 = performance.now();
-      (function step(now) {
-        const k = Math.min(1, (now - t0) / RUN);
-        const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;   // ease in and out
-        const pt = path.getPointAtLength(len * e);
-        dot.setAttribute('cx', pt.x); dot.setAttribute('cy', pt.y);
-        path.style.strokeDashoffset = len * (1 - e);
-        svg.style.opacity = k < 0.7 ? 1 : (1 - k) / 0.3;   // the trail is a guide, not a drawing
-        if (k < 1) requestAnimationFrame(step);
-        else {
-          svg.remove();
-          // arrival: the dot is spent and the button carries the hint from here
-          if (!HINT_DONE.play) {
-            play.classList.remove('lead'); void play.offsetWidth;
-            play.classList.add('lead');
-            play.addEventListener('animationend', () => play.classList.remove('lead'), { once: true });
-          }
-        }
-      })(t0);
-    }
-
     seg('seg-mode', v => {
-      // Two of the four are stages, not render modes, and both leave the scene exactly as it is.
-      if (v === 'analysis') { setTurnover(false, false); setAnalysis(true); return; }
-      if (v === 'turnover') { setAnalysis(false); setTurnover(true, false); return; }
-      const cameFromStage = ANALYSIS_ON || TURNOVER_ON;
-      setAnalysis(false); setTurnover(false, false);
-      // stepping back out onto the mode that is already drawn: take the stage away and leave the
-      // scene alone. Rebuilding here would re-pack and re-frame a view the eye was just on.
-      if (!(cameFromStage && v === RENDER_MODE)) { RENDER_MODE = v; updateExportPanel(); updateSubRow(); build(); }
-      // The three schemes are the whole of what Massing has to set, and the row they live in only
-      // stands under the mode that is lit, so arriving at Massing is the moment they appear.
-      // Pulsed after the row has been placed, or the first ring plays while it is still fading in.
-      if (v === 'solid') hintPulse('core');
+      if (v === 'analysis') { setAnalysis(true); return; }   // the model underneath is untouched
+      const cameFromStage = ANALYSIS_ON;
+      setAnalysis(false);
+      // stepping back out onto the mode that is already drawn: take the stage away and leave
+      // the scene alone. Rebuilding here would re-pack and re-frame a view the eye was just on.
+      if (cameFromStage && v === RENDER_MODE) return;
+      RENDER_MODE = v; updateExportPanel(); updateSubRow(); build();
     }, 'mode');
     seg('seg-struct-sys', v => { STRUCT_SYS = v; build(); }, 'sys');
     // The second row belongs to the mode above it: Massing shows the three schemes, Structure the
-    // two frames, and neither stage anything, because neither of them is set from down here.
+    // two frames, and Analysis nothing, because the stage covers the model and reads none of it.
     // The row itself slides so the pill stands under its own button — the distance is measured
     // here rather than written into the CSS, since both rows are sized in vh and change with the
     // window.
@@ -8590,7 +8362,7 @@
     function updateSubRow() {
       const bar = document.getElementById('viewbar'), row = document.getElementById('vb-sub-row');
       if (!bar || !row) return;
-      const which = (ANALYSIS_ON || TURNOVER_ON) ? null : (RENDER_MODE === 'structure' ? 'structure' : 'solid');
+      const which = ANALYSIS_ON ? null : (RENDER_MODE === 'structure' ? 'structure' : 'solid');
       const pill = { solid: 'seg-core', structure: 'seg-struct-sys' };
       for (const k in pill) {
         const el = document.getElementById(pill[k]);
@@ -8613,14 +8385,10 @@
       document.getElementById('export-massing').style.display = structure ? 'none' : '';
       document.getElementById('export-structure').style.display = structure ? '' : 'none';
       document.getElementById('export-title').innerHTML = structure ? 'Export &middot; Structure' : 'Export &middot; Massing';
-      // Structure is about the frame, and the Site card is reference information that sizes
-      // nothing in it. Hidden by a body class rather than by touching the panel's own display, so
-      // the handoff and the Turnover stage can still set and clear that inline style.
-      document.body.classList.toggle('structure-on', structure);
     }
     // Switching by hand keeps the ranking on screen and just moves the highlight: the scores
     // are still true, the architect has simply chosen to overrule them.
-    seg('seg-core', v => { hintStop('core'); CORE_OPTION = v; renderCorePick(); build(); });
+    seg('seg-core', v => { CORE_OPTION = v; renderCorePick(); build(); });
     // M8: the readout states the OUTCOME (which side the core landed on), not the flips —
     // "core NE" is checkable against the drawing, "flipX true" is not.
     function renderOrientReadout() {
@@ -9012,7 +8780,6 @@
       // ?mode=analysis opens the last step over whatever the model was already drawing, so it
       // must not reach RENDER_MODE: build() knows solid and structure and nothing else.
       if (q.get('mode') === 'analysis') { ANALYSIS_FROM_URL = true; const sm = document.getElementById('seg-mode'); if (sm) sm.querySelectorAll('[data-seg="mode"]').forEach(b => b.classList.toggle('active', b.dataset.v === 'analysis')); }
-      else if (q.get('mode') === 'turnover') { TURNOVER_FROM_URL = true; }   // applied after the first build, like the stage itself
       else if (q.get('mode')) { RENDER_MODE = q.get('mode'); const sm = document.getElementById('seg-mode'); if (sm) sm.querySelectorAll('[data-seg="mode"]').forEach(b => b.classList.toggle('active', b.dataset.v === RENDER_MODE)); }
       if (q.get('sys')) { STRUCT_SYS = q.get('sys'); const ss = document.getElementById('seg-struct-sys'); if (ss) ss.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.v === STRUCT_SYS)); }
       if (q.get('core')) { CORE_OPTION = q.get('core'); CORE_FROM_URL = true; const sc = document.getElementById('seg-core'); if (sc) sc.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.v === CORE_OPTION)); }
@@ -9025,8 +8792,6 @@
       if (q.get('consol') !== null) CONSOL_ON = q.get('consol') !== '0';
       if (q.get('skin') !== null) SKIN_ONLY = q.get('skin') !== '0';
       if (q.get('cbrace') !== null) { const cb = q.get('cbrace'); CANT_EDGE = cb !== '0'; if (cb === 'building' || cb === 'volume') CANT_EDGE_SCOPE = cb; }
-      if (q.get('cband') !== null) CANT_BAND = q.get('cband') !== '0';
-      if (q.get('cstack') !== null) CANT_STACK = q.get('cstack') !== '0';
       if (q.get('spine') !== null) SPINE_ON = q.get('spine') !== '0';   // 1 = restore the 260817 spine deep beam
       if (q.get('protrudeair') !== null) PROTRUDE_AIR = q.get('protrudeair') !== '0';
       if (q.get('adapt') !== null) ADAPT_ON = q.get('adapt') !== '0';   // 0 = old free re-layout (frame moves with the timeline)
@@ -9293,11 +9058,9 @@
 
       TL_MODE = EVOLUTION && EVOLUTION.events.length ? 'evolution' : 'futures';
       applyTimelineMode(false);   // loadText() below re-seeds and does the one build
-      // Evolve is the only axis the panel offers. Futures stays in the data and a handover that
-      // carries nothing else still runs on it, but the switch is never shown: two timelines under
-      // one slider was a choice nobody was asking to make on this stage.
       const seg = document.getElementById('tl-mode');
       if (seg && EVOLUTION && EVOLUTION.events.length && FUTURES) {
+        seg.style.display = 'flex';
         seg.addEventListener('click', e => {
           const b = e.target.closest('button[data-m]');
           if (!b || b.classList.contains('active')) return;
@@ -9307,12 +9070,10 @@
           applyTimelineMode(true);
         });
       }
-      // The timeline is seeded and ready, but the page does NOT open on it: leaving the wizard
-      // arrives at the massing, which is the thing that was just specified. Turnover is the step
-      // after it, and the pulse on the mode row is what says so. (?play=1 still goes straight in.)
+      // the slider is the whole point of arriving here, so surface it straight away
+      openChatPanel(true);   // the header toggles, so a click could just as well close it
       // ?mode=analysis waits for the timeline: the stage counts what the timeline says changes
       if (ANALYSIS_FROM_URL) setAnalysis(true);
-      else if (TURNOVER_FROM_URL) setTurnover(true);
     })();
 
     // Which core scheme to open on. Deliberately here: the site panel above has already set
@@ -9325,15 +9086,9 @@
     // ?play=1 starts the demo as soon as there is a timeline to play. Deliberately last: it
     // needs the slider's max, which syncScenarioUI only sets once the rules or track are in.
     if ((new URLSearchParams(location.search)).get('play') === '1' && (CONVERSIONS.length || FORECAST_TRACK.length)) {
-      setTurnover(true);     // no-op if the stage is already up
+      openChatPanel(true);   // no-op if the panel is already open
       setTimeout(() => tlPlay(true), 600);
     }
-
-    // Arriving on Massing, the three schemes are the one thing there is to set, and they are three
-    // small drawings in a row that is easy to read as decoration. They pulse once the first frame
-    // is up. Guarded on the row actually being the one on show, so ?mode=structure and the two
-    // stages do not pulse a group that is sitting at opacity 0.
-    setTimeout(() => { if (document.querySelector('#seg-core.on')) hintPulse('core'); }, 900);
 
     // ── Viewport compass ──────────────────────────────────────────────────────────────────
     // The dial is not a rotated picture of a compass: it is the ground plane, drawn through the
